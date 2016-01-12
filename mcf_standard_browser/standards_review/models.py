@@ -10,6 +10,14 @@ class Dataset(models.Model):
         return self.name
 
 
+class Adduct(models.Model):
+    formula = models.TextField(default="")
+    offset = models.FloatField(default = 0.0)
+    charge = models.IntegerField(default=1)
+    datasets_present_in = models.ManyToManyField(Dataset)
+
+
+
 class Standard(models.Model):
     name = models.TextField(default = "")
     sum_formula = models.TextField(null=True)
