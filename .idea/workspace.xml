@@ -2,18 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="277090bc-15fa-4609-b3bb-d0f31c76fb44" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/db.sqlite3" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/admin.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/apps.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/templates/mcf_standards_browse/home_page.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/models.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/urls.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mcf_standard_browser/functional_tests.py" afterPath="$PROJECT_DIR$/mcf_standard_browser/functional_tests.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mcf_standard_browser/mcf_standard_browser/settings.py" afterPath="$PROJECT_DIR$/mcf_standard_browser/mcf_standard_browser/settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mcf_standard_browser/mcf_standard_browser/urls.py" afterPath="$PROJECT_DIR$/mcf_standard_browser/mcf_standard_browser/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mcf_standard_browser/db.sqlite3" afterPath="$PROJECT_DIR$/mcf_standard_browser/db.sqlite3" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mcf_standard_browser/standards_review/models.py" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/models.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py" afterPath="$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mcf_standard_browser.iws" />
@@ -69,11 +60,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mcf_standard_browser/standards_review/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.34802786">
-              <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -81,11 +72,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tests.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="tests.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
+            <state vertical-scroll-proportion="0.7215777">
+              <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
               </folding>
@@ -116,8 +107,8 @@
         <option value="$PROJECT_DIR$/mcf_standard_browser/standards_review/templates/mcf_standards_browse/home_page.html" />
         <option value="$PROJECT_DIR$/mcf_standard_browser/functional_tests.py" />
         <option value="$PROJECT_DIR$/mcf_standard_browser/mcf_standard_browser/settings.py" />
-        <option value="$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py" />
         <option value="$PROJECT_DIR$/mcf_standard_browser/standards_review/models.py" />
+        <option value="$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py" />
       </list>
     </option>
   </component>
@@ -411,7 +402,13 @@
       <option name="project" value="LOCAL" />
       <updated>1452626764264</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added Standards model &amp; FT">
+      <created>1452630995876</created>
+      <option name="number" value="00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1452630995876</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -452,7 +449,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added review_standards app" />
-    <option name="LAST_COMMIT_MESSAGE" value="added review_standards app" />
+    <MESSAGE value="added Standards model &amp; FT" />
+    <option name="LAST_COMMIT_MESSAGE" value="added Standards model &amp; FT" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -529,22 +527,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py">
+    <entry file="file://$PROJECT_DIR$/mcf_standard_browser/standards_review/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
+          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
           <folding>
-            <element signature="e#0#32#0" expanded="true" />
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mcf_standard_browser/standards_review/models.py">
+    <entry file="file://$PROJECT_DIR$/mcf_standard_browser/standards_review/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.34802786">
-          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+        <state vertical-scroll-proportion="0.7215777">
+          <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
           <folding>
-            <element signature="e#0#39#0" expanded="true" />
+            <element signature="e#0#32#0" expanded="true" />
           </folding>
         </state>
       </provider>
