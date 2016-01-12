@@ -1,6 +1,6 @@
 from django.test import TestCase
-from models import Standard, Dataset, Adduct
-import unittest
+from models import Standard, Dataset, Adduct, Xic
+import numpy as np
 # Create your tests here.
 
 class DatasetModelTest(TestCase):
@@ -61,3 +61,40 @@ class AdductModelTest(TestCase):
         self.assertEqual(Adduct.objects.all().count(),2)
         self.assertEqual(Dataset.objects.all().count(),3)
         self.assertEqual(d2.adduct_set.all().count(),2)
+
+class XicModelTest(TestCase):
+    def test_add_xic(self):
+        d1 = Dataset(name='Dataset1')
+        d1.save()
+        x1 = Xic(mz='0.0',dataset=d1)
+        xic = [1.0,2.0,3.0,4.0,5.0]
+        x1.set_xic(xic)
+        x1.save()
+        self.assertEqual(Xic.objects.all().count(),1)
+        np.testing.assert_array_almost_equal(xic,x1.get_xic())
+
+    def test_xic_and_standard_and_adduct(self):
+        # create some datasets
+        d1 = Dataset(name='Dataset1')
+        d1.save()
+        a1 = Adduct(formula='-H',offset=-1.007, charge=-1)
+        a1.save()
+        a1.datasets_present_in.add(d1)
+        s1 = Standard(name='Standard1',sum_formula="C1H2O3", MCFID = "00")
+        s1.save()
+        # create some xics
+        x1 = Xic(mz= 60.993,dataset=d1)
+        xic = [1.0,2.0,3.0,4.0,5.0]
+        x1.set_xic(xic)
+        x1.standard = s1
+        x1.adduct = a1
+        x1.save()
+        self.assertEqual(Xic.objects.all().count(),1)
+        self.assertEqual(Dataset.objects.all().count(),1)
+        self.assertEqual(Standard.objects.all().count(),1)
+        # mass check
+        with self.assertRaises(ValueError):
+            print x1.check_mass()
+            x1.mz = 123.993
+            x1.save()
+            x1.check_mass()
