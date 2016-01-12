@@ -50,7 +50,7 @@ class Xic(models.Model):
 
     def set_xic(self, xic):
         xic = np.asarray(xic,dtype=np.float64)
-        self._xic = s = base64.b64encode(xic)
+        self._xic  = base64.b64encode(xic)
 
     def get_xic(self):
         r = base64.decodestring(self._xic)
@@ -66,3 +66,38 @@ class Xic(models.Model):
         return True
     #todo(An)
     #extend save to check that standard+adduct mass == precursor
+
+
+class FragmentationSpectrum(models.Model):
+    precursor_mz = models.FloatField(null=True)
+    _centroid_mzs = models.TextField()
+    _centroid_ints = models.TextField()
+    dataset = models.ForeignKey(Dataset)
+    standard = models.ForeignKey(Standard,blank=True, null=True)
+    spec_num = models.IntegerField()
+
+    def __str__(self):
+        return "{} {:3.2f}".format(self.spec_num, self.precursor)
+
+    def set_centroid_mzs(self, mzs):
+        mzs = np.asarray(mzs,dtype=np.float64)
+        self._centroid_mzs = base64.b64encode(mzs)
+
+    def get_centroid_mzs(self):
+        r = base64.decodestring(self._centroid_mzs)
+        return np.frombuffer(r, dtype=np.float64)
+
+    centroid_mzs = property(get_centroid_mzs, set_centroid_mzs)
+
+    def set_centroid_ints(self, values):
+        values = np.asarray(values,dtype=np.float64)
+        self._centroid_ints =  base64.b64encode(values)
+
+    def get_centroid_ints(self):
+        r = base64.decodestring(self._centroid_ints)
+        return np.frombuffer(r, dtype=np.float64)
+
+    centroid_ints = property(get_centroid_ints, set_centroid_ints)
+
+    def get_centroids(self):
+        return self.centroid_mzs, self.centroid_ints

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from models import Standard, Dataset, Adduct, Xic
+from models import Standard, Dataset, Adduct, Xic, FragmentationSpectrum
 import numpy as np
 # Create your tests here.
 
@@ -71,7 +71,7 @@ class XicModelTest(TestCase):
         x1.set_xic(xic)
         x1.save()
         self.assertEqual(Xic.objects.all().count(),1)
-        np.testing.assert_array_almost_equal(xic,x1.get_xic())
+        np.testing.assert_array_almost_equal(xic,x1.xic)
 
     def test_xic_and_standard_and_adduct(self):
         # create some datasets
@@ -89,12 +89,34 @@ class XicModelTest(TestCase):
         x1.standard = s1
         x1.adduct = a1
         x1.save()
+        self.assertEqual(x1.check_mass(),True)
         self.assertEqual(Xic.objects.all().count(),1)
         self.assertEqual(Dataset.objects.all().count(),1)
         self.assertEqual(Standard.objects.all().count(),1)
         # mass check
         with self.assertRaises(ValueError):
-            print x1.check_mass()
             x1.mz = 123.993
             x1.save()
             x1.check_mass()
+
+class FragmentationSpectrumModelTest(TestCase):
+    def test_make_FragmentationSpectrum(self):
+        d1 = Dataset(name='Dataset1')
+        d1.save()
+        FragmentationSpectrum(precursor_mz='123.456',
+                              spec_num = 0, dataset=d1).save()
+        self.assertEqual(FragmentationSpectrum.objects.all().count(),1)
+
+    def test_make_FragmentationSpectrum_with_centroids(self):
+        d1 = Dataset(name='Dataset1')
+        d1.save()
+        f1 = FragmentationSpectrum(precursor_mz='123.456',
+                              spec_num = 0, dataset=d1)
+        mzs = [10.,20,50]
+        ints = [1.,1.,1.]
+        f1.set_centroid_mzs(mzs)
+        f1.set_centroid_ints(ints)
+        f1.save()
+        np.testing.assert_array_almost_equal(mzs,f1.centroid_mzs)
+        np.testing.assert_array_almost_equal(ints,f1.centroid_ints)
+
