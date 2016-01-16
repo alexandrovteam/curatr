@@ -7,10 +7,14 @@
     </div>
     <div id = links>
         <p>
-            <a href="{% url 'MCFStandard-list' %}"> Browse Standards Library </a> - Browse Fragmentation Spectra - Browse XIC
+            <a href="{% url 'MCFStandard-list' %}"> Browse Standards Library </a> -
+            <a href="{% url 'fragmentSpectrum-list' %}"> Browse Fragmentation Spectra </a> -
+            <a href="{% url 'dataset-list' %}"> Browse datasets </a> -
         </p>
         <p>
-            Data Review
+            Data Review (Browse XIC)
         </p>
     </div>
 {% endblock %}
+
+

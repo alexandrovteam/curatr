@@ -1,0 +1,15 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+    <h2> EMBL-MCF Standards: </h2>
+    <table id="id_list_table">
+        <tr>
+            <td>ID  Precursor m/z </td>
+        </tr>
+        {% for spectrum in fragmentSpectra %}
+            <tr>
+                <td>{{ spectrum.pk }} {{ spectrum.precursor_mz }} <a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

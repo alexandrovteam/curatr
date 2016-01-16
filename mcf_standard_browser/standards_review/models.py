@@ -57,9 +57,7 @@ class Standard(models.Model):
 
 class Dataset(models.Model):
     name = models.TextField(default="")
-    # standards
-    # adducts
-    adducts_present = models.ManyToManyField(Adduct)
+    adducts_present = models.ManyToManyField(Adduct,null=True,blank=True)
     standards_present = models.ManyToManyField(Standard,null=True,blank=True)
 
     def __str__(self):
@@ -103,7 +101,7 @@ class FragmentationSpectrum(models.Model):
     spec_num = models.IntegerField()
 
     def __str__(self):
-        return "{} {:3.2f}".format(self.spec_num, self.precursor)
+        return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)
 
     def set_centroid_mzs(self, mzs):
         mzs = np.asarray(mzs,dtype=np.float64)

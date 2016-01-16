@@ -11,12 +11,30 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import sys
+sys.path.append("/Users/palmer/Documents/python_codebase/django-nvd3/")
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), ".."),
+)
+APPLICATION_DIR = os.path.dirname(globals()['__file__'])
+
+STATICFILES_DIRS = [
+    "/Users/palmer/Documents/python_codebase/django-nvd3/django_nvd3/",
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'djangobower.finders.BowerFinder',
+)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '1$9gtj)_tj2(&3_l#hsmpb3zi()bx927mxy4q^j2s^&c8c&=y6'
@@ -37,6 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'standards_review',
+    'django_nvd3',
+    'djangobower',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -69,6 +89,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mcf_standard_browser.wsgi.application'
+# Django-bower
+# ------------
+
+# Specifie path to components root (you need to use absolute path)
+BOWER_COMPONENTS_ROOT = os.path.join(APPLICATION_DIR, 'components')
+BOWER_PATH = '/usr/local/bin/bower'
+BOWER_INSTALLED_APPS = (
+    'd3#3.3.13',
+    'nvd3#1.7.1',
+)
 
 
 # Database

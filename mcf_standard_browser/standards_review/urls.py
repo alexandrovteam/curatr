@@ -12,6 +12,9 @@ urlpatterns = [
     url(r'^library/$', views.MCFStandard_list, name='MCFStandard-list'),
     url(r'^library/add/$', views.MCFStandard_add, name='MCFStandard-add'),
     url(r'^library/MCF(?P<pk>.+)/$', views.MCFStandard_detail, name='MCFStandard-detail'),
+    url(r'^MS2/$', views.fragmentSpectrum_list, name='fragmentSpectrum-list'),
+    url(r'^MS2/spec(?P<pk>.+)/$', views.fragmentSpectrum_detail, name='fragmentSpectrum-detail'),
+
 
     #url(r'^mol/mol(?P<pk>[0-9]+)/$', views.mol_detail, name='mol_detail'),
     #url(r'^sf/(?P<pk>[A-Z,0-9]+)/$', views.sf_detail, name='sf_detail'),

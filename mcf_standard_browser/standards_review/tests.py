@@ -2,41 +2,12 @@ from django.test import TestCase
 from models import Standard, Dataset, Adduct, Xic, FragmentationSpectrum
 import numpy as np
 # Create your tests here.
-
-class DatasetModelTest(TestCase):
-    def test_add_dataset(self):
-        Dataset(name='TestDataset').save()
-        self.assertEqual(Dataset.objects.all().count(),1)
-
-
 class StandardModelTest(TestCase):
     def test_add_standard(self):
         s1 = Standard(name='TestStandard',sum_formula="C1H2O3", MCFID = "0")
         s1.save()
         self.assertEqual(Standard.objects.all().count(),1)
         self.assertAlmostEqual(s1.exact_mass,62.00039,places=4)
-
-    def test_standard_and_dataset(self):
-        # create some datasets
-        d1 = Dataset(name='Dataset1')
-        d1.save()
-        d2 = Dataset(name='Dataset1')
-        d2.save()
-        # create some standards
-        s1 = Standard(name='Standard1',sum_formula="C1H2O3", MCFID = "00")
-        s1.save()
-        s1.datasets_present_in.add(d1)
-        s1.datasets_present_in.add(d2)
-        s2 = Standard(name='Standard2',sum_formula="C1H2O3", MCFID = "000")
-        s2.save()
-        s2.datasets_present_in.add(d2)
-        s2.datasets_present_in.create(name='Dataset3')
-        s1.save()
-        s2.save()
-        self.assertEqual(Standard.objects.all().count(),2)
-        self.assertEqual(Dataset.objects.all().count(),3)
-        self.assertEqual(d2.standard_set.all().count(),2)
-
 
 class AdductModelTest(TestCase):
     def test_add_standard(self):
@@ -46,25 +17,37 @@ class AdductModelTest(TestCase):
         a2.save()
         self.assertEqual(a1.delta_atoms,"+H1+K1")
         self.assertEqual(a2.delta_atoms,"-Na1-P1")
-        self.assertEqual(Adduct.objects.all().count(),2)
+        self.assertEqual(Adduct.objects.all().count(), 2)
 
-
-    def test_adduct_and_dataset(self):
-        # create some standards
-        a1=Adduct(nM=1, delta_formula='+H', charge=1)
+class DatasetModelTest(TestCase):
+    def test_add_dataset(self):
+        # create standards
+        s1 = Standard(name='TestStandard1',sum_formula="C1H2O3", MCFID = "0")
+        s1.save()
+        s2 = Standard(name='TestStandard2',sum_formula="C2H2O3", MCFID = "1")
+        s2.save()
+        # create adduct
+        a1=Adduct(nM=1, delta_formula='+H+K', charge=-2)
         a1.save()
-        a2=Adduct(nM=1, delta_formula='+2H', charge=2)
-        a2.save()
-        a1.save()
-        a2.save()
-        self.assertEqual(Adduct.objects.all().count(),2)
-        self.assertEqual(Dataset.objects.all().count(),3)
-        self.assertEqual(d2.adduct_set.all().count(),2)
+        # create a dataset
+        d1 = Dataset(name='Dataset1')
+        d1.save()
+        d1.standards_present.add(s1)
+        d1.standards_present.add(s2)
+        d1.adducts_present.add(a1)
+        self.assertEqual(Dataset.objects.all().count(), 1)
+        self.assertEqual(Dataset.objects.all()[0].standards_present.count(),2)
 
 class XicModelTest(TestCase):
     def test_add_xic(self):
+        s1 = Standard(name='TestStandard1',sum_formula="C1H2O3", MCFID = "0")
+        s1.save()
+        a1=Adduct(nM=1, delta_formula='+H+K', charge=-2)
+        a1.save()
         d1 = Dataset(name='Dataset1')
         d1.save()
+        d1.standards_present.add(s1)
+        d1.adducts_present.add(a1)
         x1 = Xic(mz='0.0',dataset=d1)
         xic = [1.0,2.0,3.0,4.0,5.0]
         x1.set_xic(xic)
