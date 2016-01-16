@@ -1,0 +1,9 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+    <h1> XIC Detail: {{dataset.pk}}</h1>
+    <h2>{{ dataset.name }} {{ standard}} {{ adduct }}</h2>
+    {% for xic in xics %}
+        {{ xic }}
+    {% endfor %}
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response
 
-from models import Standard, FragmentationSpectrum, Dataset
+from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic
 from .forms import MCFStandardForm
 import numpy as np
 import datetime
@@ -12,14 +12,6 @@ def home_page(request):
 def StandardAdduct_detail(request,dataset_pk, standard_pk, adduct_pk):
     print 'standard - yo'
     print dataset_pk, standard_pk, adduct_pk
-    return True
-
-def Dataset_detail(request):
-    print 'dataset detail - yo'
-    return True
-
-def Dataset_list(request):
-    print 'dataset - yo'
     return True
 
 
@@ -97,10 +89,28 @@ def fragmentSpectrum_detail(request,pk):
 
 def MCFdataset_list(request):
     datasets = Dataset.objects.all()
-    return  render(request,'mcf_standards_browse/dataset_list.html',{'datasets':datasets})
+    return  render(request,'mcf_standards_browse/mcf_dataset_list.html',{'datasets':datasets})
 
-def MCFStandard_detail(request, pk):
-    standard=get_object_or_404(Standard, MCFID=pk)
-    #adducts = Adduct.objects.all()
-    return render(request, 'mcf_standards_browse/mcf_standard_detail.html', {'standard': standard})
+def MCFdataset_detail(request, pk):
+    dataset=get_object_or_404(Dataset, pk=pk)
+    adducts = dataset.adducts_present.all()
+    standards = dataset.standards_present.all()
+    data = {'dataset':dataset,
+            'adducts':adducts,
+            'standards':standards,}
+    return render_to_response('mcf_standards_browse/mcf_dataset_detail.html', context=data)
+
+def MCFxic_detail(request,dataset_pk, standard_pk, adduct_pk):
+    dataset=get_object_or_404(Dataset, pk=dataset_pk)
+    standard=get_object_or_404(Standard, pk=standard_pk)
+    adduct=get_object_or_404(Adduct, pk=adduct_pk)
+    #todo - add mass accuracy to dataset
+    mz=standard.get_mz(adduct)
+    xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz+0.01).filter(mz__lte=mz-0.01)
+    data = {"dataset":dataset,
+            "standard":standard,
+            "adduct":adduct,
+            "xics":xics,}
+    return render_to_response('mcf_standards_browse/mcf_xic_detail.html', context=data)
+
 

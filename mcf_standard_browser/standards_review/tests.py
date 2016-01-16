@@ -9,6 +9,15 @@ class StandardModelTest(TestCase):
         self.assertEqual(Standard.objects.all().count(),1)
         self.assertAlmostEqual(s1.exact_mass,62.00039,places=4)
 
+    def test_get_mz(self):
+        a1=Adduct(nM=1, delta_formula='-H', charge=-1)
+        a1.save()
+        s1 = Standard(name='TestStandard',sum_formula="C1H2O3", MCFID = "0")
+        s1.save()
+        self.assertEqual(Standard.objects.all().count(),1)
+        self.assertAlmostEqual(s1.get_mz(a1),60.99311,places=4)
+
+
 class AdductModelTest(TestCase):
     def test_add_standard(self):
         a1=Adduct(nM=1, delta_formula='+H+K', charge=-2)
@@ -18,6 +27,7 @@ class AdductModelTest(TestCase):
         self.assertEqual(a1.delta_atoms,"+H1+K1")
         self.assertEqual(a2.delta_atoms,"-Na1-P1")
         self.assertEqual(Adduct.objects.all().count(), 2)
+
 
 class DatasetModelTest(TestCase):
     def test_add_dataset(self):
@@ -70,7 +80,6 @@ class XicModelTest(TestCase):
         x1.standard = s1
         x1.adduct = a1
         x1.save()
-        #self.assertEqual(x1.check_mass(),True)
         self.assertEqual(Xic.objects.all().count(),1)
         self.assertEqual(Dataset.objects.all().count(),1)
         self.assertEqual(Standard.objects.all().count(),1)
@@ -78,7 +87,34 @@ class XicModelTest(TestCase):
         with self.assertRaises(ValueError):
             x1.mz = 123.993
             x1.save()
-       #     x1.check_mass()
+            x1.check_mass()
+
+        def test_xic_mass_filter(self):
+            d1=Dataset(name='dataset')
+            d1.save()
+            mz = 60.993
+            # three larger
+            Xic(mz= mz+5.,dataset=d1).save()
+            Xic(mz= mz+10.,dataset=d1).save()
+            Xic(mz= mz+15.,dataset=d1).save()
+            # three approx equal
+            Xic(mz= mz+0.005,dataset=d1).save()
+            Xic(mz= mz+0.0,dataset=d1).save()
+            Xic(mz= mz-0.0015,dataset=d1).save()
+            # three smaller
+            Xic(mz= mz-5.,dataset=d1).save()
+            Xic(mz= mz-10.,dataset=d1).save()
+            Xic(mz= mz-15.,dataset=d1).save()
+            # three approx equal from another dataset
+            d2=Dataset(name='dataset2')
+            d2.save()
+            Xic(mz= mz+0.005,dataset=d2).save()
+            Xic(mz= mz+0.0,dataset=d2).save()
+            Xic(mz= mz-0.0015,dataset=d2).save()
+            self.assertEqual(Xic.objects.all().count(),12)
+            xics=Xic.objects.all().filter(dataset=d1).filter(mz__gte=mz+0.01).filter(mz__lte=mz-0.01)
+            self.assertEqual(xics.objects.all().count(),3)
+
 
 class FragmentationSpectrumModelTest(TestCase):
     def test_make_FragmentationSpectrum(self):

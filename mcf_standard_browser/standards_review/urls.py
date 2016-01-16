@@ -6,14 +6,14 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.home_page),
-    url(r'^dataset/(?P<dataset_pk>.+)/MCF(?P<standard_pk>.+)/M(?P<adduct_pk>.+)$', views.StandardAdduct_detail, name='standard_addect_detail'),
-    url(r'^dataset/(?P<pk>.+)/$', views.Dataset_detail, name='dataset-detail'),
-    url(r'^dataset/$', views.Dataset_list, name='dataset-list'),
     url(r'^library/$', views.MCFStandard_list, name='MCFStandard-list'),
     url(r'^library/add/$', views.MCFStandard_add, name='MCFStandard-add'),
     url(r'^library/MCF(?P<pk>.+)/$', views.MCFStandard_detail, name='MCFStandard-detail'),
     url(r'^MS2/$', views.fragmentSpectrum_list, name='fragmentSpectrum-list'),
     url(r'^MS2/spec(?P<pk>.+)/$', views.fragmentSpectrum_detail, name='fragmentSpectrum-detail'),
+    url(r'^dataset/$', views.MCFdataset_list, name='MCFdataset-list'),
+    url(r'^dataset/(?P<pk>.+)/$', views.MCFdataset_detail, name='MCFdataset-detail'),
+    url(r'^xic/(?P<dataset_pk>.+)/MCF(?P<standard_pk>.+)/M(?P<adduct_pk>.+)$', views.MCFxic_detail, name='MCFxic-detail'),
 
 
     #url(r'^mol/mol(?P<pk>[0-9]+)/$', views.mol_detail, name='mol_detail'),

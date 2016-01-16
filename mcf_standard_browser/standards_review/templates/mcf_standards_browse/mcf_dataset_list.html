@@ -4,14 +4,12 @@
     <h2> EMBL-MCF Standards: </h2>
     <table id="id_list_table">
         <tr>
-            <td>ID MCFID Name Formula </td>
+            <td>ID MCFID Dataset </td>
         </tr>
-        {% for standard in standards %}
+        {% for dataset in datasets %}
             <tr>
-                <td>{{ standard.pk }} {{ standard.MCFID }} {{standard}} {{ standard.sum_formula }}<a href="{% url 'MCFStandard-detail' pk=standard.MCFID %}" id="MCF">Detail</a></td>
+                <td>{{ dataset.pk }} {{dataset}} <a href="{% url 'MCFdataset-detail' pk=dataset.pk %}" id="MCF">View</a></td>
             </tr>
         {% endfor %}
     </table>
-    <a href="{% url 'MCFStandard-add' %}" id="add_standard_button"><span class="glyphicon glyphicon-plus"></span></a>
-
 {% endblock %}

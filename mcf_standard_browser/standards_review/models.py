@@ -54,14 +54,30 @@ class Standard(models.Model):
         self.exact_mass = self.get_mass()
         super(Standard, self).save(*args, **kwargs)
 
+    def make_ion_formula(self, adduct):
+        formula = "({}){}{}".format(self.sum_formula,adduct.nM,adduct.delta_atoms)
+        return formula
+
+    def get_mz(self, adduct):
+        """
+        Calculate the precursor mass for this standard with a given adduct
+        :param adduct: object of class Adduct
+        :return: float
+        """
+        formula = pyisocalc.complex_to_simple(self.make_ion_formula(adduct))
+        spec = pyisocalc.isodist(formula,charges=adduct.charge,do_centroid=False)
+        mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
+        return mass
+
 
 class Dataset(models.Model):
     name = models.TextField(default="")
-    adducts_present = models.ManyToManyField(Adduct,null=True,blank=True)
-    standards_present = models.ManyToManyField(Standard,null=True,blank=True)
-
+    adducts_present = models.ManyToManyField(Adduct,blank=True)
+    standards_present = models.ManyToManyField(Standard,blank=True)
+    # mass accuracy (for xic search)
     def __str__(self):
         return self.name
+
 
 class Xic(models.Model):
     mz = models.FloatField(default=0.0)
@@ -71,6 +87,7 @@ class Xic(models.Model):
             blank=True)
     standard = models.ForeignKey(Standard,blank=True, null=True)
     adduct = models.ForeignKey(Adduct,blank=True, null=True)
+
 
     def set_xic(self, xic):
         xic = np.asarray(xic,dtype=np.float64)
@@ -84,12 +101,14 @@ class Xic(models.Model):
 
     def check_mass(self,tol_ppm=100):
         tol_mz = self.mz*tol_ppm*1e-6
-        theor_mz = self.standard.get_mass() + self.adduct.offset
+        theor_mz = self.standard.get_mz(self.adduct)
         if np.abs(theor_mz - self.mz) > tol_mz:
             raise ValueError('Mass tolerance not satisfied {} {}'.format(theor_mz,self.mz))
         return True
-    #todo(An)
+        #todo(An)
     #extend save to check that standard+adduct mass == precursor
+
+
 
 
 class FragmentationSpectrum(models.Model):

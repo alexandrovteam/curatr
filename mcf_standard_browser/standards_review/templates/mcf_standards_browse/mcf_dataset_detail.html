@@ -1,0 +1,11 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+    <h1> Dataset Detail: {{dataset.pk}}</h1>
+    <h2>{{ dataset.name }}</h2>
+    {% for standard in standards %}
+        {% for adduct in adducts %}
+            <p>{{ standard }} {{ adduct }} <a href="{% url 'MCFxic-detail' dataset_pk=dataset.pk standard_pk=standard.pk adduct_pk=adduct.pk%}">View</a></p>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
