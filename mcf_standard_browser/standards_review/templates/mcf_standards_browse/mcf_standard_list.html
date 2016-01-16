@@ -1,0 +1,12 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+    <h1> Existing Standards </h1>
+    <table id="id_list_table">
+        {% for standard in standards %}
+           <tl> {{ standard.MCFID }} {{standard}} </tl>
+        {% endfor %}
+    </table>
+
+    <a href="/library/add/" id="add_standard_button">Add New Standard</a>
+{% endblock %}

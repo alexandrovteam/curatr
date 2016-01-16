@@ -1,0 +1,9 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+    <h1> Add Standard </h1>
+    <form method="POST">
+    <input name="item_text" id="id_new_item" placeholder="Enter a new standard" />
+    {% csrf_token %}
+</form>
+{% endblock %}

@@ -19,8 +19,9 @@ class Adduct(models.Model):
     formula = models.TextField(default="")
     offset = models.FloatField(default = 0.0)
     charge = models.IntegerField(default=1)
-    datasets_present_in = models.ManyToManyField(Dataset)
 
+    def __str__(self):
+        return self.formula
 
 class Standard(models.Model):
     name = models.TextField(default = "")
@@ -28,7 +29,7 @@ class Standard(models.Model):
     MCFID = models.TextField(default="")
     # todo(An)
     # Inchi, ChEBI
-    datasets_present_in = models.ManyToManyField(Dataset)
+    datasets_present_in = models.ManyToManyField(Dataset,null=True,blank=True)
 
     def __str__(self):
         return self.name
