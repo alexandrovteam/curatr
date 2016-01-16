@@ -1,44 +1,69 @@
 from __future__ import unicode_literals
 from django.db import models
+
 import base64
 import numpy as np
 import sys
+import re
 sys.path.append("//Users/palmer/Documents/python_codebase/")
 from pyMS.pyisocalc import pyisocalc
 
 
 # Create your models here.
-class Dataset(models.Model):
-    name = models.TextField(default="")
-
-    def __str__(self):
-        return self.name
-
-
 class Adduct(models.Model):
-    formula = models.TextField(default="")
-    offset = models.FloatField(default = 0.0)
-    charge = models.IntegerField(default=1)
+    nM = models.IntegerField(default=1)
+    delta_formula = models.TextField(default="")# addition/loss groups per M (sum of +X-Y)
+    delta_atoms = models.TextField(default="") #net atom addition/loss
+    charge = models.IntegerField(default=1)#overall charge after atom change
 
     def __str__(self):
-        return self.formula
+        return "[{}M {}]{}".format(self.nM, self.delta_formula, self.charge)
+
+    def get_delta_atoms(self):
+        self.delta_formula = self.delta_formula.strip()
+        if all([self.delta_formula.startswith("+"),self.delta_formula.startswith("-")]):
+            self.delta_formula = "+"+self.delta_formula
+        formula_split = re.split(u'([+-])',self.delta_formula)
+        el_dict = {}
+        for sign,el in zip(formula_split[1::2],formula_split[2::2]):
+            el_dict.update(pyisocalc.process_sf(sign+el))
+        sign_dict = {1:"+",-1:"-"}
+        return "".join(["{}{}{}".format(sign_dict[np.sign(el_dict[el])],el,abs(el_dict[el])) for el in el_dict if el_dict[el]!=0])
+
+    def save(self,*args,**kwargs):
+        self.delta_atoms = self.get_delta_atoms()
+        super(Adduct, self).save(*args, **kwargs)
 
 class Standard(models.Model):
     name = models.TextField(default = "")
     sum_formula = models.TextField(null=True)
     MCFID = models.TextField(default="")
-    # todo(An)
-    # Inchi, ChEBI
-    datasets_present_in = models.ManyToManyField(Dataset,null=True,blank=True)
-
-    def __str__(self):
-        return self.name
+    #inchi_code = models.TextField(default="",null=True,blank=True)
+    # todo(An) ChEBI
+    exact_mass = models.FloatField(default=0.0)
 
     def get_mass(self):
         spec = pyisocalc.isodist(self.sum_formula,charges=0,do_centroid=False)
         mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
         return mass
 
+    def __str__(self):
+        return self.name
+
+    def save(self,*args,**kwargs):
+        self.exact_mass = self.get_mass()
+        super(Standard, self).save(*args, **kwargs)
+
+
+class Dataset(models.Model):
+    name = models.TextField(default="")
+    # standards
+    # adducts
+    adducts_present = models.ManyToManyField(Adduct)
+    standards_present = models.ManyToManyField(Standard,null=True,blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Xic(models.Model):
     mz = models.FloatField(default=0.0)

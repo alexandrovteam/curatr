@@ -6,6 +6,13 @@ body {
     padding-left: 15px;
 }
 
+.top-menu, .top-menu:hover, .top-menu:visited {
+    color: #ffffff;
+    float: right;
+    font-size: 26pt;
+    margin-right: 20px;
+}
+
 .page-header {
     background-color: #ff9400;
     margin-top: 0;
@@ -62,7 +69,8 @@ h3 {
 }
 
 .post-form textarea, .post-form input {
-    width: 100%;
+    width: 20%;
+    height: 40px;
 }
 
 .top-menu, .top-menu:hover, .top-menu:visited {

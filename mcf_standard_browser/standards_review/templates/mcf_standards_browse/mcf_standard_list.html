@@ -4,9 +4,11 @@
     <h1> Existing Standards </h1>
     <table id="id_list_table">
         {% for standard in standards %}
-           <tl> {{ standard.MCFID }} {{standard}} </tl>
+            <tr>
+                <td> {{ standard.MCFID }} {{standard}} </td>
+            </tr>
         {% endfor %}
     </table>
+    <a href="{% url 'MCFStandard-add' %}" id="add_standard_button"><span class="glyphicon glyphicon-plus"></span></a>
 
-    <a href="/library/add/" id="add_standard_button">Add New Standard</a>
 {% endblock %}

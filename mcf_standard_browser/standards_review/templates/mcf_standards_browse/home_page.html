@@ -3,12 +3,14 @@
 {% block content %}
 
     <div id = welcome>
-        Welcome to the MCF Standards Browser
-        </div>
+        <h2>Welcome to the MCF Standards Browser</h2>
+    </div>
     <div id = links>
-        <a href="/library/"> Browse Standards Library </a> - Browse Fragmentation Spectra - Browse XIC
-
-        Data Review
-
+        <p>
+            <a href="{% url 'MCFStandard-list' %}"> Browse Standards Library </a> - Browse Fragmentation Spectra - Browse XIC
+        </p>
+        <p>
+            Data Review
+        </p>
     </div>
 {% endblock %}
