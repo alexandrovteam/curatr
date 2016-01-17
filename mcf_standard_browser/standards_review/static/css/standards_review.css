@@ -65,14 +65,17 @@ h3 {
 }
 
 .save {
-    float: right;
+    float: left;
 }
 
 .post-form textarea, .post-form input {
     width: 20%;
     height: 40px;
 }
-
+.data_upload-form textarea, .post-form input {
+    width: 800%;
+    height: 40px;
+}
 .top-menu, .top-menu:hover, .top-menu:visited {
     color: #ffffff;
     float: right;

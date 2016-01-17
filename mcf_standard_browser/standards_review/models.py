@@ -74,7 +74,8 @@ class Dataset(models.Model):
     name = models.TextField(default="")
     adducts_present = models.ManyToManyField(Adduct,blank=True)
     standards_present = models.ManyToManyField(Standard,blank=True)
-    # mass accuracy (for xic search)
+    mass_accuracy_ppm = models.FloatField(default=10.)
+    #(for xic search)
     def __str__(self):
         return self.name
 
@@ -85,19 +86,31 @@ class Xic(models.Model):
     _xic = models.TextField(
             db_column='data',
             blank=True)
+    _rt = models.TextField(
+            db_column='rt_data',
+            blank=True)
+
     standard = models.ForeignKey(Standard,blank=True, null=True)
     adduct = models.ForeignKey(Adduct,blank=True, null=True)
 
-
     def set_xic(self, xic):
         xic = np.asarray(xic,dtype=np.float64)
-        self._xic  = base64.b64encode(xic)
+        self._xic = base64.b64encode(xic)
+
+    def set_rt(self,rt):
+        rt = np.asarray(rt,dtype=np.float64)
+        self._rt  = base64.b64encode(rt)
 
     def get_xic(self):
         r = base64.decodestring(self._xic)
         return np.frombuffer(r, dtype=np.float64)
 
+    def get_rt(self):
+        r = base64.decodestring(self._rt)
+        return np.frombuffer(r, dtype=np.float64)
+
     xic = property(get_xic, set_xic)
+    rt = property(get_rt, set_rt)
 
     def check_mass(self,tol_ppm=100):
         tol_mz = self.mz*tol_ppm*1e-6
@@ -117,7 +130,9 @@ class FragmentationSpectrum(models.Model):
     _centroid_ints = models.TextField()
     dataset = models.ForeignKey(Dataset)
     standard = models.ForeignKey(Standard,blank=True, null=True)
-    spec_num = models.IntegerField()
+    adduct = models.ForeignKey(Adduct,blank=True, null=True)
+    spec_num = models.IntegerField(blank=True, null=True)
+    rt = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)

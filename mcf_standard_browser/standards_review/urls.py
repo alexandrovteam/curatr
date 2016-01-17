@@ -1,7 +1,6 @@
 __author__ = 'palmer'
-
-from django.conf.urls import include, url
-from django.contrib import admin
+from django.conf.urls.static import static
+from django.conf.urls import url
 from . import views
 
 urlpatterns = [
@@ -11,6 +10,7 @@ urlpatterns = [
     url(r'^library/MCF(?P<pk>.+)/$', views.MCFStandard_detail, name='MCFStandard-detail'),
     url(r'^MS2/$', views.fragmentSpectrum_list, name='fragmentSpectrum-list'),
     url(r'^MS2/spec(?P<pk>.+)/$', views.fragmentSpectrum_detail, name='fragmentSpectrum-detail'),
+    url(r'^upload/dataset/$', views.dataset_upload, name='dataset-upload'),
     url(r'^dataset/$', views.MCFdataset_list, name='MCFdataset-list'),
     url(r'^dataset/(?P<pk>.+)/$', views.MCFdataset_detail, name='MCFdataset-detail'),
     url(r'^xic/(?P<dataset_pk>.+)/MCF(?P<standard_pk>.+)/M(?P<adduct_pk>.+)$', views.MCFxic_detail, name='MCFxic-detail'),

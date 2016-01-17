@@ -1,9 +1,26 @@
 {% extends 'mcf_standards_browse/base.html' %}
+{% load nvd3_tags %}
+
+{% block header%}
+    {# Jquery CDN : Needed when using jquery_on_ready=True #}
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    {% include_chart_jscss %}
+    {% load_chart charttype chartdata chartcontainer extra %}
+{% endblock %}
 
 {% block content %}
-    <h1> XIC Detail: {{dataset.pk}}</h1>
-    <h2>{{ dataset.name }} {{ standard}} {{ adduct }}</h2>
-    {% for xic in xics %}
-        {{ xic }}
+
+    <h1> XIC Detail:</h1>
+    <h2><a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
+    <div class="specgraph">
+        {% include_container chartcontainer 400 600 %}
+    </div>
+    <div>
+    <h2>Fragmentation Spectra</h2>
+    {% for spec in frag_specs %}
+        <p><a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz }}</a>  {{ spec.rt }}</p>
     {% endfor %}
+    </div>
+
+
 {% endblock %}

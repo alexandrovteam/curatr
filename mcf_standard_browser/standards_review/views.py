@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response
-
+from django.http import HttpResponseRedirect
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic
-from .forms import MCFStandardForm
+from .forms import MCFStandardForm, UploadFileForm
 import numpy as np
-import datetime
+from .tools import handle_uploaded_files
+import logging
+
 # Create your views here.
 
 def home_page(request):
@@ -16,15 +18,13 @@ def StandardAdduct_detail(request,dataset_pk, standard_pk, adduct_pk):
 
 
 def MCFStandard_list(request):
-    standards = Standard.objects.all()
-    print len(standards)
+    standards = Standard.objects.all().order_by('MCFID')
     return  render(request,'mcf_standards_browse/mcf_standard_list.html',{'standards':standards})
 
 def MCFStandard_detail(request, pk):
     standard=get_object_or_404(Standard, MCFID=pk)
     #adducts = Adduct.objects.all()
     return render(request, 'mcf_standards_browse/mcf_standard_detail.html', {'standard': standard})
-
 
 def MCFStandard_add(request):
     if request.method == "POST":
@@ -80,37 +80,64 @@ def fragmentSpectrum_detail(request,pk):
     data['specdata']={}
     data['specdata']['spectrum'] = spectrum
     data['specdata']['centroids'] = [spectrum.centroid_mzs,spectrum.centroid_ints]
-
-    #return render_to_response('discretebarchart.html', data)
-    #return render('spec_browse/lineplusbarchart.html', data)
     return render_to_response('mcf_standards_browse/mcf_fragmentSpectrum_detail.html', context=data)
-    #return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_detail.html', data)
-
 
 def MCFdataset_list(request):
     datasets = Dataset.objects.all()
-    return  render(request,'mcf_standards_browse/mcf_dataset_list.html',{'datasets':datasets})
+    return render(request,'mcf_standards_browse/mcf_dataset_list.html',{'datasets':datasets})
 
 def MCFdataset_detail(request, pk):
     dataset=get_object_or_404(Dataset, pk=pk)
     adducts = dataset.adducts_present.all()
-    standards = dataset.standards_present.all()
+    standards = dataset.standards_present.all().order_by('MCFID')
     data = {'dataset':dataset,
             'adducts':adducts,
             'standards':standards,}
     return render_to_response('mcf_standards_browse/mcf_dataset_detail.html', context=data)
 
+
 def MCFxic_detail(request,dataset_pk, standard_pk, adduct_pk):
     dataset=get_object_or_404(Dataset, pk=dataset_pk)
     standard=get_object_or_404(Standard, pk=standard_pk)
     adduct=get_object_or_404(Adduct, pk=adduct_pk)
-    #todo - add mass accuracy to dataset
     mz=standard.get_mz(adduct)
-    xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz+0.01).filter(mz__lte=mz-0.01)
-    data = {"dataset":dataset,
-            "standard":standard,
-            "adduct":adduct,
-            "xics":xics,}
+    delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
+    xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
+    frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
+    chartdata = []
+    for xic in xics:
+        chartdata.append(
+             {'name': xic.mz, 'x': xic.rt, 'y': xic.xic, 'extra': {}, 'kwargs': {}},
+         )
+    charttype = "lineWithFocusChart"
+    chartcontainer = 'linewithfocuschart_container'  # container name
+    data = {
+        'charttype': charttype,
+        'chartdata': chartdata,
+        'chartcontainer': chartcontainer,
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': True,},
+        "dataset":dataset,
+        "standard":standard,
+        "adduct":adduct,
+        "xics":xics,
+        "frag_specs":frag_specs,}
     return render_to_response('mcf_standards_browse/mcf_xic_detail.html', context=data)
 
 
+def dataset_upload(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            post_dict = dict(request.POST)
+            data = {"adducts": post_dict['adducts'],
+                    "standards": post_dict['standards'],
+                    "mass_accuracy": post_dict['mass_accuracy'][0],}
+            handle_uploaded_files(data, request.FILES['mzml_file'])
+            return redirect('MCFdataset-list')
+    else:
+        form = UploadFileForm(initial={"mass_accuracy":10.0})
+    return render(request, 'mcf_standards_browse/dataset_upload.html', {'form': form})

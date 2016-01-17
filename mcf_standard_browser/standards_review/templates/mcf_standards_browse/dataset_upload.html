@@ -1,0 +1,18 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+
+    <div id = welcome>
+        <h2>Upload Dataset</h2>
+        <p><b>Warning:</b> after upload the whole server will hang for ~5 minutes whilst it processes the data</p>
+    </div>
+    <form method="POST" class="data_upload-form" enctype="multipart/form-data">{% csrf_token %}
+
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Upload</button>
+
+
+    </form>
+{% endblock %}
+
+

@@ -8,4 +8,8 @@
             <p>{{ standard }} {{ adduct }} <a href="{% url 'MCFxic-detail' dataset_pk=dataset.pk standard_pk=standard.pk adduct_pk=adduct.pk%}">View</a></p>
         {% endfor %}
     {% endfor %}
+
+    <div>
+        <p><a href="{% url 'MCFdataset-list' %}">Back to dataset list</p></a></p>
+    </div>
 {% endblock %}
