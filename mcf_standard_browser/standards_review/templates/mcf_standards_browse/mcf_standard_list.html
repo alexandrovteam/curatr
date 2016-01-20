@@ -1,17 +1,46 @@
 {% extends 'mcf_standards_browse/base.html' %}
 
+{% block head %}
+    {% load eztables %}
+{% endblock %}
+
 {% block content %}
     <h2> EMBL-MCF Standards: </h2>
     <table id="id_list_table">
         <tr>
-            <td>ID MCFID Name Formula </td>
+            <th>Internal ID</th>
+            <th>ID MCFID Name Formula </th>
+            <th>Standard name</th>
+            <th>Sum-formula</th>
+            <th></th>
         </tr>
         {% for standard in standards %}
             <tr>
-                <td>{{ standard.pk }} {{ standard.MCFID }} {{standard}} {{ standard.sum_formula }}<a href="{% url 'MCFStandard-detail' pk=standard.MCFID %}" id="MCF">Detail</a></td>
+                <td>{{ standard.pk }} </td>
+                <td>{{ standard.MCFID }} </td>
+                <td>{{standard}} </td>
+                <td>{{ standard.sum_formula }} </td>
+                <td><a href="{% url 'MCFStandard-detail' pk=standard.MCFID %}" id="MCF">Detail</a></td>
             </tr>
         {% endfor %}
     </table>
     <a href="{% url 'MCFStandard-add' %}" id="add_standard_button"><span class="glyphicon glyphicon-plus"></span></a>
 
+   <table id="my-table"></table>
+{% endblock %}
+
+{% block script %}
+    {% load eztables %}
+    <script type='text/javascript' src='/static/js/libs/datatables/jquery.dataTables.js'></script>
+    <script>
+        $(function(){
+            $('#browser-table').dataTable({
+            "bPaginate": true,
+            "sPaginationType": "bootstrap",
+            "bProcessing": true,
+            "bServerSide": true,
+            "sAjaxSource": Django.url('dt-browsers-default')
+        });
+});
+    </script>
 {% endblock %}

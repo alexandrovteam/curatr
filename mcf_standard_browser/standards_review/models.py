@@ -74,7 +74,8 @@ class Dataset(models.Model):
     name = models.TextField(default="")
     adducts_present = models.ManyToManyField(Adduct,blank=True)
     standards_present = models.ManyToManyField(Standard,blank=True)
-    mass_accuracy_ppm = models.FloatField(default=10.)
+    mass_accuracy_ppm = models.FloatField(default=10.0)
+    quad_window_mz = models.FloatField(default=1.0)
     #(for xic search)
     def __str__(self):
         return self.name
@@ -133,6 +134,7 @@ class FragmentationSpectrum(models.Model):
     adduct = models.ForeignKey(Adduct,blank=True, null=True)
     spec_num = models.IntegerField(blank=True, null=True)
     rt = models.FloatField(blank=True, null=True)
+    precursor_quad_fraction = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)

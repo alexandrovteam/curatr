@@ -36,6 +36,8 @@ STATICFILES_FINDERS = (
     'djangobower.finders.BowerFinder',
 )
 
+STATIC_ROOT = '/Users/palmer/Documents/python_codebase/mcf_standard_browser/mcf_standard_browser/static/'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '1$9gtj)_tj2(&3_l#hsmpb3zi()bx927mxy4q^j2s^&c8c&=y6'
 
@@ -57,6 +59,10 @@ INSTALLED_APPS = [
     'standards_review',
     'django_nvd3',
     'djangobower',
+    'eztables',
+    'highcharts',
+    'django_static_jquery',
+
 ]
 
 MIDDLEWARE_CLASSES = [

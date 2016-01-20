@@ -5,12 +5,12 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="{% static 'css/standards_review.css' %}">
-
-    {% block header %}
+    {% block head %}
     {% endblock %}
     <meta charset="UTF-8">
     <title>MCF Standards Browser</title>
 </head>
+
 <body>
     <div class="page-header">
         <h1> <a href = "/" id="home_link">MCF Data Browser</a> </h1>
@@ -19,7 +19,10 @@
     {% block content %}
     {% endblock %}
 
-
-
 </body>
+{% block script %}
+{% endblock %}
+<!-- JavaScript -->
+<!-- Placed at the end of the document so the pages load faster -->
+    {% block extrajs %}{% endblock %}
 </html>

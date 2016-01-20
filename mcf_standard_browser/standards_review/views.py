@@ -1,25 +1,37 @@
-from django.shortcuts import render, redirect, get_object_or_404, render_to_response
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404, render_to_response, HttpResponse
+from django.views.generic import TemplateView, ListView
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic
 from .forms import MCFStandardForm, UploadFileForm
 import numpy as np
-from .tools import handle_uploaded_files
+import tools
+import sys
+sys.path.append('/Users/palmer/Documents/python_codebase/django-highcharts/django-highcharts/highcharts/')
+import json
 import logging
+from eztables.views import DatatablesView
 
 # Create your views here.
 
 def home_page(request):
     return render(request,'mcf_standards_browse/home_page.html',)
 
-def StandardAdduct_detail(request,dataset_pk, standard_pk, adduct_pk):
-    print 'standard - yo'
-    print dataset_pk, standard_pk, adduct_pk
-    return True
-
 
 def MCFStandard_list(request):
     standards = Standard.objects.all().order_by('MCFID')
     return  render(request,'mcf_standards_browse/mcf_standard_list.html',{'standards':standards})
+
+
+class IndexView(TemplateView):
+    template_name = 'mcf_standards_browse/home_page.html'
+class ServerSideView(TemplateView):
+    template_name = 'mcf_standards_browse/server-side-base.html'
+    model = Standard
+    context_object_name = 'browsers'
+def MCFStandard_list_ez(DatatablesView):
+    model = Standard
+    fields = ('name'
+        'sum_formula',
+        'MCFID')
 
 def MCFStandard_detail(request, pk):
     standard=get_object_or_404(Standard, MCFID=pk)
@@ -47,13 +59,15 @@ def fragmentSpectrum_detail(request,pk):
     spectrum = get_object_or_404(FragmentationSpectrum, pk=pk)
     xdata = np.concatenate((spectrum.centroid_mzs,
                             spectrum.centroid_mzs[0:-1]/2.+spectrum.centroid_mzs[1:]/2.,
-                            spectrum.centroid_mzs+0.0000001,
-                            spectrum.centroid_mzs-0.0000001,))
+                            spectrum.centroid_mzs+0.00001,
+                            spectrum.centroid_mzs-0.00001,
+                            np.arange(int(spectrum.centroid_mzs[0]-1),int(spectrum.centroid_mzs[-1]+1),1),))
     n_mzs = len(xdata)
     ydata = np.concatenate((spectrum.centroid_ints,
                             np.zeros((n_mzs-1,)),
                             np.zeros((n_mzs,)),
-                            np.zeros((n_mzs,)),))
+                            np.zeros((n_mzs,)),
+                            np.zeros(spectrum.centroid_mzs[1],spectrum.centroid_mzs[0]+2,),))
     idx = np.argsort(xdata)
     xdata=xdata[idx][1:-1]
     ydata=ydata[idx][1:-1]
@@ -65,6 +79,9 @@ def fragmentSpectrum_detail(request,pk):
     #charttype = "discreteBarChart"
     charttype = "lineWithFocusChart"
     chartcontainer = 'discretebarchart_container'  # container name
+    chartID = 'chart_ID'
+    chart_type = 'line'
+    chart_height = 500
     data = {
         'charttype': charttype,
         'chartdata': chartdata,
@@ -74,12 +91,22 @@ def fragmentSpectrum_detail(request,pk):
             'x_axis_format': '',
             'tag_script_js': True,
             'jquery_on_ready': True,
+            },
+        'specdata':{
+            'spectrum': spectrum,
+            'centroids':  [spectrum.centroid_mzs,spectrum.centroid_ints],
+        },
+        "highchart":{
+            "chart_id": 'chart_id',
+            "chart": {"renderTo": 'chart_id', "type": chart_type, "height": chart_height, "zoomType": "x"},
+            "title": {"text": 'Fragment Spectrum'},
+            "xAxis":  {"title": {"text": 'm/z'},},
+            "yAxis": {"title": {"text": 'Intensity'}},
+            "series": [
+                    {"name": 'spectrum', "data": [[ii, jj ] for ii,jj in zip (np.round(chartdata[0]['x'],5), chartdata[0]['y'])]},
+                ],
         },
     }
-
-    data['specdata']={}
-    data['specdata']['spectrum'] = spectrum
-    data['specdata']['centroids'] = [spectrum.centroid_mzs,spectrum.centroid_ints]
     return render_to_response('mcf_standards_browse/mcf_fragmentSpectrum_detail.html', context=data)
 
 def MCFdataset_list(request):
@@ -110,7 +137,10 @@ def MCFxic_detail(request,dataset_pk, standard_pk, adduct_pk):
              {'name': xic.mz, 'x': xic.rt, 'y': xic.xic, 'extra': {}, 'kwargs': {}},
          )
     charttype = "lineWithFocusChart"
-    chartcontainer = 'linewithfocuschart_container'  # container name
+    chartcontainer = 'discretebarchart_container'  # container name
+    chartID = 'chart_ID'
+    chart_type = 'line'
+    chart_height = 500
     data = {
         'charttype': charttype,
         'chartdata': chartdata,
@@ -119,13 +149,26 @@ def MCFxic_detail(request,dataset_pk, standard_pk, adduct_pk):
             'x_is_date': False,
             'x_axis_format': '',
             'tag_script_js': True,
-            'jquery_on_ready': True,},
+            'jquery_on_ready': True,
+            },
+        "highchart":{
+            "chart_id": 'chart_id',
+            "chart": {"renderTo": 'chart_id', "type": chart_type, "height": chart_height, "zoomType": "x"},
+            "title": {"text": 'XIC'},
+            "xAxis":  {"title": {"text": 'time (s)'},},
+            "yAxis": {"title": {"text": 'Intensity'}},
+            "series": [
+                    {"name": 'spectrum', "data": [[ii, jj ] for ii,jj in zip (np.round(chartdata[0]['x'],5), chartdata[0]['y'])]},
+                ],
+        },
         "dataset":dataset,
         "standard":standard,
         "adduct":adduct,
         "xics":xics,
-        "frag_specs":frag_specs,}
+        "frag_specs":frag_specs,
+    }
     return render_to_response('mcf_standards_browse/mcf_xic_detail.html', context=data)
+
 
 
 def dataset_upload(request):
@@ -135,9 +178,11 @@ def dataset_upload(request):
             post_dict = dict(request.POST)
             data = {"adducts": post_dict['adducts'],
                     "standards": post_dict['standards'],
-                    "mass_accuracy": post_dict['mass_accuracy'][0],}
-            handle_uploaded_files(data, request.FILES['mzml_file'])
+                    "mass_accuracy_ppm": post_dict['mass_accuracy_ppm'][0],
+                    "quad_window_mz": post_dict['quad_window_mz'][0]}
+            tools.handle_uploaded_files(data, request.FILES['mzml_file'])
             return redirect('MCFdataset-list')
     else:
-        form = UploadFileForm(initial={"mass_accuracy":10.0})
+        form = UploadFileForm(initial={"mass_accuracy_ppm":10.0, 'quad_window_mz':1.0})
     return render(request, 'mcf_standards_browse/dataset_upload.html', {'form': form})
+

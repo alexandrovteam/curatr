@@ -8,7 +8,7 @@
         </tr>
         {% for spectrum in fragmentSpectra %}
             <tr>
-                <td>{{ spectrum.pk }} {{ spectrum.precursor_mz }} <a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
+                <td>{{ spectrum.pk }} {{ spectrum.precursor_mz }} {{ spectrum.precursor_mz.precursor_quad_fraction }}<a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
             </tr>
         {% endfor %}
     </table>

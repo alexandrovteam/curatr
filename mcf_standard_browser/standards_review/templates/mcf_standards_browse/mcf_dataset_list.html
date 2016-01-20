@@ -4,11 +4,15 @@
     <h2> EMBL-MCF Standards: </h2>
     <table id="id_list_table">
         <tr>
-            <td>ID MCFID Dataset </td>
+            <th>ID  </th>
+            <th>MCFID Dataset</th>
+            <th></th>
         </tr>
         {% for dataset in datasets %}
             <tr>
-                <td>{{ dataset.pk }} {{dataset}} <a href="{% url 'MCFdataset-detail' pk=dataset.pk %}" id="MCF">View</a></td>
+                <td>{{ dataset.pk }} </td>
+                <td>{{dataset}}</td>
+                <td><a href="{% url 'MCFdataset-detail' pk=dataset.pk %}" id="MCF"> View</a></td>
             </tr>
         {% endfor %}
     </table>

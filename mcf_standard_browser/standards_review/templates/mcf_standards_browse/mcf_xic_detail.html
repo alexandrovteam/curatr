@@ -1,26 +1,62 @@
 {% extends 'mcf_standards_browse/base.html' %}
-{% load nvd3_tags %}
-
-{% block header%}
-    {# Jquery CDN : Needed when using jquery_on_ready=True #}
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    {% include_chart_jscss %}
-    {% load_chart charttype chartdata chartcontainer extra %}
+{% block head %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
 {% endblock %}
 
 {% block content %}
 
     <h1> XIC Detail:</h1>
-    <h2><a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
-    <div class="specgraph">
-        {% include_container chartcontainer 400 600 %}
-    </div>
+    <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
+
+        <div id='chart_id' class="specgraph"></div>
+
     <div>
     <h2>Fragmentation Spectra</h2>
-    {% for spec in frag_specs %}
-        <p><a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz }}</a>  {{ spec.rt }}</p>
-    {% endfor %}
+        <table id="id_list_table">
+        <tr>
+            <th>Internal ID</th>
+            <th>Precursor mass </th>
+            <th>Retention time</th>
+            <th>Fraction of precursor</th>
+        </tr>
+        {% for spec in frag_specs %}
+            <tr>
+                <td>{{ spec.id }}</td>
+                <td><a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz }}</a> </td>
+                <td>{{ spec.rt |floatformat:"2" }}</td>
+                <td>{{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
+            </tr>
+        {% endfor %}
+        </table>
     </div>
 
 
+
+
+{% endblock %}
+
+{% block script %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+<script>
+    var chart_id = {{ highchart.chart_id|safe }}
+    var chart = {{ highchart.chart|safe }}
+    var title = {{ highchart.title|safe }}
+    var xAxis = {{ highchart.xAxis|safe }}
+    var yAxis = {{ highchart.yAxis|safe }}
+    var series = {{ highchart.series|safe }}
+</script>
+
+<!-- Highchart js. Variable map shown above -->
+<script>
+    $(document).ready(function() {
+        $('#chart_id').highcharts({
+            chart: chart,
+            title: title,
+            xAxis: xAxis,
+            yAxis: yAxis,
+            series: series
+        });
+    });
+</script>
 {% endblock %}

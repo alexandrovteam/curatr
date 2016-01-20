@@ -34,5 +34,6 @@ class UploadFileForm(forms.Form):
     adducts = forms.MultipleChoiceField(choices=adduct_choices, widget=forms.CheckboxSelectMultiple())
     standard_choices = [(standard.pk, standard) for standard in Standard.objects.all()]
     standards = forms.MultipleChoiceField(choices=standard_choices, widget=forms.CheckboxSelectMultiple())
-    mass_accuracy = forms.FloatField(min_value=0.0)
+    mass_accuracy_ppm = forms.FloatField(min_value=0.000001)
+    quad_window_mz = forms.FloatField(min_value=0.000001)
 

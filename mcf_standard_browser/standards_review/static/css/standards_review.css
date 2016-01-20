@@ -26,7 +26,10 @@ body {
 }
 
 .specgraph {
-    margin-left: 40px;
+    margin-left: 10px;
+    min-width: 100px;
+    max-width: 500px;
+    width: 50%;
 }
 
 .mol {
