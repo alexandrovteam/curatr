@@ -1,0 +1,46 @@
+{% extends 'mcf_standards_browse/base.html' %}
+{% block head %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="mol">
+        <h2>Fragmentation Spectrum Detail - Highchart</h2>
+        <h3>ID: {{ specdata.spectrum.pk }}</h3>
+        <p>Precursor m/z: {{ specdata.spectrum.precursor_mz }}</p>
+        <p>Ion (Standard, Adduct): {{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct }}</p>
+        <p>Raw data: <a href="{% url 'MCFdataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} <{{ specdata.spectrum.spec_num }}></a></p>
+        <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
+
+    </div>
+    <div id='chart_id' style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+{% endblock %}
+
+{% block script %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+<script>
+    var chart_id = {{ highchart.chart_id|safe }}
+    var chart = {{ highchart.chart|safe }}
+    var title = {{ highchart.title|safe }}
+    var xAxis = {{ highchart.xAxis|safe }}
+    var yAxis = {{ highchart.yAxis|safe }}
+    var series = {{ highchart.series|safe }}
+</script>
+
+<!-- Highchart js. Variable map shown above -->
+<script>
+    $(document).ready(function() {
+        $('#chart_id').highcharts({
+            chart: chart,
+            title: title,
+            xAxis: xAxis,
+            yAxis: yAxis,
+            series: series
+        });
+    });
+</script>
+{% endblock %}
+
+
