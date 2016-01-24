@@ -5,58 +5,74 @@
 {% endblock %}
 
 {% block content %}
-
     <h1> XIC Detail:</h1>
     <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
-
+    <h3>m/z: {{ mz|floatformat:"4" }}</h3>
         <div id='chart_id' class="specgraph"></div>
 
     <div>
     <h2>Fragmentation Spectra</h2>
-        <table id="id_list_table">
-        <tr>
-            <th>Internal ID</th>
-            <th>Precursor mass </th>
-            <th>Retention time</th>
-            <th>Fraction of precursor</th>
-        </tr>
-        {% for spec in frag_specs %}
+        {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+        {% endif %}
+            <table id="id_list_table">
             <tr>
-                <td>{{ spec.id }}</td>
-                <td><a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz }}</a> </td>
-                <td>{{ spec.rt |floatformat:"2" }}</td>
-                <td>{{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
+                <th>ID</th>
+                <th>Precursor <br>mass </th>
+                <th>Retention <br>time</th>
+                <th>Precursor <br>Fraction </th>
+                <th>Fragmentation <br>Spectrum</th>
+                {% if user.is_authenticated %}
+                <th>yes/no</th>
+                {% endif %}
             </tr>
-        {% endfor %}
-        </table>
+            {% for spec in frag_specs %}
+                <tr>
+                    <td class="table_c"> {{ spec.id }}</td>
+                    <td class="table_c"> <a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz|floatformat:"4"  }}</a> </td>
+                    <td class="table_c"> {{ spec.rt |floatformat:"2" }}</td>
+                    <td class="table_c"> {{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
+                    <td> <div id="frag_spec{{ spec.id }}" class="xic_fraggraph"></div></td>
+                    {% if user.is_authenticated %}
+                    <td><input type="radio" name="yesno_{{ spec.id }}" value="yes" checked> Accept<br>
+                        <input type="radio" name="yesno_{{ spec.id }}" value="no"> Reject<br></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </table>
+        {% if user.is_authenticated %}
+            <input type="submit" value="Save">
+        </form>
+        {% endif %}
     </div>
-
-
-
 
 {% endblock %}
 
 {% block script %}
-<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
-<script>
-    var chart_id = {{ highchart.chart_id|safe }}
-    var chart = {{ highchart.chart|safe }}
-    var title = {{ highchart.title|safe }}
-    var xAxis = {{ highchart.xAxis|safe }}
-    var yAxis = {{ highchart.yAxis|safe }}
-    var series = {{ highchart.series|safe }}
-</script>
-
 <!-- Highchart js. Variable map shown above -->
 <script>
     $(document).ready(function() {
-        $('#chart_id').highcharts({
-            chart: chart,
-            title: title,
-            xAxis: xAxis,
-            yAxis: yAxis,
-            series: series
+        $('#{{ highchart.chart_id|safe }}').highcharts({
+            chart: {{ highchart.chart|safe }},
+            title: {{ highchart.title|safe }},
+            xAxis: {{ highchart.xAxis|safe }},
+            yAxis: {{ highchart.yAxis|safe }},
+            series: {{ highchart.series|safe }}
         });
     });
 </script>
+{% for spec in frag_spec_highchart %}
+    <script>
+        $(document).ready(function() {
+            $('#{{ spec.chart_id }}').highcharts({
+                chart: {{ spec.chart|safe }},
+                title: {{ spec.title|safe }},
+                xAxis: {{ spec.xAxis|safe }},
+                yAxis: {{ spec.yAxis|safe }},
+                series: {{ spec.series|safe }}
+            });
+        });
+    </script>
+{% endfor %}
 {% endblock %}

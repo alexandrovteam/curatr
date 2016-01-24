@@ -13,6 +13,12 @@ body {
     margin-right: 20px;
 }
 
+.top-menu h2, .top-menu h2 a, .top-menu h2 a:visited, .top-menu h2 a:active {
+    color: #ffffff;
+    font-size: 10pt;
+    text-decoration: none;
+}
+
 .page-header {
     background-color: #ff9400;
     margin-top: 0;
@@ -25,13 +31,19 @@ body {
     text-decoration: none;
 }
 
+
+
 .specgraph {
     margin-left: 10px;
     min-width: 100px;
-    max-width: 500px;
-    width: 50%;
+    max-width: 700px;
+    width: 100%;
 }
-
+.xic_fraggraph {
+    min-width: 500px;
+    max-width: 500px;
+    width: 100%;
+}
 .mol {
     margin-left: 40px;
 
@@ -92,4 +104,7 @@ h3 {
 
 .post h1 a, .post h1 a:visited {
     color: #000000;
+}
+.table_c{
+text-align: center;
 }

@@ -13,7 +13,13 @@
 
 <body>
     <div class="page-header">
+        {% if user.is_authenticated %}
+            <p class="top-menu">Welcome: {{ user }} <small>(<a href="{% url 'django.contrib.auth.views.logout' %}">Log out</a>)</small></p>
+        {% else %}
+            <a href="{% url 'django.contrib.auth.views.login' %}" class="top-menu"><small>Log in <span class="glyphicon glyphicon-lock"></span></small></a>
+        {% endif %}
         <h1> <a href = "/" id="home_link">MCF Data Browser</a> </h1>
+
     </div>
 
     {% block content %}

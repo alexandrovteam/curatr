@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response, HttpResponse
 from django.views.generic import TemplateView, ListView
+from django.views.decorators.csrf import ensure_csrf_cookie
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic
 from .forms import MCFStandardForm, UploadFileForm
 import numpy as np
@@ -123,52 +124,71 @@ def MCFdataset_detail(request, pk):
     return render_to_response('mcf_standards_browse/mcf_dataset_detail.html', context=data)
 
 
+@ensure_csrf_cookie
 def MCFxic_detail(request,dataset_pk, standard_pk, adduct_pk):
-    dataset=get_object_or_404(Dataset, pk=dataset_pk)
-    standard=get_object_or_404(Standard, pk=standard_pk)
-    adduct=get_object_or_404(Adduct, pk=adduct_pk)
-    mz=standard.get_mz(adduct)
-    delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
-    xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
-    frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
-    chartdata = []
-    for xic in xics:
-        chartdata.append(
-             {'name': xic.mz, 'x': xic.rt, 'y': xic.xic, 'extra': {}, 'kwargs': {}},
-         )
-    charttype = "lineWithFocusChart"
-    chartcontainer = 'discretebarchart_container'  # container name
-    chartID = 'chart_ID'
-    chart_type = 'line'
-    chart_height = 500
-    data = {
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'chartcontainer': chartcontainer,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': True,
+    if request.method == "POST":
+        logging.debug('not updating frag spec yet')
+        for req in request.POST:
+            #todo update fields in frag spectra
+            logging.debug((req,request.POST[req]))
+            logging.debug(request.user)
+        return redirect('MCFdataset-detail',dataset_pk)
+    else:
+        dataset=get_object_or_404(Dataset, pk=dataset_pk)
+        standard=get_object_or_404(Standard, pk=standard_pk)
+        adduct=get_object_or_404(Adduct, pk=adduct_pk)
+        mz=standard.get_mz(adduct)
+        delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
+        xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
+        frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
+        chartdata = []
+        for xic in xics:
+            chartdata.append(
+                 {'name': xic.mz, 'x': xic.rt, 'y': xic.xic, 'extra': {}, 'kwargs': {}},
+             )
+        charttype = "lineWithFocusChart"
+        chartcontainer = 'discretebarchart_container'  # container name
+        chartID = 'chart_ID'
+        chart_type = 'line'
+        chart_height = 500
+        data = {
+            'charttype': charttype,
+            'chartdata': chartdata,
+            'chartcontainer': chartcontainer,
+            'extra': {
+                'x_is_date': False,
+                'x_axis_format': '',
+                'tag_script_js': True,
+                'jquery_on_ready': True,
+                },
+            "highchart":{
+                "chart_id": 'chart_id',
+                "chart": {"renderTo": 'chart_id', "type": chart_type, "height": 300, "zoomType": "x"},
+                "title": {"text": ''},
+                "xAxis":  {"title": {"text": 'time (s)'},},
+                "yAxis": {"title": {"text": 'Intensity'}},
+                "series": [
+                        {"name": 'xic', "data": [[ii, jj ] for ii,jj in zip (np.round(chartdata[0]['x'],5), chartdata[0]['y'])]},
+                    ],
             },
-        "highchart":{
-            "chart_id": 'chart_id',
-            "chart": {"renderTo": 'chart_id', "type": chart_type, "height": chart_height, "zoomType": "x"},
-            "title": {"text": 'XIC'},
-            "xAxis":  {"title": {"text": 'time (s)'},},
-            "yAxis": {"title": {"text": 'Intensity'}},
-            "series": [
-                    {"name": 'spectrum', "data": [[ii, jj ] for ii,jj in zip (np.round(chartdata[0]['x'],5), chartdata[0]['y'])]},
-                ],
-        },
-        "dataset":dataset,
-        "standard":standard,
-        "adduct":adduct,
-        "xics":xics,
-        "frag_specs":frag_specs,
-    }
-    return render_to_response('mcf_standards_browse/mcf_xic_detail.html', context=data)
-
+            "mz":mz,
+            "dataset":dataset,
+            "standard":standard,
+            "adduct":adduct,
+            "xics":xics,
+            "frag_specs":frag_specs,
+            "frag_spec_highchart": [{
+                "chart_id": 'frag_spec{}'.format(spec.id),
+                "chart": {"renderTo": 'chart_id', "type": chart_type, "height": 300, "zoomType": "x"},
+                "title": {"text": ''},
+                "xAxis":  {"title": {"text": 'm/z'},},
+                "yAxis": {"title": {"text": 'Intensity'}},
+                "series": [
+                        {"name": 'fragment spectrum', "data": [[x+d,y*m] for x,y in zip(np.round(spec.centroid_mzs,5), spec.centroid_ints) for d,m in zip([-0.0001,0,0.0001],[0,1,0])]
+                            },
+                    ],} for spec in frag_specs]
+        }
+        return render(request, 'mcf_standards_browse/mcf_xic_detail.html', context=data)
 
 
 def dataset_upload(request):
