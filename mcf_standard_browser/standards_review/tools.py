@@ -5,6 +5,8 @@ import os
 import pymzml
 import numpy as np
 import logging
+
+
 def handle_uploaded_files(metadata,file):
     mzml_filename = os.path.join(settings.MEDIA_ROOT,"tmp_mzml.mzml")
     with open(mzml_filename, 'w') as destination:
@@ -116,3 +118,19 @@ class ChartData(object):
     def get_avg_by_day(cls,):
         data = {'dates': range(20), 'values': np.random.rand(20)}
         return data
+
+def update_fragSpec(fragSpecId,response, standard, adduct):
+    fs = FragmentationSpectrum.objects.get(pk=fragSpecId)
+
+    logging.debug(fs.dataset)
+    if response == '1':
+        logging.debug(standard)
+        logging.debug(adduct)
+        fs.standard=standard
+        fs.adduct=adduct
+    else:
+        fs.standard = None
+        fs.adduct = None
+    fs.reviewed = True
+    fs.save()
+

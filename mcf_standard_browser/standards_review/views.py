@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, render_to_resp
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import ensure_csrf_cookie
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic
-from .forms import MCFStandardForm, UploadFileForm
+from .forms import MCFStandardForm, UploadFileForm, FragSpecReview
 import numpy as np
 import tools
 import sys
@@ -125,22 +125,22 @@ def MCFdataset_detail(request, pk):
 
 
 @ensure_csrf_cookie
-def MCFxic_detail(request,dataset_pk, standard_pk, adduct_pk):
-    if request.method == "POST":
-        logging.debug('not updating frag spec yet')
-        for req in request.POST:
+def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
+    dataset=get_object_or_404(Dataset, pk=dataset_pk)
+    standard=get_object_or_404(Standard, pk=standard_pk)
+    adduct=get_object_or_404(Adduct, pk=adduct_pk)
+    mz=standard.get_mz(adduct)
+    delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
+    xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
+    frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
+    form = FragSpecReview(request.POST or None, extra=list([fs.pk for fs in frag_specs]), user=request.user)
+    if form.is_valid():
+        for (fragSpecId, response) in form.get_response():
             #todo update fields in frag spectra
-            logging.debug((req,request.POST[req]))
-            logging.debug(request.user)
+            logging.debug((form.user,fragSpecId,response))
+            tools.update_fragSpec(fragSpecId, response, standard, adduct)
         return redirect('MCFdataset-detail',dataset_pk)
     else:
-        dataset=get_object_or_404(Dataset, pk=dataset_pk)
-        standard=get_object_or_404(Standard, pk=standard_pk)
-        adduct=get_object_or_404(Adduct, pk=adduct_pk)
-        mz=standard.get_mz(adduct)
-        delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
-        xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
-        frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
         chartdata = []
         for xic in xics:
             chartdata.append(
@@ -152,6 +152,7 @@ def MCFxic_detail(request,dataset_pk, standard_pk, adduct_pk):
         chart_type = 'line'
         chart_height = 500
         data = {
+            'form':form,
             'charttype': charttype,
             'chartdata': chartdata,
             'chartcontainer': chartcontainer,

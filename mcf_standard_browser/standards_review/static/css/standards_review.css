@@ -3,20 +3,28 @@ h1 a {
 }
 
 body {
-    padding-left: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
-.top-menu, .top-menu:hover, .top-menu:visited {
-    color: #ffffff;
-    float: right;
-    font-size: 26pt;
-    margin-right: 20px;
+.main-content {
+    padding-left: 20px;
+    padding-bottom: 20px;
+    width:80%;
+    min-width=500px;
+    display:inline-block;
+    overflow: auto;
+    white-space: nowrap;
+    margin:0px auto;
+    border:1px lightgrey solid;
 }
 
-.top-menu h2, .top-menu h2 a, .top-menu h2 a:visited, .top-menu h2 a:active {
-    color: #ffffff;
-    font-size: 10pt;
-    text-decoration: none;
+.center{
+    margin: auto;
+    width: 60%;
+    border: 1px solid lightgrey;
+    padding: 10px;
+    text-align: center;
 }
 
 .page-header {
@@ -31,8 +39,26 @@ body {
     text-decoration: none;
 }
 
+.page-header h2, .page-header h2 a, .page-header h2 a:visited, .page-header h2 a:active {
+    color: #ffffff;
+    font-size: 18pt;
+    text-decoration: none;
+    float: right;
+}
 
+.page-header small, .page-header small a, .page-header small a:visited, .page-header small a:active {
+    color: #ffffff;
+    font-size: 10pt;
+    text-decoration: none;
+    float: right;
+}
 
+.top-menu, .top-menu:hover, .top-menu:visited {
+    color: #ffffff;
+    float: right;
+    font-size: 26pt;
+    margin-right: 20px;
+}
 .specgraph {
     margin-left: 10px;
     min-width: 100px;
@@ -83,19 +109,22 @@ h3 {
     float: left;
 }
 
-.post-form textarea, .post-form input {
+.post-standard{
+    width: 80%;
+}
+.post-standard textarea{
     width: 20%;
-    height: 40px;
+    height: 30px;
 }
+.post-standard input {
+    width: 20%;
+    height: 10px;
+}
+
 .data_upload-form textarea, .post-form input {
-    width: 800%;
+    width: 80%;
     height: 40px;
-}
-.top-menu, .top-menu:hover, .top-menu:visited {
-    color: #ffffff;
-    float: right;
-    font-size: 26pt;
-    margin-right: 20px;
+    margin-left: 20px;
 }
 
 .post {
@@ -105,6 +134,7 @@ h3 {
 .post h1 a, .post h1 a:visited {
     color: #000000;
 }
+
 .table_c{
 text-align: center;
 }

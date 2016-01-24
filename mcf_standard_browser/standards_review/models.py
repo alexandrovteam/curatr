@@ -135,6 +135,7 @@ class FragmentationSpectrum(models.Model):
     spec_num = models.IntegerField(blank=True, null=True)
     rt = models.FloatField(blank=True, null=True)
     precursor_quad_fraction = models.FloatField(blank=True, null=True)
+    reviewed = models.BooleanField(default=0)
 
     def __str__(self):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)

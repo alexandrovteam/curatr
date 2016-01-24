@@ -1,4 +1,5 @@
 {% extends 'mcf_standards_browse/base.html' %}
+{% load xic_extras %}
 {% block head %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
@@ -6,47 +7,55 @@
 
 {% block content %}
     <h1> XIC Detail:</h1>
-    <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
-    <h3>m/z: {{ mz|floatformat:"4" }}</h3>
-        <div id='chart_id' class="specgraph"></div>
-
-    <div>
-    <h2>Fragmentation Spectra</h2>
-        {% if user.is_authenticated %}
-        <form method="post">
-            {% csrf_token %}
-        {% endif %}
-            <table id="id_list_table">
-            <tr>
-                <th>ID</th>
-                <th>Precursor <br>mass </th>
-                <th>Retention <br>time</th>
-                <th>Precursor <br>Fraction </th>
-                <th>Fragmentation <br>Spectrum</th>
-                {% if user.is_authenticated %}
-                <th>yes/no</th>
-                {% endif %}
-            </tr>
-            {% for spec in frag_specs %}
+    <div class="main-content">
+        <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
+        <h3>m/z: {{ mz|floatformat:"4" }}</h3>
+            <div id='chart_id' class="specgraph"></div>
+    </div>
+    <div class="main-content">
+        <h2>Fragmentation Spectra</h2>
+        {% if frag_specs|length > 0 %}
+            {% if user.is_authenticated %}
+            <form method="post">
+                {% csrf_token %}
+            {% endif %}
+                <table id="id_list_table">
                 <tr>
-                    <td class="table_c"> {{ spec.id }}</td>
-                    <td class="table_c"> <a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz|floatformat:"4"  }}</a> </td>
-                    <td class="table_c"> {{ spec.rt |floatformat:"2" }}</td>
-                    <td class="table_c"> {{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
-                    <td> <div id="frag_spec{{ spec.id }}" class="xic_fraggraph"></div></td>
-                    {% if user.is_authenticated %}
-                    <td><input type="radio" name="yesno_{{ spec.id }}" value="yes" checked> Accept<br>
-                        <input type="radio" name="yesno_{{ spec.id }}" value="no"> Reject<br></td>
-                    {% endif %}
+                    <th>Scan No</th>
+                    <th>Precursor <br>mass </th>
+                    <th>Retention <br>time</th>
+                    <th>Precursor <br>Fraction </th>
+                    <th>Fragmentation <br>Spectrum</th>
+                    <th>Acceptance <br> Status</th>
                 </tr>
-            {% endfor %}
-            </table>
-        {% if user.is_authenticated %}
-            <input type="submit" value="Save">
-        </form>
+                {% for spec in frag_specs %}
+                    <tr>
+                        <td class="table_c"> {{ spec.spec_num }}</td>
+                        <td class="table_c"> <a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz|floatformat:"4"  }}</a> </td>
+                        <td class="table_c"> {{ spec.rt |floatformat:"2" }}</td>
+                        <td class="table_c"> {{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
+                        <td> <div id="frag_spec{{ spec.id }}" class="xic_fraggraph"></div></td>
+                        <td>
+                            {% if user.is_authenticated %}
+                                {{ form|form_id:spec.id }}
+                            {% else %}
+                                {% if spec.standard == None %}
+                                    Rejected
+                                {% else %}
+                                    Confirmed
+                                {% endif %}
+                            {% endif %}
+
+                        </td>
+                    </tr>
+                {% endfor %}
+                </table>
+            {% if user.is_authenticated %}
+                <input type="submit" value="Save" class="save btn btn-default" style="float: right; margin-right: 5%;">
+            </form>
+            {% endif %}
         {% endif %}
     </div>
-
 {% endblock %}
 
 {% block script %}
@@ -75,4 +84,5 @@
         });
     </script>
 {% endfor %}
+
 {% endblock %}

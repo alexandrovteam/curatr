@@ -2,6 +2,9 @@
 {% load staticfiles %}
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="{% static 'css/standards_review.css' %}">
@@ -14,12 +17,11 @@
 <body>
     <div class="page-header">
         {% if user.is_authenticated %}
-            <p class="top-menu">Welcome: {{ user }} <small>(<a href="{% url 'django.contrib.auth.views.logout' %}">Log out</a>)</small></p>
+            <p><small><a href="{% url 'django.contrib.auth.views.logout' %}">(log out)</a></small><h2>welcome: {{ user }}</h2>  </p>
         {% else %}
             <a href="{% url 'django.contrib.auth.views.login' %}" class="top-menu"><small>Log in <span class="glyphicon glyphicon-lock"></span></small></a>
         {% endif %}
         <h1> <a href = "/" id="home_link">MCF Data Browser</a> </h1>
-
     </div>
 
     {% block content %}

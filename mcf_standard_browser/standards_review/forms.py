@@ -1,8 +1,8 @@
 __author__ = 'palmer'
 from django import forms
-from .models import Standard, Adduct
+from .models import Standard, Adduct, FragmentationSpectrum
 import os
-
+import logging
 class MCFStandardForm(forms.ModelForm):
     class Meta:
         model = Standard
@@ -36,4 +36,34 @@ class UploadFileForm(forms.Form):
     standards = forms.MultipleChoiceField(choices=standard_choices, widget=forms.CheckboxSelectMultiple())
     mass_accuracy_ppm = forms.FloatField(min_value=0.000001)
     quad_window_mz = forms.FloatField(min_value=0.000001)
+
+
+class FragSpecReview(forms.Form):
+    def __init__(self,*args,**kwargs):
+        fragSpecId = kwargs.pop('extra')
+        self.user = kwargs.pop('user', None)
+
+        super(FragSpecReview, self).__init__(*args, **kwargs)
+        for i in fragSpecId:
+
+            logging.debug(i)
+            fs = FragmentationSpectrum.objects.get(pk=i)
+            logging.debug(fs.dataset)
+            initial = 2
+            if fs.reviewed:
+                if fs.standard:
+                    initial = 1
+                else:
+                    initial = 0
+
+
+            self.fields['yesno_%s' % i] = forms.ChoiceField(choices=((1, 'Accept'), (0, 'Reject'), (2, 'Unrated')), widget=forms.RadioSelect, label=i, initial=initial)
+
+    def get_response(self):
+        for name, value in self.cleaned_data.items():
+            if name.startswith('yesno_'):
+                yield (self.fields[name].label, value)
+
+
+
 

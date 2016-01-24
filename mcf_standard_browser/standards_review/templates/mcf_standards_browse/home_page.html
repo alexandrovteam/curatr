@@ -2,17 +2,22 @@
 
 {% block content %}
 
-    <div id = welcome>
-        <h2>Welcome to the MCF Standards Browser</h2>
-    </div>
-    <div id = links>
+    <div id = welcome, style="text-align: center; width = 100%;">
+        <h1>Welcome to the MCF Standard Library Browser</h1>
+        </div>
+    <div class="center">
+
         <p>
             <a href="{% url 'MCFStandard-list' %}"> Browse Standards Library </a> -
             <a href="{% url 'fragmentSpectrum-list' %}"> Browse Fragmentation Spectra </a> -
             <a href="{% url 'MCFdataset-list' %}"> Browse datasets </a> -
         </p>
+        </div>
+        <div class="center">
         <p>
-            Data Review (Browse XIC)
+            {% if user.is_authenticated %}
+                <a href="{% url 'dataset-upload' %}"> Upload Data </a>
+            {% endif %}
         </p>
     </div>
 {% endblock %}

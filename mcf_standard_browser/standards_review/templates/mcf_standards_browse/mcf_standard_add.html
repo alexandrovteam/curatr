@@ -1,17 +1,19 @@
 {% extends 'mcf_standards_browse/base.html' %}
 
 {% block content %}
-    {% if user.is_authenticated %}
-
-        <h1> Add Standard </h1>
-        <form method="POST" class="post-form">{% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="save btn btn-default">Save</button>
-        </form>
-    {% else %}
-        <div>
-            You must be logged in to add a molecule
-        </div>
-    {% endif %}
-
+    <h1> Add Standard </h1>
+    <div class=main-content">
+        {% if user.is_authenticated %}
+            <div class="post-standard">
+                <form method="POST" class="post-form">{% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="save btn btn-default">Save</button>
+                </form>
+            </div>
+        {% else %}
+            <div class="center">
+                You must be logged in to add a molecule
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
