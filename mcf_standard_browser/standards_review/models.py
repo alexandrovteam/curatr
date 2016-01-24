@@ -38,7 +38,7 @@ class Standard(models.Model):
     name = models.TextField(default = "")
     sum_formula = models.TextField(null=True)
     MCFID = models.TextField(default="")
-    #inchi_code = models.TextField(default="",null=True,blank=True)
+    #inchi_code = models.TextField(null=True, blank=True)
     # todo(An) ChEBI
     exact_mass = models.FloatField(default=0.0)
 
@@ -48,7 +48,7 @@ class Standard(models.Model):
         return mass
 
     def __str__(self):
-        return self.name
+        return "{} {}".format(self.MCFID,self.name)
 
     def save(self,*args,**kwargs):
         self.exact_mass = self.get_mass()
