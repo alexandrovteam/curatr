@@ -7,22 +7,30 @@ body {
     padding-right: 20px;
 }
 
-.main-content {
-    padding-left: 20px;
-    padding-bottom: 20px;
-    width:80%;
-    min-width=500px;
-    display:inline-block;
+.center .main-content {
+    padding: 20px;
+    width: 95%;
+    display: inline-block;
     overflow: auto;
-    white-space: nowrap;
-    margin:0px auto;
-    border:1px lightgrey solid;
+    white-space: wrap;
+    margin: 0px auto;
+    border: 1px lightgrey solid;
+    float: left;
+    text-align: left;
+}
+
+.center h1 {
+    color: #000000;
+    float: left;
+    margin-left: 10px
 }
 
 .center{
     margin: auto;
-    width: 60%;
-    border: 1px solid lightgrey;
+    width: 90%;
+    min-width: 300px;
+    max-width: 900px;
+    border: 0px solid lightgrey;
     padding: 10px;
     text-align: center;
 }
@@ -53,6 +61,19 @@ body {
     float: right;
 }
 
+.page-header-extras {
+    background-color: #ff9400;
+    margin-top: 0;
+    padding: 20px 20px 20px 20px;
+
+}
+.page-header-extras small, .page-header-extras small a, .page-header-extras small a:visited, .page-header-extras small a:active {
+    color: #ffffff;
+    font-size: 10pt;
+    text-decoration: none;
+    float: left;
+}
+
 .top-menu, .top-menu:hover, .top-menu:visited {
     color: #ffffff;
     float: right;
@@ -72,7 +93,6 @@ body {
 }
 .mol {
     margin-left: 40px;
-
 }
 
 h1 {
@@ -83,6 +103,7 @@ h1 {
 	font-weight: 500;
 	line-height: 26.4px;
 }
+
 h2 {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	font-size: 17px;
@@ -91,6 +112,7 @@ h2 {
 	font-weight: 500;
 	line-height: 15.4px;
 }
+
 h3 {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -110,20 +132,19 @@ h3 {
 }
 
 .post-standard{
-    width: 80%;
+    width: 100%;
 }
 .post-standard textarea{
-    width: 20%;
+    width: 80%;
     height: 30px;
 }
 .post-standard input {
-    width: 20%;
     height: 10px;
+    float: left;
 }
 
 .data_upload-form textarea, .post-form input {
-    width: 80%;
-    height: 40px;
+    height: 50px;
     margin-left: 20px;
 }
 

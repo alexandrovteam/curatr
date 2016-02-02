@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 from django.db import models
-
+import logging
 import base64
 import numpy as np
 import sys
 import re
 sys.path.append("//Users/palmer/Documents/python_codebase/")
 from pyMS.pyisocalc import pyisocalc
-
+import json
 
 # Create your models here.
 class Adduct(models.Model):
@@ -35,12 +35,34 @@ class Adduct(models.Model):
         super(Adduct, self).save(*args, **kwargs)
 
 class Standard(models.Model):
+    _adduct_mzs = models.TextField(default="")
     name = models.TextField(default = "")
     sum_formula = models.TextField(null=True)
     MCFID = models.TextField(default="")
-    #inchi_code = models.TextField(null=True, blank=True)
-    # todo(An) ChEBI
+    inchi_code = models.TextField(default="")
     exact_mass = models.FloatField(default=0.0)
+    solubility = models.TextField(null=True, blank=True)
+    # External reference numbers
+    hmdb_id = models.TextField(null=True, blank=True)
+    chebi_id = models.TextField(null=True, blank=True)
+    lipidmaps_id = models.TextField(null=True, blank=True)
+    cas_id = models.TextField(null=True, blank=True)
+    pubchem_id = models.TextField(null=True, blank=True)
+    vendor = models.TextField(null=True, blank=True)
+    vendor_cat = models.TextField(null=True, blank=True)
+
+
+    def get_adduct_mzs(self):
+        return json.loads(self._adduct_mzs)
+
+    def set_adduct_mzs(self):
+        adduct_dict = {}
+        for adduct in Adduct.objects.all():
+            adduct_dict[str(adduct)] = self.get_mz(adduct)
+        self._adduct_mzs = json.dumps(adduct_dict)
+
+    adduct_mzs = property(get_adduct_mzs, set_adduct_mzs)
+
 
     def get_mass(self):
         spec = pyisocalc.isodist(self.sum_formula,charges=0,do_centroid=False)
@@ -51,7 +73,9 @@ class Standard(models.Model):
         return "{} {}".format(self.MCFID,self.name)
 
     def save(self,*args,**kwargs):
+        self.sum_formula=self.sum_formula.strip()
         self.exact_mass = self.get_mass()
+        self.set_adduct_mzs()
         super(Standard, self).save(*args, **kwargs)
 
     def make_ion_formula(self, adduct):
@@ -64,10 +88,16 @@ class Standard(models.Model):
         :param adduct: object of class Adduct
         :return: float
         """
-        formula = pyisocalc.complex_to_simple(self.make_ion_formula(adduct))
-        spec = pyisocalc.isodist(formula,charges=adduct.charge,do_centroid=False)
-        mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
-        return mass
+        try:
+            formula = pyisocalc.complex_to_simple(self.make_ion_formula(adduct))
+            spec = pyisocalc.isodist(formula,charges=adduct.charge,do_centroid=False)
+            mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
+            return mass
+        except:
+            logging.debug(self.name, adduct)
+            return -1.
+
+
 
 
 class Dataset(models.Model):

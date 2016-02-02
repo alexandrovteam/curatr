@@ -44,9 +44,9 @@ def handle_uploaded_files(metadata,file):
         d.adducts_present.add(adduct)
     logging.debug('adding msms - grabbing xics')
     xics={}
-    ii=0
+    spec_n=0
     for spectrum in msrun:
-        ii+=1
+        spec_n+=1
         if spectrum['ms level'] == 1:
             scan_time.append(spectrum['scan start time'])
         # Iterate adducts/standards and get values as required
@@ -89,7 +89,7 @@ def handle_uploaded_files(metadata,file):
                         else:
                             pre_fraction = sum(ppm_ints)/sum(quad_ints)
                         f = FragmentationSpectrum(precursor_mz=pre_mz,
-                              rt = spectrum['scan start time'], dataset=d, spec_num=ii, precursor_quad_fraction=pre_fraction)
+                              rt = spectrum['scan start time'], dataset=d, spec_num=spec_n, precursor_quad_fraction=pre_fraction)
                         f.set_centroid_mzs(spectrum.mz)
                         f.set_centroid_ints(spectrum.i)
                         f.save()
@@ -121,7 +121,6 @@ class ChartData(object):
 
 def update_fragSpec(fragSpecId,response, standard, adduct):
     fs = FragmentationSpectrum.objects.get(pk=fragSpecId)
-
     logging.debug(fs.dataset)
     if response == '1':
         logging.debug(standard)
@@ -133,4 +132,64 @@ def update_fragSpec(fragSpecId,response, standard, adduct):
         fs.adduct = None
     fs.reviewed = True
     fs.save()
+
+
+def pipe_file_to_disk(filename, file):
+    with open(filename, 'w') as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+
+
+def process_batch_standard(metadata, file):
+    """
+    handle a csv fil of standards
+    header line should be "ID","Name","Formula", "InChi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id"
+    name = models.TextField(default = "")
+    sum_formula = models.TextField(null=True)
+    MCFID = models.TextField(default="")
+    inchi_code = models.TextField(default="")
+    exact_mass = models.FloatField(default=0.0)
+    solubility = models.TextField(null=True, blank=True)
+    # External reference numbers
+    hmdb_id = models.TextField(null=True, blank=True)
+    chebi_id = models.TextField(null=True, blank=True)
+    lipidmaps_id = models.TextField(null=True, blank=True)
+    cas_id = models.TextField(null=True, blank=True)
+    pubchem_id = models.TextField(null=True, blank=True)
+    vendor = models.TextField(null=True, blank=True)
+    vendor_cat = models.TextField(null=True, blank=True)
+    :param csv_file:
+    :return:
+    """
+    csv_filename = os.path.join(settings.MEDIA_ROOT,"tmp_csv.csv")
+    logging.debug(">>>>>>>")
+    logging.debug(csv_filename)
+    pipe_file_to_disk(csv_filename, file)
+    add_batch_standard(csv_filename)
+
+
+def add_batch_standard(csv_filename):
+    import pandas as pd
+    import sys
+    df = pd.read_csv(csv_filename, sep="\t")
+    df = df.fillna("")
+    for row in df.iterrows():
+        try:
+            entry = row[1]
+            s = Standard(MCFID = entry["id"],
+                         name=entry["name"],
+                         sum_formula = entry["formula"],
+                         inchi_code = entry["inchi"],
+                         solubility = entry["solubility"],
+                         vendor = entry["vendor"],
+                         vendor_cat = entry["vendor_id"],
+                         hmdb_id = entry["hmdb_id"],
+                         chebi_id = entry["chebi_id"],
+                         lipidmaps_id = entry["lipidmaps_id"],
+                         cas_id = entry["cas_id"],
+                         pubchem_id = entry["pubchem_id"])
+            s.save()
+        except:
+            logging.debug("Failed for: {} with {}".format(entry, sys.exc_info()[0]))
+
 

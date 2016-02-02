@@ -3,29 +3,27 @@ from django import forms
 from .models import Standard, Adduct, FragmentationSpectrum
 import os
 import logging
+
+
 class MCFStandardForm(forms.ModelForm):
     class Meta:
         model = Standard
-        fields = ('MCFID','name', 'sum_formula',)
+        fields = ('MCFID','name','sum_formula','inchi_code','solubility','hmdb_id','chebi_id','lipidmaps_id','cas_id','pubchem_id','vendor','vendor_cat')
 
-
-class ExtFileField(forms.FileField):
-    """
-    Same as forms.FileField, but you can specify a file extension whitelist.
-    expects ext_whitelist in kwargs
-    """
-    def __init__(self, *args, **kwargs):
-        ext_whitelist = kwargs.pop("ext_whitelist")
-        self.ext_whitelist = [i.lower() for i in ext_whitelist]
-        super(ExtFileField, self).__init__(*args, **kwargs)
-
-    def clean(self, *args, **kwargs):
-        data = super(ExtFileField, self).clean(*args, **kwargs)
-        filename = data.name
-        ext = os.path.splitext(filename)[1]
-        ext = ext.lower()
-        if ext not in self.ext_whitelist:
-            raise forms.ValidationError("Not allowed filetype!")
+class MCFStandardBatchForm(forms.Form):
+    tab_delimited_file = forms.FileField()
+    #def clean(self, *args, **kwargs):
+    #    data = super(MCFStandardBatchForm, self).clean(*args, **kwargs)
+    #    print data
+    #    required_headers = ("ID","Name","Formula", "InChi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id")
+    #    err = []
+    #    with open(data.name) as f:
+    #        headers = f.readline().split(",")
+    #        for header in required_headers:
+    #            if header not in headers:
+    #                err.append(header)
+    #    if err != []:
+    #        raise forms.ValidationError("The following headers are missing: {}".format(err))
 
 
 class UploadFileForm(forms.Form):

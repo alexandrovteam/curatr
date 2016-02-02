@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, render_to_resp
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import ensure_csrf_cookie
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic
-from .forms import MCFStandardForm, UploadFileForm, FragSpecReview
+from .forms import MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm
 import numpy as np
 import tools
 import sys
@@ -10,6 +10,7 @@ sys.path.append('/Users/palmer/Documents/python_codebase/django-highcharts/djang
 import json
 import logging
 from eztables.views import DatatablesView
+from django.views.generic import TemplateView, ListView
 
 # Create your views here.
 
@@ -19,20 +20,35 @@ def home_page(request):
 
 def MCFStandard_list(request):
     standards = Standard.objects.all().order_by('MCFID')
-    return  render(request,'mcf_standards_browse/mcf_standard_list.html',{'standards':standards})
+    adducts = Adduct.objects.all()
+    adduct_names = [adduct for adduct in adducts]
+    logging.debug(adduct_names)
+    standard_data = []
+    for standard in standards:
+        precalc_adduct_mzs = standard.adduct_mzs
+        adduct_mzs=[]
+        for adduct in adducts:
+            adduct_mzs.append({"val": np.round(precalc_adduct_mzs[str(adduct)], decimals=5)})
+        standard_data.append([standard,adduct_mzs])
+
+    return  render(request,'mcf_standards_browse/mcf_standard_list.html',{'standards':standard_data, 'adduct_names':adduct_names,})
 
 
 class IndexView(TemplateView):
     template_name = 'mcf_standards_browse/home_page.html'
+
 class ServerSideView(TemplateView):
     template_name = 'mcf_standards_browse/server-side-base.html'
     model = Standard
     context_object_name = 'browsers'
-def MCFStandard_list_ez(DatatablesView):
+
+class MCFStandard_list_ez(ListView):
+    template_name ='eztables/client_side.html'
     model = Standard
-    fields = ('name'
-        'sum_formula',
-        'MCFID')
+    #fields = ('name',
+    #        'sum_formula',
+    #         'MCFID',)
+    context_object_name = 'standards'
 
 def MCFStandard_detail(request, pk):
     standard=get_object_or_404(Standard, MCFID=pk)
@@ -48,7 +64,18 @@ def MCFStandard_add(request):
             return redirect('MCFStandard-list')
     else:
         form = MCFStandardForm()
-    return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form})
+    return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'single'})
+
+def MCFStandard_add_batch(request):
+    logging.debug(request.FILES)
+    if request.method == "POST":
+        form = MCFStandardBatchForm(request.POST, request.FILES)
+        if form.is_valid():
+            tools.process_batch_standard(dict(request.POST), request.FILES['tab_delimited_file'])
+            return redirect('MCFStandard-list')
+    else:
+        form = MCFStandardBatchForm()
+    return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'batch'})
 
 
 def fragmentSpectrum_list(request):

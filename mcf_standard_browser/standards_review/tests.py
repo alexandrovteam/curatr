@@ -137,3 +137,11 @@ class FragmentationSpectrumModelTest(TestCase):
         np.testing.assert_array_almost_equal(mzs,f1.centroid_mzs)
         np.testing.assert_array_almost_equal(ints,f1.centroid_ints)
 
+
+from .tools import add_batch_standard
+class DataImportTest(TestCase):
+    def test_batch_add(self):
+        csv_filename = "/Users/palmer/Downloads/Standard_Library_MCF_Inhouse_metabolites.txt"
+        add_batch_standard(csv_filename)
+        print Standard.objects.all().count()
+        assert Standard.objects.all().count() > 0

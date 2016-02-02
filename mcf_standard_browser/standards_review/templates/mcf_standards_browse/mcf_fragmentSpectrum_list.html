@@ -1,15 +1,34 @@
 {% extends 'mcf_standards_browse/base.html' %}
+{% block head %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+{% endblock %}
 
 {% block content %}
     <h2> EMBL-MCF Standards: </h2>
-    <table id="id_list_table">
-        <tr>
-            <td>ID  Precursor m/z </td>
-        </tr>
+    <table id="id_list_table" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>ID </th>
+                <th>Precursor m/z </th>
+                <th> </th>
+            </tr>
+        </thead>
         {% for spectrum in fragmentSpectra %}
             <tr>
-                <td>{{ spectrum.pk }} {{ spectrum.precursor_mz }} {{ spectrum.precursor_mz.precursor_quad_fraction }}<a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
+                <td>{{ spectrum.pk }} </td>
+                <td>{{ spectrum.precursor_mz }} </td>
+                <td>{{ spectrum.precursor_mz.precursor_quad_fraction }}<a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
             </tr>
         {% endfor %}
     </table>
+{% endblock %}
+
+{% block script %}
+    <script type='text/javascript' src='/static/js/libs/datatables/jquery.dataTables.js'></script>
+    <script>
+        $(document).ready(function() {
+            $('#id_list_table').DataTable();
+        } );
+    </script>
 {% endblock %}
