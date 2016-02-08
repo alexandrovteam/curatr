@@ -33,7 +33,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-    'djangobower.finders.BowerFinder',
+    #'djangobower.finders.BowerFinder',
 )
 
 STATIC_ROOT = '/Users/palmer/Documents/python_codebase/mcf_standard_browser/mcf_standard_browser/static/'
@@ -57,9 +57,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'standards_review',
-    'django_nvd3',
-    'djangobower',
-    'eztables',
+    #'django_nvd3',
+    #'djangobower',
+    #'eztables',
     'highcharts',
     'django_static_jquery',
 
