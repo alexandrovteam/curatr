@@ -34,11 +34,11 @@ class Adduct(models.Model):
         self.delta_atoms = self.get_delta_atoms()
         super(Adduct, self).save(*args, **kwargs)
 
-class Standard(models.Model):
+
+class Molecule(models.Model):
     _adduct_mzs = models.TextField(default="")
     name = models.TextField(default = "")
     sum_formula = models.TextField(null=True)
-    MCFID = models.TextField(default="")
     inchi_code = models.TextField(default="")
     exact_mass = models.FloatField(default=0.0)
     solubility = models.TextField(null=True, blank=True)
@@ -48,9 +48,6 @@ class Standard(models.Model):
     lipidmaps_id = models.TextField(null=True, blank=True)
     cas_id = models.TextField(null=True, blank=True)
     pubchem_id = models.TextField(null=True, blank=True)
-    vendor = models.TextField(null=True, blank=True)
-    vendor_cat = models.TextField(null=True, blank=True)
-
 
     def get_adduct_mzs(self):
         return json.loads(self._adduct_mzs)
@@ -70,13 +67,13 @@ class Standard(models.Model):
         return mass
 
     def __str__(self):
-        return "{} {}".format(self.MCFID,self.name)
+        return "{}".format(self.name)
 
     def save(self,*args,**kwargs):
         self.sum_formula=self.sum_formula.strip()
         self.exact_mass = self.get_mass()
         self.set_adduct_mzs()
-        super(Standard, self).save(*args, **kwargs)
+        super(Molecule, self).save(*args, **kwargs)
 
     def make_ion_formula(self, adduct):
         formula = "({}){}{}".format(self.sum_formula,adduct.nM,adduct.delta_atoms)
@@ -84,7 +81,7 @@ class Standard(models.Model):
 
     def get_mz(self, adduct):
         """
-        Calculate the precursor mass for this standard with a given adduct
+        Calculate the precursor mass for this molecule with a given adduct
         :param adduct: object of class Adduct
         :return: float
         """
@@ -98,6 +95,16 @@ class Standard(models.Model):
             return -1.
 
 
+class Standard(models.Model):
+    MCFID = models.IntegerField(null=True, blank=True)# MCFID == Standard.pk
+    molecule = models.ForeignKey(Molecule, default=Molecule.objects.all().filter(name='DUMMY'))
+    vendor = models.TextField(null=True, blank=True)
+    vendor_cat = models.TextField(null=True, blank=True)
+    lot_num = models.TextField(null=True, blank=True)
+    location = models.TextField(null=True, blank=True)
+    purchase_date = models.DateField(null=True, blank=True)
+    def __str__(self):
+        return "{}: {}".format(self.MCFID, self.molecule.name)
 
 
 class Dataset(models.Model):
@@ -145,7 +152,7 @@ class Xic(models.Model):
 
     def check_mass(self,tol_ppm=100):
         tol_mz = self.mz*tol_ppm*1e-6
-        theor_mz = self.standard.get_mz(self.adduct)
+        theor_mz = self.standard.molecule.get_mz(self.adduct)
         if np.abs(theor_mz - self.mz) > tol_mz:
             raise ValueError('Mass tolerance not satisfied {} {}'.format(theor_mz,self.mz))
         return True

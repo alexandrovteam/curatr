@@ -6,55 +6,60 @@
 {% endblock %}
 
 {% block content %}
-    <h1> XIC Detail:</h1>
-    <div class="main-content">
-        <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
-        <h3>m/z: {{ mz|floatformat:"4" }}</h3>
-            <div id='chart_id' class="specgraph"></div>
+    <div class="page-header-extras">
+        <small><a href="{% url 'MCFdataset-detail' dataset.pk %}">return to list</a></small>
     </div>
-    <div class="main-content">
-        <h2>Fragmentation Spectra</h2>
-        {% if frag_specs|length > 0 %}
-            {% if user.is_authenticated %}
-            <form method="post">
-                {% csrf_token %}
-            {% endif %}
-                <table id="id_list_table">
-                <tr>
-                    <th>Scan No</th>
-                    <th>Precursor <br>mass </th>
-                    <th>Retention <br>time</th>
-                    <th>Precursor <br>Fraction </th>
-                    <th>Fragmentation <br>Spectrum</th>
-                    <th>Acceptance <br> Status</th>
-                </tr>
-                {% for spec in frag_specs %}
+    <div class="center">
+        <h1> XIC Detail:</h1>
+        <div class="main-content">
+            <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
+            <h3>m/z: {{ mz|floatformat:"4" }}</h3>
+                <div id='chart_id' class="specgraph"></div>
+        </div>
+        <div class="main-content">
+            <h2>Fragmentation Spectra</h2>
+            {% if frag_specs|length > 0 %}
+                {% if user.is_authenticated %}
+                <form method="post">
+                    {% csrf_token %}
+                {% endif %}
+                    <table id="id_list_table">
                     <tr>
-                        <td class="table_c"> {{ spec.spec_num }}</td>
-                        <td class="table_c"> <a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz|floatformat:"4"  }}</a> </td>
-                        <td class="table_c"> {{ spec.rt |floatformat:"2" }}</td>
-                        <td class="table_c"> {{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
-                        <td> <div id="frag_spec{{ spec.id }}" class="xic_fraggraph"></div></td>
-                        <td>
-                            {% if user.is_authenticated %}
-                                {{ form|form_id:spec.id }}
-                            {% else %}
-                                {% if spec.standard == None %}
-                                    Rejected
-                                {% else %}
-                                    Confirmed
-                                {% endif %}
-                            {% endif %}
-
-                        </td>
+                        <th>Scan No</th>
+                        <th>Precursor <br>mass </th>
+                        <th>Retention <br>time</th>
+                        <th>Precursor <br>Fraction </th>
+                        <th>Fragmentation <br>Spectrum</th>
+                        <th>Acceptance <br> Status</th>
                     </tr>
-                {% endfor %}
-                </table>
-            {% if user.is_authenticated %}
-                <input type="submit" value="Save" class="save btn btn-default" style="float: right; margin-right: 5%;">
-            </form>
+                    {% for spec in frag_specs %}
+                        <tr>
+                            <td class="table_c"> {{ spec.spec_num }}</td>
+                            <td class="table_c"> <a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz|floatformat:"4"  }}</a> </td>
+                            <td class="table_c"> {{ spec.rt |floatformat:"2" }}</td>
+                            <td class="table_c"> {{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
+                            <td> <div id="frag_spec{{ spec.id }}" class="xic_fraggraph"></div></td>
+                            <td>
+                                {% if user.is_authenticated %}
+                                    {{ form|form_id:spec.id }}
+                                {% else %}
+                                    {% if spec.standard == None %}
+                                        Unrated
+                                    {% else %}
+                                        {{ spec.standard }}
+                                    {% endif %}
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                {% if user.is_authenticated %}
+                    <input type="submit" value="Save" class="save btn btn-default" style="float: right; margin-right: 1%;">
+                </form>
+                {% endif %}
             {% endif %}
-        {% endif %}
+        </div>
     </div>
 {% endblock %}
 

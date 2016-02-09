@@ -1,0 +1,27 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+    <div class="page-header-extras">
+        <small><a href="{% url 'MCFMolecule-list' %}">return to list</a></small>
+    </div>
+    <div class="center">
+        <h2> EMBL-MCF Standard: Standard Detail: {{standard.name}}</h2>
+
+        <div class="main-content">
+            <h2>Chemical Information</h2>
+            <p>Formula: {{molecule.sum_formula}}</p>
+            <p>MCFID: {{molecule.MCFID}} </p>
+            <p>Inchi: {{molecule.inchi_code}} </p>
+            <p>Exact mass: {{molecule.exact_mass}} </p>
+            <p>Solubility: {{molecule.solubility}} </p>
+        </div>
+        <div class="main-content">
+            <h2> External reference numbers</h2>
+            <p>ChEBI: {{molecule.chebi_id}} </p>
+            <p>lipidMAPS: {{molecule.lipidmaps_id}} </p>
+            <p>CAS: {{molecule.cas_id}} </p>
+            <p>Pubchem: {{molecule.pubchem_id}} </p>
+            <p>HMDB: {{molecule.hmdb_id}} </p>
+        </div>
+    </div>
+{% endblock %}

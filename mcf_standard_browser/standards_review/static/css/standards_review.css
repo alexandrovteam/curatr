@@ -9,7 +9,7 @@ body {
 
 .center .main-content {
     padding: 20px;
-    width: 95%;
+    width: 99%;
     display: inline-block;
     overflow: auto;
     white-space: wrap;
@@ -27,9 +27,8 @@ body {
 
 .center{
     margin: auto;
-    width: 90%;
+    width: 95%;
     min-width: 300px;
-    max-width: 900px;
     border: 0px solid lightgrey;
     padding: 10px;
     text-align: center;

@@ -1,14 +1,20 @@
 __author__ = 'palmer'
 from django import forms
-from .models import Standard, Adduct, FragmentationSpectrum
+from .models import Standard, Adduct, FragmentationSpectrum, Molecule
 import os
 import logging
 
 
+class MCFMoleculeForm(forms.ModelForm):
+    class Meta:
+        model = Molecule
+        fields = ('name','sum_formula','inchi_code','solubility','hmdb_id','chebi_id','lipidmaps_id','cas_id','pubchem_id')
+
 class MCFStandardForm(forms.ModelForm):
     class Meta:
         model = Standard
-        fields = ('MCFID','name','sum_formula','inchi_code','solubility','hmdb_id','chebi_id','lipidmaps_id','cas_id','pubchem_id','vendor','vendor_cat')
+        fields = ('MCFID','molecule','vendor','vendor_cat','lot_num' ,'location' ,'purchase_date')
+
 
 class MCFStandardBatchForm(forms.Form):
     tab_delimited_file = forms.FileField()

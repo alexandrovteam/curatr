@@ -1,25 +1,55 @@
 from django.test import TestCase
-from models import Standard, Dataset, Adduct, Xic, FragmentationSpectrum
+from models import Molecule, Standard, Dataset, Adduct, Xic, FragmentationSpectrum
+import datetime
+import logging
 import numpy as np
 # Create your tests here.
 class StandardModelTest(TestCase):
+
+    def test_add_molecule(self):
+        m1 = Molecule(
+                name = 'test_molecule',
+                sum_formula = 'C1H2O3',
+                inchi_code = "str",
+                solubility = "none",
+                hmdb_id = "000235",
+                chebi_id = "123456",
+                lipidmaps_id = "558855",
+                cas_id = "789456",
+                pubchem_id = "1235")
+        m1.save()
+        self.assertEqual(Molecule.objects.all().count(),1)
+        self.assertAlmostEqual(m1.exact_mass,62.00039,places=4)
+
     def test_add_standard(self):
-        s1 = Standard(name='TestStandard',sum_formula="C1H2O3", MCFID = "0")
+        m1=Molecule(name='test', sum_formula="C1H2O3")
+        m1.save()
+        s1 = Standard(
+             MCFID = 0,
+            molecule = m1,
+            vendor = "sigma",
+            vendor_cat = "sig0001",
+            lot_num = "#123456",
+            location = "fridge",
+            purchase_date = datetime.datetime.now(),
+        )
         s1.save()
         self.assertEqual(Standard.objects.all().count(),1)
-        self.assertAlmostEqual(s1.exact_mass,62.00039,places=4)
+        self.assertAlmostEqual(s1.molecule.exact_mass,62.00039,places=4)
 
     def test_get_mz(self):
+        m1=Molecule(name='test', sum_formula="C1H2O3")
+        m1.save()
         a1=Adduct(nM=1, delta_formula='-H', charge=-1)
         a1.save()
-        s1 = Standard(name='TestStandard',sum_formula="C1H2O3", MCFID = "0")
+        s1 = Standard(molecule=m1)
         s1.save()
         self.assertEqual(Standard.objects.all().count(),1)
-        self.assertAlmostEqual(s1.get_mz(a1),60.99311,places=4)
+        self.assertAlmostEqual(s1.molecule.get_mz(a1),60.99311,places=4)
 
 
 class AdductModelTest(TestCase):
-    def test_add_standard(self):
+    def test_add_adduct(self):
         a1=Adduct(nM=1, delta_formula='+H+K', charge=-2)
         a1.save()
         a2=Adduct(nM=1, delta_formula='-Na-P', charge=2)
@@ -32,9 +62,13 @@ class AdductModelTest(TestCase):
 class DatasetModelTest(TestCase):
     def test_add_dataset(self):
         # create standards
-        s1 = Standard(name='TestStandard1',sum_formula="C1H2O3", MCFID = "0")
+        m1=Molecule(name='TestMolecule1', sum_formula="C1H2O3")
+        m1.save()
+        m2=Molecule(name='TestMolecule1', sum_formula="C2H2O3")
+        m2.save()
+        s1 = Standard(molecule=m1, MCFID = "0")
         s1.save()
-        s2 = Standard(name='TestStandard2',sum_formula="C2H2O3", MCFID = "1")
+        s2 = Standard(molecule=m2, MCFID = "1")
         s2.save()
         # create adduct
         a1=Adduct(nM=1, delta_formula='+H+K', charge=-2)
@@ -50,7 +84,9 @@ class DatasetModelTest(TestCase):
 
 class XicModelTest(TestCase):
     def test_add_xic(self):
-        s1 = Standard(name='TestStandard1',sum_formula="C1H2O3", MCFID = "0")
+        m1=Molecule(name='TestMolecule1', sum_formula="C1H2O3")
+        m1.save()
+        s1 = Standard(molecule=m1, MCFID = "0")
         s1.save()
         a1=Adduct(nM=1, delta_formula='+H+K', charge=-2)
         a1.save()
@@ -71,7 +107,9 @@ class XicModelTest(TestCase):
         d1.save()
         a1=Adduct(nM=1, delta_formula='-H', charge=-1)
         a1.save()
-        s1 = Standard(name='Standard1',sum_formula="C1H2O3", MCFID = "00")
+        m1=Molecule(name='TestMolecule1', sum_formula="C1H2O3")
+        m1.save()
+        s1 = Standard(molecule=m1, MCFID = "0")
         s1.save()
         # create some xics
         x1 = Xic(mz= 60.993,dataset=d1)
@@ -141,7 +179,18 @@ class FragmentationSpectrumModelTest(TestCase):
 from .tools import add_batch_standard
 class DataImportTest(TestCase):
     def test_batch_add(self):
-        csv_filename = "/Users/palmer/Downloads/Standard_Library_MCF_Inhouse_metabolites.txt"
+        csv_filename = "./media/Standard_Library_MCF_Inhouse_metabolites.csv"
         add_batch_standard(csv_filename)
-        print Standard.objects.all().count()
+        logging.debug(Molecule.objects.all().count())
+        logging.debug(Standard.objects.all().count())
         assert Standard.objects.all().count() > 0
+
+    def test_batch_double_add(self):
+        #should not produce duplicate identical entries
+        csv_filename = "./media/Standard_Library_MCF_Inhouse_metabolites.csv"
+        add_batch_standard(csv_filename)
+        mol_list_1 = Molecule.objects.all().count()
+        std_list_1 = Standard.objects.all().count()
+        add_batch_standard(csv_filename)
+        self.assertEqual(Molecule.objects.all().count(), mol_list_1)
+        self.assertEqual(Standard.objects.all().count(), std_list_1)

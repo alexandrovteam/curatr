@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response, HttpResponse
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import ensure_csrf_cookie
-from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic
+from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
 from .forms import MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm
 import numpy as np
 import tools
@@ -19,19 +19,34 @@ def home_page(request):
 
 
 def MCFStandard_list(request):
-    standards = Standard.objects.all().order_by('MCFID')
+    standards = Standard.objects.all()#.order_by('MCFID')
     adducts = Adduct.objects.all()
     adduct_names = [adduct for adduct in adducts]
-    logging.debug(adduct_names)
     standard_data = []
     for standard in standards:
-        precalc_adduct_mzs = standard.adduct_mzs
+        precalc_adduct_mzs = standard.molecule.adduct_mzs
         adduct_mzs=[]
         for adduct in adducts:
             adduct_mzs.append({"val": np.round(precalc_adduct_mzs[str(adduct)], decimals=5)})
         standard_data.append([standard,adduct_mzs])
 
     return  render(request,'mcf_standards_browse/mcf_standard_list.html',{'standards':standard_data, 'adduct_names':adduct_names,})
+
+def MCFMolecule_list(request):
+    molecules = Molecule.objects.all()
+    adducts = Adduct.objects.all()
+    adduct_names = [adduct for adduct in adducts]
+    logging.debug(adduct_names)
+    standard_data = []
+    for molecule in molecules:
+        precalc_adduct_mzs = molecule.adduct_mzs
+        adduct_mzs=[]
+        for adduct in adducts:
+            adduct_mzs.append({"val": np.round(precalc_adduct_mzs[str(adduct)], decimals=5)})
+        standard_data.append([molecule,adduct_mzs])
+
+    return  render(request,'mcf_standards_browse/mcf_molecule_list.html',{'standards':standard_data, 'adduct_names':adduct_names,})
+
 
 
 class IndexView(TemplateView):
@@ -54,6 +69,11 @@ def MCFStandard_detail(request, pk):
     standard=get_object_or_404(Standard, MCFID=pk)
     #adducts = Adduct.objects.all()
     return render(request, 'mcf_standards_browse/mcf_standard_detail.html', {'standard': standard})
+
+def MCFMolecule_detail(request, pk):
+    molecule=get_object_or_404(Molecule, pk=pk)
+    return render(request, 'mcf_standards_browse/mcf_molecule_detail.html', {'molecule': molecule})
+
 
 def MCFStandard_add(request):
     if request.method == "POST":
@@ -156,7 +176,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
     dataset=get_object_or_404(Dataset, pk=dataset_pk)
     standard=get_object_or_404(Standard, pk=standard_pk)
     adduct=get_object_or_404(Adduct, pk=adduct_pk)
-    mz=standard.get_mz(adduct)
+    mz=standard.molecule.get_mz(adduct)
     delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
     xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
     frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
@@ -228,7 +248,8 @@ def dataset_upload(request):
                     "standards": post_dict['standards'],
                     "mass_accuracy_ppm": post_dict['mass_accuracy_ppm'][0],
                     "quad_window_mz": post_dict['quad_window_mz'][0]}
-            tools.handle_uploaded_files(data, request.FILES['mzml_file'])
+            r= tools.handle_uploaded_files(data, request.FILES['mzml_file'])
+            logging.debug("added = {}".format(r))
             return redirect('MCFdataset-list')
     else:
         form = UploadFileForm(initial={"mass_accuracy_ppm":10.0, 'quad_window_mz':1.0})

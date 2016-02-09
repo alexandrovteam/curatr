@@ -5,10 +5,12 @@ from . import views
 from .views import MCFStandard_list_ez
 urlpatterns = [
     url(r'^$', views.home_page),
-    url(r'^library/$', views.MCFStandard_list, name='MCFStandard-list'),
-    url(r'^library/add/$', views.MCFStandard_add, name='MCFStandard-add'),
-    url(r'^library/add/batch/$', views.MCFStandard_add_batch, name='MCFStandard-add-batch'),
-    url(r'^library/MCF(?P<pk>.+)/$', views.MCFStandard_detail, name='MCFStandard-detail'),
+    url(r'^inventory/$', views.MCFStandard_list, name='MCFStandard-list'),
+    url(r'^inventory/add/$', views.MCFStandard_add, name='MCFStandard-add'),
+    url(r'^inventory/add/batch/$', views.MCFStandard_add_batch, name='MCFStandard-add-batch'),
+    url(r'^inventory/MCF(?P<pk>.+)/$', views.MCFStandard_detail, name='MCFStandard-detail'),
+    url(r'^molecule/$', views.MCFMolecule_list, name='MCFMolecule-list'),
+    url(r'^molecule/(?P<pk>.+)/$', views.MCFMolecule_detail, name='MCFMolecule-detail'),
     url(r'^MS2/$', views.fragmentSpectrum_list, name='fragmentSpectrum-list'),
     url(r'^MS2/spec(?P<pk>.+)/$', views.fragmentSpectrum_detail, name='fragmentSpectrum-detail'),
     url(r'^upload/dataset/$', views.dataset_upload, name='dataset-upload'),

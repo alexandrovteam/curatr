@@ -7,12 +7,12 @@
 
 {% block content %}
     <div class="center">
-        <h2> EMBL-MCF Standards Inventory: </h2>
+        <h2> EMBL-MCF Standards: </h2>
         <div class="main-content">
-   <table id="id_list_table" class="display" cellspacing="0" width="100%">
+            <table id="id_list_table" class="display" cellspacing="0" width="100%">
                 <thead>
                     <tr>
-                        <th>InventoryID </th>
+                        <th>MCF-ID </th>
                         <th>Name </th>
                         <th>Formula </th>
                         <th>Exact Mass</th>
@@ -31,9 +31,9 @@
                         <td>{{ standard.molecule}} </td>
                         <td>{{ standard.molecule.sum_formula }} </td>
                         <td>{{ standard.molecule.exact_mass }} </td>
-                        <td>{{ standard.vendor }}</td>
-                        <td>{{ standard.vendor_id }}</td>
                         <td>{{ standard.molecule.pubchem_id }} </td>
+                        <td>{{ standard.vendor }} </td>
+                        <td>{{ standard.vendor_id }} </td>
                         {% for mz in adduct_mzs %}
                             <td> {{mz.val}} </td>
                         {% endfor %}

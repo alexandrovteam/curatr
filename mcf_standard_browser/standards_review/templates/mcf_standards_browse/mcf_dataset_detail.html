@@ -1,6 +1,9 @@
 {% extends 'mcf_standards_browse/base.html' %}
 
 {% block content %}
+    <div class="page-header-extras">
+        <small><a href="{% url 'MCFdataset-list' %}">return to list</a></small>
+    </div>
     <h1> Dataset Detail: {{dataset.pk}}</h1>
     <h2>{{ dataset.name }}</h2>
     {% for standard in standards %}

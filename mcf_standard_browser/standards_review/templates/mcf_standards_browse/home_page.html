@@ -8,16 +8,10 @@
     <div class="center">
 
         <p>
-            <a href="{% url 'MCFStandard-list' %}"> Browse Standards Library </a> -
+            <a href="{% url 'MCFMolecule-list' %}"> Browse Molecule Library </a> -
+            <a href="{% url 'MCFStandard-list' %}"> Browse Standards Inventory </a> -
             <a href="{% url 'fragmentSpectrum-list' %}"> Browse Fragmentation Spectra </a> -
             <a href="{% url 'MCFdataset-list' %}"> Browse datasets </a> -
-        </p>
-        </div>
-        <div class="center">
-        <p>
-            {% if user.is_authenticated %}
-                <a href="{% url 'dataset-upload' %}"> Upload Data </a>
-            {% endif %}
         </p>
     </div>
 {% endblock %}

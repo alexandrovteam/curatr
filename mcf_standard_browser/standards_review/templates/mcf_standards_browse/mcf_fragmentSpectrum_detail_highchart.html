@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+    <div class="page-header-extras">
+        <small><a href="{% url 'fragmentSpectrum-list' %}">return to list</a></small>
+    </div>
     <div class="mol">
         <h2>Fragmentation Spectrum Detail - Highchart</h2>
         <h3>ID: {{ specdata.spectrum.pk }}</h3>

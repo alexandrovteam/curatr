@@ -9,20 +9,24 @@
 
         <div class="main-content">
             <h2>Chemical Information</h2>
-            <p>Formula: {{standard.sum_formula}}</p>
+            <p>Formula: {{standard.molecule.sum_formula}}</p>
             <p>MCFID: {{standard.MCFID}} </p>
-            <p>Inchi: {{standard.inchi_code}} </p>
-            <p>Exact mass: {{standard.exact_mass}} </p>
-            <p>Solubility: {{standard.solubility}} </p>
+            <p>Exact mass: {{standard.molecule.exact_mass}} </p>
+            <p>Solubility: {{standard.molecule.solubility}} </p>
+            <p>Inchi: {{standard.molecule.inchi_code}} </p>
+
         </div>
         <div class="main-content">
             <h2> External reference numbers</h2>
-            <p>ChEBI: {{standard.chebi_id}} </p>
-            <p>lipidMAPS: {{standard.lipidmaps_id}} </p>
-            <p>CAS: {{standard.cas_id}} </p>
-            <p>Pubchem: {{standard.pubchem_id}} </p>
+            <p>ChEBI: {{standard.molecule.chebi_id}} </p>
+            <p>lipidMAPS: {{standard.molecule.lipidmaps_id}} </p>
+            <p>CAS: {{standard.molecule.cas_id}} </p>
+            <p>Pubchem: {{standard.molecule.pubchem_id}} </p>
             <p>Vendor: {{standard.vendor}} </p>
             <p>Vendor Catalogue Number: {{standard.vendor_cat}} </p>
         </div>
+    </div>
+    <div>
+
     </div>
 {% endblock %}
