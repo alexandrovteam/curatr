@@ -8,7 +8,7 @@ import logging
 class MCFMoleculeForm(forms.ModelForm):
     class Meta:
         model = Molecule
-        fields = ('name','sum_formula','inchi_code','solubility','hmdb_id','chebi_id','lipidmaps_id','cas_id','pubchem_id')
+        fields = ('name', 'sum_formula', 'lipidmaps_id', 'pubchem_id', 'cas_id', 'chebi_id', 'hmdb_id', 'inchi_code', 'solubility')
 
 class MCFStandardForm(forms.ModelForm):
     class Meta:
@@ -17,19 +17,7 @@ class MCFStandardForm(forms.ModelForm):
 
 
 class MCFStandardBatchForm(forms.Form):
-    tab_delimited_file = forms.FileField()
-    #def clean(self, *args, **kwargs):
-    #    data = super(MCFStandardBatchForm, self).clean(*args, **kwargs)
-    #    print data
-    #    required_headers = ("ID","Name","Formula", "InChi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id")
-    #    err = []
-    #    with open(data.name) as f:
-    #        headers = f.readline().split(",")
-    #        for header in required_headers:
-    #            if header not in headers:
-    #                err.append(header)
-    #    if err != []:
-    #        raise forms.ValidationError("The following headers are missing: {}".format(err))
+    semicolon_delimited_file = forms.FileField()
 
 
 class UploadFileForm(forms.Form):
@@ -57,8 +45,6 @@ class FragSpecReview(forms.Form):
                     initial = 1
                 else:
                     initial = 0
-
-
             self.fields['yesno_%s' % i] = forms.ChoiceField(choices=((1, 'Accept'), (0, 'Reject'), (2, 'Unrated')), widget=forms.RadioSelect, label=i, initial=initial)
 
     def get_response(self):

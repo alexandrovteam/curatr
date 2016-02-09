@@ -6,7 +6,7 @@ import pymzml
 import numpy as np
 import dateutil
 import logging
-
+from django.contrib.auth.models import User
 
 def handle_uploaded_files(metadata,file):
     mzml_filename = os.path.join(settings.MEDIA_ROOT,"tmp_mzml.mzml")
@@ -106,18 +106,22 @@ class ChartData(object):
         data = {'dates': range(20), 'values': np.random.rand(20)}
         return data
 
-def update_fragSpec(fragSpecId,response, standard, adduct):
+def update_fragSpec(fragSpecId,response, standard, adduct, username):
     fs = FragmentationSpectrum.objects.get(pk=fragSpecId)
     logging.debug(fs.dataset)
-    if response == '1':
-        logging.debug(standard)
-        logging.debug(adduct)
+    if response == '0':
+        fs.standard = None
+        fs.adduct = None
+        fs.reviewed = True
+    elif response == '1':
         fs.standard=standard
         fs.adduct=adduct
+        fs.reviewed = True
     else:
         fs.standard = None
         fs.adduct = None
-    fs.reviewed = True
+        fs.reviewed = False
+    fs.last_editor = User.objects.get(username=username)
     fs.save()
 
 
@@ -164,23 +168,30 @@ def process_batch_standard(metadata, file):
     """
     csv_filename = os.path.join(settings.MEDIA_ROOT,"tmp_csv.csv")
     pipe_file_to_disk(csv_filename, file)
-    add_batch_standard(csv_filename)
+    error_list = add_batch_standard(csv_filename)
+    return error_list
 
 
 def add_batch_standard(csv_filename):
     import pandas as pd
     import sys
-    error_list = []
+    error_list = {}
     df = pd.read_csv(csv_filename, sep=";")
     df = df.fillna("")
     for row in df.iterrows():
         try:
             # clean up input
             entry = row[1]
+            if entry['formula'] == '':
+                raise ValueError('sum formula cannot be blank')
             entry['id'] = ''.join([char for char in entry['id'] if char in ("0123456789")])
 
-            molecule = Molecule.objects.all().filter(pubchem_id=entry['pubchem_id'])
-            if all((molecule.exists(), entry['pubchem_id'] != "")):
+            if entry['pubchem_id'] != "":
+                molecule = Molecule.objects.all().filter(pubchem_id=entry['pubchem_id'])
+            else:
+                molecule = Molecule.objects.all().filter(name__iexact=entry['name']) #filter lowercase
+
+            if molecule.exists():
                 molecule = molecule[0]
             else:
                 molecule = Molecule(
@@ -192,7 +203,8 @@ def add_batch_standard(csv_filename):
                     chebi_id = entry["chebi_id"],
                     lipidmaps_id = entry["lipidmaps_id"],
                     cas_id = entry["cas_id"],
-                    pubchem_id = entry["pubchem_id"])
+                    pubchem_id = entry["pubchem_id"],
+                    )
                 molecule.save()
 
             s = Standard.objects.all().filter(MCFID=entry['id'])
@@ -213,7 +225,8 @@ def add_batch_standard(csv_filename):
                 s.MCFID = entry['id']
             s.save()
         except:
-            error_list.append( (entry['name'], sys.exc_info()[1]) )
+            error_list[entry['name']] = sys.exc_info()[1]
             logging.debug("Failed for: {} with {}".format(entry['name'], sys.exc_info()[1]))
 
+        return error_list
 

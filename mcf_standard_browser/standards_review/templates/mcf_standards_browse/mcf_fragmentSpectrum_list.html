@@ -12,6 +12,7 @@
                 <th>ID </th>
                 <th>Precursor m/z </th>
                 <th>Ion </th>
+                <th> Reviewed </th>
                 <th> </th>
             </tr>
         </thead>
@@ -19,7 +20,8 @@
             <tr>
                 <td>{{ spectrum.pk }} </td>
                 <td>{{ spectrum.precursor_mz }} </td>
-                <td>{{ specdata.spectrum.standard }} {{ specdata.spectrum.adduct }}</td>
+                <td>{{ spectrum.standard }} {{ spectrum.adduct }}</td>
+                <td>{{ spectrum.reviewed }} </td>
                 <td>{{ spectrum.precursor_mz.precursor_quad_fraction }}<a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
             </tr>
         {% endfor %}

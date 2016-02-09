@@ -1,0 +1,20 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="center">
+        <h2> EMBL-MCF Standards Inventory: </h2>
+        <div class="main-content">
+            {% for error in error_list %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

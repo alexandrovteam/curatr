@@ -2,15 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404, render_to_resp
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import ensure_csrf_cookie
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
-from .forms import MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm
+from .forms import MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm
 import numpy as np
 import tools
 import sys
 sys.path.append('/Users/palmer/Documents/python_codebase/django-highcharts/django-highcharts/highcharts/')
 import json
 import logging
-from eztables.views import DatatablesView
 from django.views.generic import TemplateView, ListView
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -67,14 +68,13 @@ class MCFStandard_list_ez(ListView):
 
 def MCFStandard_detail(request, pk):
     standard=get_object_or_404(Standard, MCFID=pk)
-    #adducts = Adduct.objects.all()
     return render(request, 'mcf_standards_browse/mcf_standard_detail.html', {'standard': standard})
 
 def MCFMolecule_detail(request, pk):
     molecule=get_object_or_404(Molecule, pk=pk)
     return render(request, 'mcf_standards_browse/mcf_molecule_detail.html', {'molecule': molecule})
 
-
+@login_required()
 def MCFStandard_add(request):
     if request.method == "POST":
         form = MCFStandardForm(request.POST)
@@ -86,16 +86,55 @@ def MCFStandard_add(request):
         form = MCFStandardForm()
     return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'single'})
 
+@login_required()
+def MCFStandard_edit(request, pk):
+    standard = get_object_or_404(Standard, MCFID=pk)
+    if request.method == "POST":
+        form = MCFStandardForm(request.POST)
+        if form.is_valid():
+            standard = form.save()
+            standard.save()
+            return redirect('MCFStandard-list')
+    else:
+        form = MCFStandardForm(instance=standard)
+    logging.debug(form)
+    return render(request,'mcf_standards_browse/mcf_standard_edit.html', {'form':form,})
+
+@login_required()
+def MCFMolecule_edit(request, pk):
+    molecule = get_object_or_404(Molecule, pk=pk)
+    standards = Standard.objects.all().filter(molecule=molecule)
+    if request.method == "POST":
+        form = MCFMoleculeForm(request.POST)
+        if form.is_valid():
+            standard = form.save()
+            standard.save()
+            return redirect('MCFStandard-list')
+    else:
+        form = MCFMoleculeForm(instance=molecule)
+    return render(request,'mcf_standards_browse/mcf_molecule_edit.html', {'form':form, 'standards': standards, 'molecule':molecule})
+
+
+
+@login_required()
 def MCFStandard_add_batch(request):
     logging.debug(request.FILES)
     if request.method == "POST":
         form = MCFStandardBatchForm(request.POST, request.FILES)
         if form.is_valid():
-            tools.process_batch_standard(dict(request.POST), request.FILES['tab_delimited_file'])
-            return redirect('MCFStandard-list')
+            error_list = tools.process_batch_standard({'username': request.user.username}, request.FILES['semicolon_delimited_file'])
+            logging.debug(error_list)
+            if error_list =={}:
+                return redirect('MCFStandard-list')
+            else:
+                return redirect('upload-error', error_list= error_list)
     else:
         form = MCFStandardBatchForm()
     return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'batch'})
+
+
+def upload_error(request, error_list):
+    render_to_response(request,'mcf_standards_browse/upload_error.html', context=error_list)
 
 
 def fragmentSpectrum_list(request):
@@ -185,7 +224,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
         for (fragSpecId, response) in form.get_response():
             #todo update fields in frag spectra
             logging.debug((form.user,fragSpecId,response))
-            tools.update_fragSpec(fragSpecId, response, standard, adduct)
+            tools.update_fragSpec(fragSpecId, response, standard, adduct, request.user.username)
         return redirect('MCFdataset-detail',dataset_pk)
     else:
         chartdata = []
@@ -238,7 +277,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
         }
         return render(request, 'mcf_standards_browse/mcf_xic_detail.html', context=data)
 
-
+@login_required()
 def dataset_upload(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)

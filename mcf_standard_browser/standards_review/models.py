@@ -8,6 +8,9 @@ import re
 sys.path.append("//Users/palmer/Documents/python_codebase/")
 from pyMS.pyisocalc import pyisocalc
 import json
+from django.contrib.auth.models import User
+from django.utils import timezone
+import datetime
 
 # Create your models here.
 class Adduct(models.Model):
@@ -173,6 +176,9 @@ class FragmentationSpectrum(models.Model):
     rt = models.FloatField(blank=True, null=True)
     precursor_quad_fraction = models.FloatField(blank=True, null=True)
     reviewed = models.BooleanField(default=0)
+    date_added = models.DateField(default=timezone.now)
+    date_edited = models.DateField(default=timezone.now)
+    last_editor = models.ForeignKey(User, blank=True, null=True)
 
     def __str__(self):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)
@@ -199,3 +205,10 @@ class FragmentationSpectrum(models.Model):
 
     def get_centroids(self):
         return self.centroid_mzs, self.centroid_ints
+
+    def save(self,*args,**kwargs):
+        logging.debug(self.pk)
+        if not self.pk:
+            self.date_added = datetime.datetime.now()
+        self.date_edited = datetime.datetime.now()
+        super(FragmentationSpectrum, self).save(*args, **kwargs)

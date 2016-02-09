@@ -5,7 +5,7 @@
         <small><a href="{% url 'MCFMolecule-list' %}">return to list</a></small>
     </div>
     <div class="center">
-        <h2> EMBL-MCF Standard: Standard Detail: {{standard.name}}</h2>
+        <h2> EMBL-MCF Molecule Detail: {{ molecule }}</h2>
 
         <div class="main-content">
             <h2>Chemical Information</h2>
@@ -23,5 +23,10 @@
             <p>Pubchem: {{molecule.pubchem_id}} </p>
             <p>HMDB: {{molecule.hmdb_id}} </p>
         </div>
+        {% if user.is_authenticated %}
+        <div class="main-content">
+            <a href="{% url 'MCFMolecule-edit' pk=molecule.pk %}" class="btn btn-default">Edit Standard</a>
+        </div>
+        {% endif %}
     </div>
 {% endblock %}
