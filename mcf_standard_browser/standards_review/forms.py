@@ -56,6 +56,6 @@ class FragSpecReview(forms.Form):
 
 
 class ExportLibrary(forms.Form):
-    data_format = forms.ChoiceField(choices=((0, 'mgf'), (1, 'csv'),), widget=forms.Select)
+    data_format = forms.ChoiceField(choices=((0, 'mgf'), (1, 'msp'), (2, 'csv'),), widget=forms.Select)
     spectra_to_export = forms.ChoiceField(choices=((0, 'Rated Correct'), (1, 'All Rated'), (2, 'ALL MSMS'),), widget=forms.Select)
 

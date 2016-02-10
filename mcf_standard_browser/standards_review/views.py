@@ -334,7 +334,13 @@ def fragmentSpectrum_export(request):
                 response['Content-Disposition'] = 'attachment; filename=mcf_spectra.mgf'
                 t = loader.get_template('mcf_standards_browse/mgf_template.mgf')
                 response.write(t.render(c))
-            elif data_format_id == 1: #csv
+            if data_format_id   == 1: #mgf
+                content_type = "text/txt"
+                response=HttpResponse(content_type=content_type)
+                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.msp'
+                t = loader.get_template('mcf_standards_browse/mgf_template.msp')
+                response.write(t.render(c))
+            elif data_format_id == 2: #csv
                 writer = csv.writer(pseudo_buffer)
                 content_type = "text/csv"
                 response = StreamingHttpResponse((writer.writerow([spectrum.pk, spectrum.centroid_mzs, spectrum.centroid_ints]) for spectrum in spectra),

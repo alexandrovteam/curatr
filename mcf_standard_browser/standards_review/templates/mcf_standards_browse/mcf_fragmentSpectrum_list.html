@@ -20,7 +20,7 @@
             <tr>
                 <td>{{ spectrum.pk }} </td>
                 <td>{{ spectrum.precursor_mz }} </td>
-                <td>{{ spectrum.standard }} {{ spectrum.adduct }}</td>
+                <td>{{ spectrum.standard }} {{ spectrum.adduct.html_str }}</td>
                 <td>{% if spectrum.reviewed %}
                         {% if spectrum.standard == None %}
                             Rejected
@@ -48,7 +48,6 @@
                 "aoColumnDefs": [
                         { "aTargets": [2],
                           "sType": "html",
-                          "sTitle": "Affected column",
                           "mRender": function(o) {
                             return o.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
                            }
