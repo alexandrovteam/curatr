@@ -20,7 +20,7 @@ class Adduct(models.Model):
     charge = models.IntegerField(default=1)#overall charge after atom change
 
     def __str__(self):
-        return "[{}M {}]{}".format(self.nM, self.delta_formula, self.charge)
+        return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge).replace("1","")
 
     def get_delta_atoms(self):
         self.delta_formula = self.delta_formula.strip()

@@ -12,7 +12,7 @@
                 <th>ID </th>
                 <th>Precursor m/z </th>
                 <th>Ion </th>
-                <th> Reviewed </th>
+                <th> Review Status </th>
                 <th> </th>
             </tr>
         </thead>
@@ -21,7 +21,15 @@
                 <td>{{ spectrum.pk }} </td>
                 <td>{{ spectrum.precursor_mz }} </td>
                 <td>{{ spectrum.standard }} {{ spectrum.adduct }}</td>
-                <td>{{ spectrum.reviewed }} </td>
+                <td>{% if spectrum.reviewed %}
+                        {% if spectrum.standard == None %}
+                            Rejected
+                        {% else %}
+                            Confirmed
+                        {% endif %}
+                    {% else %}
+                        Unrated
+                    {% endif %} </td>
                 <td>{{ spectrum.precursor_mz.precursor_quad_fraction }}<a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
             </tr>
         {% endfor %}
@@ -36,7 +44,17 @@
     <script type='text/javascript' src= 'https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>
     <script>
         $(document).ready(function() {
-            var table = $('#id_list_table').DataTable();
+            var table = $('#id_list_table').DataTable({
+                "aoColumnDefs": [
+                        { "aTargets": [2],
+                          "sType": "html",
+                          "sTitle": "Affected column",
+                          "mRender": function(o) {
+                            return o.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                           }
+                        }
+]
+            });
         });
     </script>
 

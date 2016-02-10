@@ -327,16 +327,13 @@ def fragmentSpectrum_export(request):
             pseudo_buffer = Echo()
             data_format_id = int(post_dict['data_format'][0])
             spec_pairs =  [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints)] for spectrum in spectra]
-
+            c = Context({'spec_data': spec_pairs})
             if data_format_id   == 0: #mgf
-
                 content_type = "text/txt"
                 response=HttpResponse(content_type=content_type)
                 response['Content-Disposition'] = 'attachment; filename=mcf_spectra.mgf'
                 t = loader.get_template('mcf_standards_browse/mgf_template.mgf')
-                c = Context({'spec_data': spec_pairs})
                 response.write(t.render(c))
-                return response
             elif data_format_id == 1: #csv
                 writer = csv.writer(pseudo_buffer)
                 content_type = "text/csv"
