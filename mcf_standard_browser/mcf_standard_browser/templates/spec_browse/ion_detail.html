@@ -1,0 +1,11 @@
+{% extends 'spec_browse/base.html' %}
+{% block content %}
+
+    <div class="mol">
+        <h1>Ion Detail</h1>
+        <p>Charge: {{ ion.charge }}</p>
+        <p>Adduct: {{ ion.adduct }}</p>
+        <p>Formula: {{ ion.molecule.formula }}</p>
+        <p>m/z (monoisotopic) {{ ion.mono_mz }}</p>
+    </div>
+{% endblock %}
