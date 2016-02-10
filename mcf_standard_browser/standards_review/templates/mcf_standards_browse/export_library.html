@@ -1,0 +1,13 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+    <div id="center">
+    <div id = welcome>
+            <h2>Export Library</h2>
+        <form method="POST" class="data_upload-form" enctype="multipart/form-data">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="save btn btn-default">Download</button>
+        </form>
+    </div>
+    </div>
+{% endblock %}

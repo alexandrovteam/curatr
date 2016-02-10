@@ -1,0 +1,10 @@
+{% spaceless %}
+{% for spectrum,  mz_ii_pairs in spec_data %}
+BEGIN IONS
+PEPMASS={{ spectrum.precursor_mz }}
+CHARGE=1+
+TITLE=MS/MS scan at {{ spectrum.rt }} min{% for mz_ii in mz_ii_pairs%}
+{{mz_ii.0}} {{mz_ii.1}}{% endfor %}
+END IONS
+{% endfor %}
+{% endspaceless %}

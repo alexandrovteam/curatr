@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^molecule/edit/(?P<pk>.+)/$', views.MCFMolecule_edit, name='MCFMolecule-edit'),
     url(r'^molecule/(?P<pk>.+)/$', views.MCFMolecule_detail, name='MCFMolecule-detail'),
     url(r'^molecule/$', views.MCFMolecule_list, name='MCFMolecule-list'),
+    url(r'^MS2/export/$', views.fragmentSpectrum_export, name='fragmentSpectrum-export'),
     url(r'^MS2/$', views.fragmentSpectrum_list, name='fragmentSpectrum-list'),
     url(r'^MS2/spec(?P<pk>.+)/$', views.fragmentSpectrum_detail, name='fragmentSpectrum-detail'),
     url(r'^upload/dataset/$', views.dataset_upload, name='dataset-upload'),

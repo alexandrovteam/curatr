@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, render_to_resp
 from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import ensure_csrf_cookie
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
-from .forms import MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm
+from .forms import MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
 import numpy as np
 import tools
 import sys
@@ -11,7 +11,9 @@ import json
 import logging
 from django.views.generic import TemplateView, ListView
 from django.contrib.auth.decorators import login_required
-
+import csv
+from django.http import StreamingHttpResponse
+from django.template import loader, Context
 
 # Create your views here.
 
@@ -138,6 +140,10 @@ def upload_error(request, error_list):
 
 
 def fragmentSpectrum_list(request):
+    logging.debug(request)
+    if request.method == "POST":
+        logging.debug('got some post')
+        logging.debug(request.POST)
     fragmentSpectra = FragmentationSpectrum.objects.all()
     return  render(request,'mcf_standards_browse/mcf_fragmentSpectrum_list.html',{'fragmentSpectra':fragmentSpectra})
 
@@ -277,6 +283,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
         }
         return render(request, 'mcf_standards_browse/mcf_xic_detail.html', context=data)
 
+
 @login_required()
 def dataset_upload(request):
     if request.method == 'POST':
@@ -294,3 +301,49 @@ def dataset_upload(request):
         form = UploadFileForm(initial={"mass_accuracy_ppm":10.0, 'quad_window_mz':1.0})
     return render(request, 'mcf_standards_browse/dataset_upload.html', {'form': form})
 
+
+class Echo(object):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+def fragmentSpectrum_export(request):
+    if request.method=='POST':
+        form = ExportLibrary(request.POST)
+        if form.is_valid():
+            post_dict = dict(request.POST)
+            spectra_to_export_id =int(post_dict['spectra_to_export'][0])
+            if spectra_to_export_id  == 0:
+                spectra = FragmentationSpectrum.objects.all().filter(reviewed=True).exclude(standard=None)
+            elif spectra_to_export_id  == 1:
+                spectra = FragmentationSpectrum.objects.all().filter(reviewed=True)
+            elif spectra_to_export_id == 2:
+                spectra = FragmentationSpectrum.objects.all()
+            else:
+                raise ValueError('export code not known')
+            pseudo_buffer = Echo()
+            data_format_id = int(post_dict['data_format'][0])
+            spec_pairs =  [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints)] for spectrum in spectra]
+
+            if data_format_id   == 0: #mgf
+
+                content_type = "text/txt"
+                response=HttpResponse(content_type=content_type)
+                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.mgf'
+                t = loader.get_template('mcf_standards_browse/mgf_template.mgf')
+                c = Context({'spec_data': spec_pairs})
+                response.write(t.render(c))
+                return response
+            elif data_format_id == 1: #csv
+                writer = csv.writer(pseudo_buffer)
+                content_type = "text/csv"
+                response = StreamingHttpResponse((writer.writerow([spectrum.pk, spectrum.centroid_mzs, spectrum.centroid_ints]) for spectrum in spectra),
+                                     content_type=content_type)
+                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.csv'
+            return response
+    else:
+        form=ExportLibrary()
+    return render(request, 'mcf_standards_browse/export_library.html', {'form':form})

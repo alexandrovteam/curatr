@@ -230,3 +230,6 @@ def add_batch_standard(csv_filename):
 
         return error_list
 
+
+
+
