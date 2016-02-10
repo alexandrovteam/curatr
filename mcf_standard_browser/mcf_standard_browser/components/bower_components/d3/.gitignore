@@ -1,1 +1,8 @@
 /.bower.json
+*.json
+/CONTRIBUTING.md
+/d3.js
+/d3.min.js
+/.gitignore
+/LICENSE
+/README.md
