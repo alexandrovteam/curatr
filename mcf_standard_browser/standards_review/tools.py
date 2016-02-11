@@ -178,13 +178,14 @@ def add_batch_standard(csv_filename):
     error_list = {}
     df = pd.read_csv(csv_filename, sep=";")
     df = df.fillna("")
+    logging.debug(df.shape)
     for row in df.iterrows():
         try:
             # clean up input
             entry = row[1]
             if entry['formula'] == '':
                 raise ValueError('sum formula cannot be blank')
-            entry['id'] = ''.join([char for char in entry['id'] if char in ("0123456789")])
+            entry['id'] = ''.join([char for char in str(entry['id']) if char in ("0123456789")])
 
             if entry['pubchem_id'] != "":
                 molecule = Molecule.objects.all().filter(pubchem_id=entry['pubchem_id'])
