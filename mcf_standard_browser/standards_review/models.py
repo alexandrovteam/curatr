@@ -22,7 +22,7 @@ class Adduct(models.Model):
     def html_str(self):
             return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge).replace("1","")
     def __str__(self):
-        return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge).replace("1","")
+        return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
 
     def get_delta_atoms(self):
         self.delta_formula = self.delta_formula.strip()

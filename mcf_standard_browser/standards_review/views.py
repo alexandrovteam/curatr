@@ -129,14 +129,14 @@ def MCFStandard_add_batch(request):
             if error_list =={}:
                 return redirect('MCFStandard-list')
             else:
-                return redirect('upload-error', error_list= error_list)
+                return render_to_response('mcf_standards_browse/upload_error.html', context={'error_list': error_list})
     else:
         form = MCFStandardBatchForm()
     return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'batch'})
 
 
-def upload_error(request, error_list):
-    render_to_response(request,'mcf_standards_browse/upload_error.html', context=error_list)
+def error_page(request):
+    return render(request,'mcf_standards_browse/upload_error.html')
 
 
 def fragmentSpectrum_list(request):
