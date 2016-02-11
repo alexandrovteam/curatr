@@ -15,6 +15,11 @@ class MCFStandardForm(forms.ModelForm):
         model = Standard
         fields = ('MCFID','molecule','vendor','vendor_cat','lot_num' ,'location' ,'purchase_date')
 
+class MCFAdductForm(forms.ModelForm):
+    class Meta:
+        model = Adduct
+        fields = ('nM', 'delta_formula', 'charge')
+
 
 class MCFStandardBatchForm(forms.Form):
     semicolon_delimited_file = forms.FileField()

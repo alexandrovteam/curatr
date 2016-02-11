@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response, HttpResponse
-from django.views.generic import TemplateView, ListView
 from django.views.decorators.csrf import ensure_csrf_cookie
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
-from .forms import MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
+from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
 import numpy as np
 import tools
 import sys
@@ -116,6 +115,21 @@ def MCFMolecule_edit(request, pk):
         form = MCFMoleculeForm(instance=molecule)
     return render(request,'mcf_standards_browse/mcf_molecule_edit.html', {'form':form, 'standards': standards, 'molecule':molecule})
 
+@login_required()
+def MCFAdduct_add(request):
+    if request.method == "POST":
+        form = MCFAdductForm(request.POST)
+        if form.is_valid():
+            if Adduct.objects.filter(nM=request.POST['nM'], delta_formula=request.POST['delta_formula']).exists():
+                error_list ={"adduct already exists":""}
+                return render_to_response('mcf_standards_browse/upload_error.html', context={'error_list': error_list})
+            adduct=form.save()
+            adduct.save()
+            tools.update_mzs()
+        return redirect("/")
+    else:
+        form = MCFAdductForm()
+    return render(request,'mcf_standards_browse/mcf_adduct_add.html', {'form':form})
 
 
 @login_required()

@@ -1,0 +1,19 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+ <div class="center">
+     <h1> Add adduct</h1>
+        <div class="main-content">
+            <form method="POST" class="data_upload-form" enctype="multipart/form-data">{% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="save btn btn-default">Save</button>
+            </form>
+            <a href="{% url 'MCFStandard-list' %}" class="btn btn-default">Cancel</a>
+
+        </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

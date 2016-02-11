@@ -236,6 +236,10 @@ def add_batch_standard(csv_filename):
 
     return error_list
 
-
+def update_mzs():
+    molecules = Molecule.objects.all()
+    for molecule in molecules:
+        molecule.set_adduct_mzs()
+        molecule.save()
 
 

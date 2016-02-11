@@ -7,6 +7,7 @@ from .views import MCFStandard_list_ez
 
 urlpatterns = [
     url(r'^$', views.home_page),
+    url(r'^adduct/add/$', views.MCFAdduct_add, name='MCFAdduct-add'),
     url(r'^inventory/$', views.MCFStandard_list, name='MCFStandard-list'),
     url(r'^inventory/add/$', views.MCFStandard_add, name='MCFStandard-add'),
     url(r'^inventory/add/batch/$', views.MCFStandard_add_batch, name='MCFStandard-add-batch'),
