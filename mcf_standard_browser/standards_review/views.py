@@ -224,9 +224,26 @@ def MCFdataset_detail(request, pk):
     dataset=get_object_or_404(Dataset, pk=pk)
     adducts = dataset.adducts_present.all()
     standards = dataset.standards_present.all().order_by('MCFID')
-    data = {'dataset':dataset,
-            'adducts':adducts,
-            'standards':standards,}
+    table_list = []
+    for standard in standards:
+        for adduct in adducts:
+            mz=standard.molecule.get_mz(adduct)
+            delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
+            table_list.append(
+                [standard,
+                 adduct,
+                 int(np.sum(Xic.objects.get(standard=standard,adduct=adduct,dataset=dataset).xic)),
+                 FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz).count(),
+                ]
+                )
+
+#    data = {'dataset':dataset,
+#            'adducts':adducts,
+#            'standards':standards,
+#            'xics':xics}
+    data = {'table_data':table_list,
+            'dataset': dataset}
+    logging.debug(table_list)
     return render_to_response('mcf_standards_browse/mcf_dataset_detail.html', context=data)
 
 
@@ -237,7 +254,8 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
     adduct=get_object_or_404(Adduct, pk=adduct_pk)
     mz=standard.molecule.get_mz(adduct)
     delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
-    xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
+    #xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
+    xics = Xic.objects.all().filter(standard=standard,adduct=adduct,dataset=dataset)
     frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
     form = FragSpecReview(request.POST or None, extra=list([fs.pk for fs in frag_specs]), user=request.user)
     if form.is_valid():
@@ -291,7 +309,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
                 "xAxis":  {"title": {"text": 'm/z'},},
                 "yAxis": {"title": {"text": 'Intensity'}},
                 "series": [
-                        {"name": 'fragment spectrum', "data": [[x+d,y*m] for x,y in zip(np.round(spec.centroid_mzs,5), spec.centroid_ints) for d,m in zip([-0.0001,0,0.0001],[0,1,0])]
+                        {"name": 'fragment spectrum', "data": [[x+d,y*m] for x,y in zip(np.round(spec.centroid_mzs,5), spec.centroid_ints) for d,m in zip([-0.00,0,0.00 ],[0,1,0])]
                             },
                     ],} for spec in frag_specs]
         }

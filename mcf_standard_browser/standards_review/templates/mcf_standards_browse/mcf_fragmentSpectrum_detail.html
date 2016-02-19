@@ -1,6 +1,5 @@
 {% extends 'mcf_standards_browse/base.html' %}
 {% block head %}
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
 {% endblock %}
 
@@ -8,17 +7,21 @@
     <div class="page-header-extras">
         <small><a href="{% url 'fragmentSpectrum-list' %}">return to list</a></small>
     </div>
-    <div class="mol">
-        <h2>Fragmentation Spectrum Detail</h2>
-        <h3>Scan number: {{ specdata.spectrum.spec_num }}</h3>
-        <p>Precursor m/z: {{ specdata.spectrum.precursor_mz }}</p>
-        <p>Ion (Standard, Adduct): {{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct }}</p>
-        <p>Raw data: <a href="{% url 'MCFdataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} <{{ specdata.spectrum.spec_num }}></a></p>
-        <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
-
+<div class="center">
+    <div class="main-content">
+        <div class="mol">
+            <h2>Fragmentation Spectrum Detail</h2>
+            <h3>Scan number: {{ specdata.spectrum.spec_num }}</h3>
+            <p>Precursor m/z: {{ specdata.spectrum.precursor_mz }}</p>
+            <p>Ion (Standard, Adduct): {{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct }}</p>
+            <p>Raw data: <a href="{% url 'MCFdataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} <{{ specdata.spectrum.spec_num }}></a></p>
+            <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
+        </div>
+    <div>
+    <div class="main-content">
+        <div id='chart_id' class="specgraph"></div>
     </div>
-    <div id='chart_id' class="specgraph"></div>
-
+</div>
 {% endblock %}
 
 {% block script %}
@@ -34,7 +37,8 @@
 
 <!-- Highchart js. Variable map shown above -->
 <script>
-    $(document).ready(function() {
+
+    $(function() {
         $('#chart_id').highcharts({
             chart: chart,
             title: title,

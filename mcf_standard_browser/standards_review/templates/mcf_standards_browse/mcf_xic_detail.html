@@ -2,7 +2,9 @@
 {% load xic_extras %}
 {% block head %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
+    <script src="http://github.highcharts.com/highcharts.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -64,7 +66,6 @@
 {% endblock %}
 
 {% block script %}
-<!-- Highchart js. Variable map shown above -->
 <script>
     $(document).ready(function() {
         $('#{{ highchart.chart_id|safe }}').highcharts({
@@ -84,7 +85,14 @@
                 title: {{ spec.title|safe }},
                 xAxis: {{ spec.xAxis|safe }},
                 yAxis: {{ spec.yAxis|safe }},
-                series: {{ spec.series|safe }}
+                series: {{ spec.series|safe }},
+                tooltip: {
+                    snap: 50,
+                    crosshairs: [true,false],
+                    formatter: function () {
+                        return this.point.x;
+                    }
+                }
             });
         });
     </script>

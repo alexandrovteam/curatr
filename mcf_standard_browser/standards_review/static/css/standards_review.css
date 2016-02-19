@@ -27,6 +27,7 @@ body {
 
 .center{
     margin: auto;
+    margin-top:45px;
     width: 95%;
     min-width: 300px;
     border: 0px solid lightgrey;
@@ -62,7 +63,7 @@ body {
 
 .page-header-extras {
     background-color: #ff9400;
-    margin-top: 0;
+    margin-top: 15px;
     padding: 20px 20px 20px 20px;
 
 }
@@ -157,4 +158,9 @@ h3 {
 
 .table_c{
 text-align: center;
+}
+
+.footer, .push {
+    position: fixed;
+    bottom: 0px;
 }

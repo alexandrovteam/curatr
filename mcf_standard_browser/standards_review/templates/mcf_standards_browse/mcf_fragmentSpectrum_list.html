@@ -1,43 +1,45 @@
 {% extends 'mcf_standards_browse/base.html' %}
 {% block head %}
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
 {% endblock %}
 
 {% block content %}
-    <h2> Fragmentation Spectra: </h2>
-    <table id="id_list_table" class="display" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th>ID </th>
-                <th>Precursor m/z </th>
-                <th>Ion </th>
-                <th> Review Status </th>
-                <th> </th>
-            </tr>
-        </thead>
-        {% for spectrum in fragmentSpectra %}
-            <tr>
-                <td>{{ spectrum.pk }} </td>
-                <td>{{ spectrum.precursor_mz }} </td>
-                <td>{{ spectrum.standard }} {{ spectrum.adduct.html_str }}</td>
-                <td>{% if spectrum.reviewed %}
-                        {% if spectrum.standard == None %}
-                            Rejected
-                        {% else %}
-                            Confirmed
-                        {% endif %}
-                    {% else %}
-                        Unrated
-                    {% endif %} </td>
-                <td>{{ spectrum.precursor_mz.precursor_quad_fraction }}<a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
-            </tr>
-        {% endfor %}
-    </table>
-    <a href="{% url 'fragmentSpectrum-export' %}" id="add_standard_button"><span class="glyphicon glyphicon-plus"> Export library </span></a>
+<div class="center">
+    <div class="main-content">
+        <h2> Fragmentation Spectra </h2>
+        <table id="id_list_table" class="display" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>ID </th>
+                    <th>Precursor m/z </th>
+                    <th>Ion </th>
+                    <th> Review Status </th>
+                    <th> </th>
+                </tr>
+            </thead>
 
+            {% for spectrum in fragmentSpectra %}
+                <tr>
+                    <td>{{ spectrum.pk }} </td>
+                    <td>{{ spectrum.precursor_mz }} </td>
+                    <td>{{ spectrum.standard }} {{ spectrum.adduct.html_str }}</td>
+                    <td>{% if spectrum.reviewed %}
+                            {% if spectrum.standard == None %}
+                                Rejected
+                            {% else %}
+                                Confirmed
+                            {% endif %}
+                        {% else %}
+                            Unrated
+                        {% endif %} </td>
+                    <td>{{ spectrum.precursor_mz.precursor_quad_fraction }}<a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}" id="MCF">View</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        <a href="{% url 'fragmentSpectrum-export' %}" id="add_standard_button">Export library </span></a>
     </div>
 
+</div>
 {% endblock %}
 
 {% block script %}

@@ -1,19 +1,47 @@
 {% extends 'mcf_standards_browse/base.html' %}
 
 {% block content %}
-
-    <div id = welcome, style="text-align: center; width = 100%;">
-        <h1>Welcome to the MCF Standard Library Browser</h1>
-        </div>
-    <div class="center">
-
-        <p>
-            <a href="{% url 'MCFMolecule-list' %}"> Browse Molecule Library </a> -
-            <a href="{% url 'MCFStandard-list' %}"> Browse Standards Inventory </a> -
-            <a href="{% url 'fragmentSpectrum-list' %}"> Browse Fragmentation Spectra </a> -
-            <a href="{% url 'MCFdataset-list' %}"> Browse datasets </a> -
-        </p>
+<!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container" style="margin-top:45px">
+        <p><h1>Welcome to Curatr</h1></p>
+        <p>Curatr is a portal for the curation and exploration of tandem mass spectrometry data.</p>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+      </div>
     </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+          <h2>Browse Molecules</h2>
+          <p>Explore the library of molecules.</p>
+          <p><a class="btn btn-default" href="{% url 'MCFMolecule-list' %}" role="button">Go &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+          <h2>Browse Standards</h2>
+          <p>Explore the library of standards</p>
+          <p><a class="btn btn-default" href="{% url 'MCFStandard-list' %}" role="button">Go &raquo;</a></p>
+       </div>
+        <div class="col-md-4">
+          <h2>Browse Spectra</h2>
+          <p>Explore the spectral data contained in the library</p>
+          <p><a class="btn btn-default" href="{% url 'fragmentSpectrum-list' %}" role="button">Go &raquo;</a></p>
+        </div>
+      </div>
+        <div class="row">
+            <div class="col-md-4 col-centered" >
+                <h2>Curate Data</h2>
+                <p>Upload a LC-MS(/MS) or shotgun dataset and curate the fragmentation spectra within. </p>
+                <p><a class="btn btn-default" href="{% url 'MCFdataset-list' %}" role="button">Go &raquo;</a></p>
+            </div>
+        </div>
+
+      <hr>
+
+
+    </div> <!-- /container -->
+
 {% endblock %}
 
 

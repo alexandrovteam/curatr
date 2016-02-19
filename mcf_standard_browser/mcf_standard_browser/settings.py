@@ -22,7 +22,6 @@ PROJECT_ROOT = os.path.abspath(
 APPLICATION_DIR = os.path.dirname(globals()['__file__'])
 
 STATICFILES_DIRS = [
-    "/Users/palmer/Documents/python_codebase/django-nvd3/django_nvd3/",
 ]
 
 # Quick-start development settings - unsuitable for production
@@ -32,8 +31,6 @@ STATICFILES_DIRS = [
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-    #'djangobower.finders.BowerFinder',
 )
 
 STATIC_ROOT = '/Users/palmer/Documents/python_codebase/mcf_standard_browser/mcf_standard_browser/static/'

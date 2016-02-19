@@ -1,35 +1,75 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="{% static 'css/standards_review.css' %}">
-    {% block head %}
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="Data curation and librarian for fragmentation spectra">
+        <meta name="author" content="Andrew Palmer, EMBL, Alexandrov Team">
+        <link rel="icon" href="../../favicon.ico">
+
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="{% static 'css/standards_review.css' %}">
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+        {% block head %}
+        {% endblock %}
+
+        <title>Curatr</title>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+          <div class="container">
+            <div class="navbar-header" style="height:75px">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand"  href = "/" id="home_link"><img src="{% static 'curatr_logo.png'  %}" alt="curatr_logo" style="width:75px;height:75px"/> Curatr [EMBL-MCF] </a>
+            </div>
+            {% if user.is_authenticated %}
+                <small style="float:right"><a href="{% url 'django.contrib.auth.views.logout' %}">(log out)</a></small>
+                <h2 style="float:right; color:#ffffff">welcome: {{ user }}</h2>
+            {% else %}
+                <a href="{% url 'django.contrib.auth.views.login' %}" class="top-menu" style="float:right"><small>Log in <span class="glyphicon glyphicon-lock"></span></small></a>
+            {% endif %}
+            <div id="navbar" class="navbar-collapse collapse">
+            </div> <!--/.navbar-collapse -->
+          </div> <!-- /container -->
+
+        </nav>
+
+        <div class="center">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <div class="footer">
+            <p>&copy; <a href="https://github.com/andy-d-palmer/curatr" > open source </a> </p>
+        </div>
+
+
+    <!-- JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"><\/script>')</script>
+    <script src="{% static 'js/bootstrap.min.js'  %}"></script>
+    {% block script %}
     {% endblock %}
-    <title>MCF Standards Browser</title>
-</head>
-
-<body>
-    <div class="page-header">
-        {% if user.is_authenticated %}
-            <p><small><a href="{% url 'django.contrib.auth.views.logout' %}">(log out)</a></small><h2>welcome: {{ user }}</h2>  </p>
-        {% else %}
-            <a href="{% url 'django.contrib.auth.views.login' %}" class="top-menu"><small>Log in <span class="glyphicon glyphicon-lock"></span></small></a>
-        {% endif %}
-        <h1> <a href = "/" id="home_link">MCF Data Browser</a> </h1>
-    </div>
-
-    {% block content %}
+    {% block extrajs %}
     {% endblock %}
 
-</body>
-{% block script %}
-{% endblock %}
-<!-- JavaScript -->
-<!-- Placed at the end of the document so the pages load faster -->
-    {% block extrajs %}{% endblock %}
+
+    </body>
 </html>

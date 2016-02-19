@@ -33,7 +33,9 @@
     <script type='text/javascript' src= 'https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>
     <script>
         $(document).ready(function() {
-            $('#id_list_table').DataTable();
+            $('#id_list_table').DataTable({
+                    stateSave: true
+            });
         } );
     </script>
 {% endblock %}
