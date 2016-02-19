@@ -1,16 +1,22 @@
 {% extends 'mcf_standards_browse/base.html' %}
+{% block head %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
+    <script src="http://github.highcharts.com/highcharts.js"></script>
+{% endblock %}
 
 {% block content %}
     <div class="page-header-extras">
-        <small><a href="{% url 'MCFMolecule-list' %}">return to list</a></small>
+        <small><a href="{% url 'MCFMolecule-list' %}">return to molecule catalogue</a></small>
     </div>
     <div class="center">
-        <h2> EMBL-MCF Molecule Detail: {{ molecule }}</h2>
-
+         <div class="main-content">
+            <h2> Molecule Detail</h2>
+            <h2> {{ molecule }}</h2>
+        </div>
         <div class="main-content">
             <h2>Chemical Information</h2>
             <p>Formula: {{molecule.sum_formula}}</p>
-            <p>MCFID: {{molecule.MCFID}} </p>
             <p>Inchi: {{molecule.inchi_code}} </p>
             <p>Exact mass: {{molecule.exact_mass}} </p>
             <p>Solubility: {{molecule.solubility}} </p>
@@ -23,10 +29,47 @@
             <p>Pubchem: {{molecule.pubchem_id}} </p>
             <p>HMDB: {{molecule.hmdb_id}} </p>
         </div>
+        <div class="main-content">
+            {% for standard, spectra in standards %}
+            <p>Standard ID: <a href="{% url 'MCFStandard-detail' standard.MCFID %}"> {{ standard }} </a></p>
+                {% for spectrum in spectra %}
+
+                    {{ spectrum.adduct.html_str }}
+                    <div id="frag_spec{{ spectrum.id }}" class="xic_fraggraph"></div>
+                    <a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}">View Spectrum Detail</a>
+            <br>
+                {% endfor %}
+            {% endfor %}
+        </div>
         {% if user.is_authenticated %}
         <div class="main-content">
             <a href="{% url 'MCFMolecule-edit' pk=molecule.pk %}" class="btn btn-default">Edit Standard</a>
         </div>
         {% endif %}
     </div>
+{% endblock %}
+
+
+{% block script %}
+{% for spec in frag_spec_highchart %}
+    <script>
+        $(document).ready(function() {
+            $('#{{ spec.chart_id }}').highcharts({
+                chart: {{ spec.chart|safe }},
+                title: {{ spec.title|safe }},
+                xAxis: {{ spec.xAxis|safe }},
+                yAxis: {{ spec.yAxis|safe }},
+                series: {{ spec.series|safe }},
+                legend: {enabled: false},
+                tooltip: {
+                    snap: 50,
+                    crosshairs: [true,false],
+                    formatter: function () {
+                        return this.point.x;
+                    }
+                }
+            });
+        });
+    </script>
+{% endfor %}
 {% endblock %}

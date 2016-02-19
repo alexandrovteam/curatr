@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^dataset/(?P<pk>.+)/$', views.MCFdataset_detail, name='MCFdataset-detail'),
     url(r'^xic/(?P<dataset_pk>.+)/MCF(?P<standard_pk>.+)/M(?P<adduct_pk>.+)$', views.MCFxic_detail,
         name='MCFxic-detail'),
-    url(r'^accounts/login/$', auth_views.login),
+    url(r'^accounts/login/$', auth_views.login, name='login'),
     url(r'^accounts/logout/$', auth_views.logout, {'next_page': '/'}),
     url(r'^about/', MCFStandard_list_ez.as_view(), name="MCFStandard_list_ez"),
     url(r'^errors/batch_molecule_upload/', views.error_page, name="batch-upload-error"),

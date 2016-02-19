@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404, render_to_response, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
 from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
@@ -69,11 +69,48 @@ class MCFStandard_list_ez(ListView):
 
 def MCFStandard_detail(request, pk):
     standard=get_object_or_404(Standard, MCFID=pk)
-    return render(request, 'mcf_standards_browse/mcf_standard_detail.html', {'standard': standard})
+    frag_specs = FragmentationSpectrum.objects.all().filter(standard=standard)
+    chart_type = 'line'
+    chart_height=300
+    data={
+        "standard":standard,
+        "frag_specs":frag_specs,
+        "frag_spec_highchart": [{
+                "chart_id": 'frag_spec{}'.format(spec.id),
+                "chart": {"type": chart_type, "height": chart_height, "zoomType": "x"},
+                "title": {"text": ''},
+                "xAxis":  {"title": {"text": 'm/z'},},
+                "yAxis": {"title": {"text": 'Intensity'}},
+                "series": [
+                        {"name": 'fragment spectrum', "data": [[x+d,y*m] for x,y in zip(np.round(spec.centroid_mzs,5), spec.centroid_ints) for d,m in zip([-0.00,0,0.00 ],[0,1,0])]
+                            },
+                    ],} for spec in frag_specs]
+          }
+    return render(request, 'mcf_standards_browse/mcf_standard_detail.html', data)
 
 def MCFMolecule_detail(request, pk):
     molecule=get_object_or_404(Molecule, pk=pk)
-    return render(request, 'mcf_standards_browse/mcf_molecule_detail.html', {'molecule': molecule})
+    standards = Standard.objects.all().filter(molecule=molecule)
+    frag_specs = []
+    for standard in standards:
+        frag_specs.extend(FragmentationSpectrum.objects.all().filter(standard=standard))
+    chart_type = 'line'
+    chart_height=300
+    data={
+        'molecule': molecule,
+        "standards":[[standard,FragmentationSpectrum.objects.all().filter(standard=standard)] for standard in standards],
+        "frag_spec_highchart": [{
+                "chart_id": 'frag_spec{}'.format(spec.id),
+                "chart": {"type": chart_type, "height": chart_height, "zoomType": "x"},
+                "title": {"text": ''},
+                "xAxis":  {"title": {"text": 'm/z'},},
+                "yAxis": {"title": {"text": 'Intensity'}},
+                "series": [
+                        {"name": 'fragment spectrum', "data": [[x+d,y*m] for x,y in zip(np.round(spec.centroid_mzs,5), spec.centroid_ints) for d,m in zip([-0.00,0,0.00 ],[0,1,0])]
+                            },
+                    ],} for spec in frag_specs]
+          }
+    return render(request, 'mcf_standards_browse/mcf_molecule_detail.html', data)
 
 @login_required()
 def MCFStandard_add(request):
@@ -122,7 +159,7 @@ def MCFAdduct_add(request):
         if form.is_valid():
             if Adduct.objects.filter(nM=request.POST['nM'], delta_formula=request.POST['delta_formula']).exists():
                 error_list ={"adduct already exists":""}
-                return render_to_response('mcf_standards_browse/upload_error.html', context={'error_list': error_list})
+                return render(request, 'mcf_standards_browse/upload_error.html', {'error_list': error_list})
             adduct=form.save()
             adduct.save()
             tools.update_mzs()
@@ -143,7 +180,7 @@ def MCFStandard_add_batch(request):
             if error_list =={}:
                 return redirect('MCFStandard-list')
             else:
-                return render_to_response('mcf_standards_browse/upload_error.html', context={'error_list': error_list})
+                return render('mcf_standards_browse/upload_error.html', {'error_list': error_list})
     else:
         form = MCFStandardBatchForm()
     return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'batch'})
@@ -214,7 +251,7 @@ def fragmentSpectrum_detail(request,pk):
                 ],
         },
     }
-    return render_to_response('mcf_standards_browse/mcf_fragmentSpectrum_detail.html', context=data)
+    return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_detail.html', data)
 
 def MCFdataset_list(request):
     datasets = Dataset.objects.all()
@@ -244,7 +281,7 @@ def MCFdataset_detail(request, pk):
     data = {'table_data':table_list,
             'dataset': dataset}
     logging.debug(table_list)
-    return render_to_response('mcf_standards_browse/mcf_dataset_detail.html', context=data)
+    return render(request, 'mcf_standards_browse/mcf_dataset_detail.html', data)
 
 
 @ensure_csrf_cookie

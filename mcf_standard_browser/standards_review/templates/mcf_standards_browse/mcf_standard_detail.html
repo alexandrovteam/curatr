@@ -1,11 +1,17 @@
 {% extends 'mcf_standards_browse/base.html' %}
+{% block head %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
+    <script src="http://github.highcharts.com/highcharts.js"></script>
+{% endblock %}
 
 {% block content %}
     <div class="page-header-extras">
-        <small><a href="{% url 'MCFStandard-list' %}">return to list</a></small>
+        <small><a href="{% url 'MCFStandard-list' %}">return to standard list</a></small>
     </div>
     <div class="center">
-        <h2> EMBL-MCF Standard: Standard Detail: {{standard.name}}</h2>
+        <h2> Standard Detail</h2>
+        <h2>{{standard.name}}</h2>
 
             <div class="main-content">
                 <h2>Chemical Information</h2>
@@ -25,12 +31,44 @@
                 <p>Vendor: {{standard.vendor}} </p>
                 <p>Vendor Catalogue Number: {{standard.vendor_cat}} </p>
             </div>
+            <div>
+                {% for spectrum in frag_specs %}
+                {{ spectrum.adduct.html_str }}
+                    <div id="frag_spec{{ spectrum.id }}" class="xic_fraggraph"></div>
+                {% endfor %}
+            </div>
+
+        {% if user.is_authenticated %}
             <div class="main-content">
                 <a href="{% url 'MCFStandard-edit' pk=standard.MCFID %}" class="btn btn-default">Edit Standard</a>
             </div>
         </div>
-
+        {% endif %}
 
 
     </div>
+{% endblock %}
+
+{% block script %}
+{% for spec in frag_spec_highchart %}
+    <script>
+        $(document).ready(function() {
+            $('#{{ spec.chart_id }}').highcharts({
+                chart: {{ spec.chart|safe }},
+                title: {{ spec.title|safe }},
+                xAxis: {{ spec.xAxis|safe }},
+                yAxis: {{ spec.yAxis|safe }},
+                series: {{ spec.series|safe }},
+                legend: {enabled: false},
+                tooltip: {
+                    snap: 50,
+                    crosshairs: [true,false],
+                    formatter: function () {
+                        return this.point.x;
+                    }
+                }
+            });
+        });
+    </script>
+{% endfor %}
 {% endblock %}
