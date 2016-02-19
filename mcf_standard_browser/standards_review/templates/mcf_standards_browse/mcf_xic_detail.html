@@ -44,10 +44,14 @@
                                 {% if user.is_authenticated %}
                                     {{ form|form_id:spec.id }}
                                 {% else %}
-                                    {% if spec.standard == None %}
+                                    {% if spec.reviewed == False %}
                                         Unrated
                                     {% else %}
-                                        {{ spec.standard }}
+                                        {% if spec.standard == None%}
+                                            Rejected
+                                        {% else %}
+                                            {{ spec.standard }}
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
                                 Status set by {{ spec.last_editor }} on {{ spec.date_edited }}
