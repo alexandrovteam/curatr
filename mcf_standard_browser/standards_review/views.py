@@ -177,10 +177,10 @@ def MCFStandard_add_batch(request):
         if form.is_valid():
             error_list = tools.process_batch_standard({'username': request.user.username}, request.FILES['semicolon_delimited_file'])
             logging.debug(error_list)
-            if error_list =={}:
+            if error_list ==[]:
                 return redirect('MCFStandard-list')
             else:
-                return render('mcf_standards_browse/upload_error.html', {'error_list': error_list})
+                return render(request, 'mcf_standards_browse/upload_error.html', {'error_list': error_list})
     else:
         form = MCFStandardBatchForm()
     return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'batch'})

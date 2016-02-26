@@ -8,8 +8,8 @@
     <div class="center">
         <h2> Errors: </h2>
         <div class="main-content">
-            {% for mykey, myvalue in error_list.items %}
-                <p>Error for: {{ mykey }}</p>
+            {% for mykey, myvalue in error_list %}
+                <p> {{ mykey }}:  {{myvalue}}</p>
             {% endfor %}
         </div>
     </div>
