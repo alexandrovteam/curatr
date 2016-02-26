@@ -176,8 +176,9 @@ def process_batch_standard(metadata, file):
 def add_batch_standard(csv_filename):
     import pandas as pd
     import sys
-    error_list = {}
-    df = pd.read_csv(csv_filename, sep=";", dtype=str)
+    error_list = []
+    df = pd.read_csv(csv_filename, sep="\t", dtype=str)
+    df.columns = [x.replace(" ", "_").lower() for x in df.columns]
     df = df.fillna("")
     logging.debug(df.shape)
     for row in df.iterrows():
@@ -222,7 +223,6 @@ def add_batch_standard(csv_filename):
             s.vendor = entry["vendor"]
             s.vendor_cat = entry["vendor_id"]
             s.lot_num = entry["lot_num"]
-            s.location = entry["location"]
             s.purchase_date = dateutil.parser.parse(entry["purchase_date"], fuzzy=True)
             s.save()
             if entry["id"] == []:
@@ -231,7 +231,7 @@ def add_batch_standard(csv_filename):
                 s.MCFID = entry['id']
             s.save()
         except:
-            error_list[''.join([i if ord(i) < 128 else ' ' for i in entry['name']])] = slugify(sys.exc_info()[1]).encode('utf-8').strip()
+            error_list.append([[''.join([i if ord(i) < 128 else ' ' for i in entry['name']])], slugify(sys.exc_info()[1]).encode('utf-8').strip()])
             logging.debug("Failed for: {} with {}".format(entry['name'], sys.exc_info()[1]))
 
     return error_list
