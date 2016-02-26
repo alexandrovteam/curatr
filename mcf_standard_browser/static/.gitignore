@@ -1,0 +1,12 @@
+/__init__.py
+/__init__.pyc
+*.DS_Store
+/admin/
+/css/
+/d3/
+/images/
+/js/
+/nvd3/
+/standards_review/
+/static_jquery/
+/templatetags/
