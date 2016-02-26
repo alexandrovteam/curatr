@@ -19,7 +19,7 @@ class Adduct(models.Model):
 
     def html_str(self):
             return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge).replace("1","")
-    def __str__(self):
+    def __unicode__(self):
         return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
 
     def get_delta_atoms(self):
@@ -69,7 +69,12 @@ class Molecule(models.Model):
         mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
         return mass
 
-    def __str__(self):
+    def __unicode__(self):
+        return u"".join([i for i in self.name if ord(i) <128])
+
+
+
+    def html_str(self):
         return "{}".format(self.name)
 
     def save(self,*args,**kwargs):
@@ -106,7 +111,7 @@ class Standard(models.Model):
     lot_num = models.TextField(null=True, blank=True)
     location = models.TextField(null=True, blank=True)
     purchase_date = models.DateField(null=True, blank=True)
-    def __str__(self):
+    def __unicode__(self):
         return "{}: {}".format(self.MCFID, self.molecule.name)
 
 
@@ -117,7 +122,7 @@ class Dataset(models.Model):
     mass_accuracy_ppm = models.FloatField(default=10.0)
     quad_window_mz = models.FloatField(default=1.0)
     #(for xic search)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 
@@ -180,7 +185,7 @@ class FragmentationSpectrum(models.Model):
     date_edited = models.DateField(default=timezone.now)
     last_editor = models.ForeignKey(User, blank=True, null=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)
 
     def set_centroid_mzs(self, mzs):

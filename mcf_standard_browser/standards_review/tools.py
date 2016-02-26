@@ -8,6 +8,7 @@ import dateutil
 import logging
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+import string
 
 def handle_uploaded_files(metadata,file):
     mzml_filename = os.path.join(settings.MEDIA_ROOT,"tmp_mzml.mzml")
@@ -172,14 +173,17 @@ def process_batch_standard(metadata, file):
     error_list = add_batch_standard(csv_filename)
     return error_list
 
+def to_unicode(s):
+    return s.encode("utf-8", errors="ignore")
 
 def add_batch_standard(csv_filename):
     import pandas as pd
     import sys
     error_list = []
-    df = pd.read_csv(csv_filename, sep="\t", dtype=str)
+    df = pd.read_csv(csv_filename, sep="\t", dtype=unicode)
     df.columns = [x.replace(" ", "_").lower() for x in df.columns]
     df = df.fillna("")
+    #df = df.applymap(to_unicode)
     logging.debug(df.shape)
     for row in df.iterrows():
         try:
@@ -231,7 +235,8 @@ def add_batch_standard(csv_filename):
                 s.MCFID = entry['id']
             s.save()
         except:
-            error_list.append([[''.join([i if ord(i) < 128 else ' ' for i in entry['name']])], slugify(sys.exc_info()[1]).encode('utf-8').strip()])
+            error_list.append([entry['name'], sys.exc_info()[1]])
+            #error_list.append([[''.join([i if ord(i) < 128 else ' ' for i in entry['name']])], slugify(sys.exc_info()[1]).encode('utf-8').strip()])
             logging.debug("Failed for: {} with {}".format(entry['name'], sys.exc_info()[1]))
 
     return error_list

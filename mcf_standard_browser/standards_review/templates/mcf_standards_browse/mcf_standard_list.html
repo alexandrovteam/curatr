@@ -27,7 +27,7 @@
                 {% for standard, adduct_mzs in standards %}
                     <tr>
                         <td><a href="{% url 'MCFStandard-detail' pk=standard.MCFID %}" id="MCF"> {{ standard.MCFID|add:"0"|stringformat:"04d" }} </a> </td>
-                        <td>{{ standard.molecule}} </td>
+                        <td>{{ standard.molecule.html_str}} </td>
                         <td>{{ standard.molecule.sum_formula }} </td>
                         <td>{{ standard.molecule.exact_mass }} </td>
                         <td>{{ standard.vendor }}</td>
