@@ -3,9 +3,7 @@ from django.db import models
 import logging
 import base64
 import numpy as np
-import sys
 import re
-sys.path.append("//Users/palmer/Documents/python_codebase/")
 from pyMS.pyisocalc import pyisocalc
 import json
 from django.contrib.auth.models import User
@@ -67,7 +65,7 @@ class Molecule(models.Model):
 
 
     def get_mass(self):
-        spec = pyisocalc.isodist(self.sum_formula,charges=0,do_centroid=False)
+        spec = pyisocalc.complete_isodist(pyisocalc.parseSumFormula(self.sum_formula),charge=0)
         mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
         return mass
 
@@ -91,8 +89,8 @@ class Molecule(models.Model):
         :return: float
         """
         try:
-            formula = pyisocalc.complex_to_simple(self.make_ion_formula(adduct))
-            spec = pyisocalc.isodist(formula,charges=adduct.charge,do_centroid=False)
+            formula = self.make_ion_formula(adduct)
+            spec = pyisocalc.complete_isodist(pyisocalc.parseSumFormula(formula), charge=adduct.charge)
             mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
             return mass
         except:
