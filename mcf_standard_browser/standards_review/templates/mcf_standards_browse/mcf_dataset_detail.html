@@ -20,7 +20,7 @@
                 </thead>
             {% for item in table_data %}
             <tr>
-                <td>{{ item.0 }} {{ item.1 }} </td>
+                <td>{{ item.0 }} {% autoescape off %}{{ item.1.html_str }}{% endautoescape%} </td>
                 <td>{{ item.2 }}</td>
                 <td>{{ item.3 }}</td>
                 <td><a href="{% url 'MCFxic-detail' dataset_pk=dataset.pk standard_pk=item.0.pk adduct_pk=item.1.pk%}">View</a></td>
