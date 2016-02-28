@@ -11,7 +11,8 @@ from django.utils.text import slugify
 import string
 
 def handle_uploaded_files(metadata,file):
-    mzml_filename = os.path.join(settings.MEDIA_ROOT,"tmp_mzml.mzml")
+    logging.debug(file.name)
+    mzml_filename = os.path.join(settings.MEDIA_ROOT,file.name)
     with open(mzml_filename, 'w') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -45,6 +46,7 @@ def handle_uploaded_files(metadata,file):
         d.standards_present.add(standard)
     for adduct in adducts:
         d.adducts_present.add(adduct)
+    d.save()
     logging.debug('adding msms')
     xics={}
     spec_n=0
@@ -71,7 +73,6 @@ def handle_uploaded_files(metadata,file):
                     mz_tol_this_adduct =  mz[standard][adduct]*ppm*1e-6
                     if any((abs(pre_mz - mz[standard][adduct]) <= mz_tol_this_adduct, abs(pre_mz - mz[standard][adduct]) <= mz_tol_quad)): # frag spectrum probably the target
                         add_msms=True
-
                     if add_msms:
                         mzs = spectrum.mz
                         ints = spectrum.i
@@ -79,6 +80,14 @@ def handle_uploaded_files(metadata,file):
                         ppm_ints  = [ii for m,ii in zip(mzs,ints) if all((m>=pre_mz-mz_tol_this_adduct, m<=pre_mz+mz_tol_this_adduct))]
                         quad_ints_sum = sum(quad_ints)
                         ppm_ints_sum = sum(ppm_ints)
+                        ce_type = ''
+                        ce_energy = ''
+                        ce_gas = ''
+                        for element in spectrum.xmlTree:
+                            if element.get('accession') == "MS:1000133":
+                                ce_type = element.items()
+                            elif element.get('accession') == "MS:1000045":
+                                ce_energy = element.items()
                         if ppm_ints_sum == 0:
                             pre_fraction=0
                         else:
