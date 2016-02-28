@@ -6,7 +6,6 @@ import numpy as np
 import tools
 import sys
 sys.path.append('/Users/palmer/Documents/python_codebase/django-highcharts/django-highcharts/highcharts/')
-import json
 import logging
 from django.views.generic import TemplateView, ListView
 from django.contrib.auth.decorators import login_required
@@ -158,7 +157,7 @@ def MCFAdduct_add(request):
         form = MCFAdductForm(request.POST)
         if form.is_valid():
             if Adduct.objects.filter(nM=request.POST['nM'], delta_formula=request.POST['delta_formula']).exists():
-                error_list ={"adduct already exists":""}
+                error_list =[("adduct already exists","{} {}".format(request.POST['nM'], request.POST['delta_formula']))]
                 return render(request, 'mcf_standards_browse/upload_error.html', {'error_list': error_list})
             adduct=form.save()
             adduct.save()
@@ -177,7 +176,7 @@ def MCFStandard_add_batch(request):
         if form.is_valid():
             error_list = tools.process_batch_standard({'username': request.user.username}, request.FILES['semicolon_delimited_file'])
             logging.debug(error_list)
-            if error_list ==[]:
+            if not error_list:
                 return redirect('MCFStandard-list')
             else:
                 return render(request, 'mcf_standards_browse/upload_error.html', {'error_list': error_list})
@@ -311,7 +310,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
         chartcontainer = 'discretebarchart_container'  # container name
         chartID = 'chart_ID'
         chart_type = 'line'
-        chart_height = 500
+        chart_height = 300
         data = {
             'form':form,
             'charttype': charttype,
@@ -325,12 +324,13 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
                 },
             "highchart":{
                 "chart_id": 'chart_id',
-                "chart": {"renderTo": 'chart_id', "type": chart_type, "height": 300, "zoomType": "x"},
+                "chart": {"renderTo": 'chart_id', "type": chart_type, "height": chart_height, "zoomType": "x"},
                 "title": {"text": ''},
                 "xAxis":  {"title": {"text": 'time (s)'},},
                 "yAxis": {"title": {"text": 'Intensity'}},
                 "series": [
                         {"name": 'xic', "data": [[ii, jj ] for ii,jj in zip (np.round(chartdata[0]['x'],5), chartdata[0]['y'])]},
+                        {"name": 'ms2', "data": [[spec.rt, 0 ] for spec in frag_specs]}
                     ],
             },
             "mz":mz,
@@ -359,6 +359,8 @@ def dataset_upload(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             post_dict = dict(request.POST)
+            files_dict=dict(request.FILES)
+            logging.debug(files_dict)
             data = {"adducts": post_dict['adducts'],
                     "standards": post_dict['standards'],
                     "mass_accuracy_ppm": post_dict['mass_accuracy_ppm'][0],
