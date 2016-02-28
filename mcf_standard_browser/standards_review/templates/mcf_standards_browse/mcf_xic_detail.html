@@ -11,9 +11,11 @@
         <small><a href="{% url 'MCFdataset-detail' dataset.pk %}">return to list</a></small>
     </div>
     <div class="center">
-        <h1> XIC Detail:</h1>
+        <h1> Curation Detail</h1>
         <div class="main-content">
-            <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }} {{ standard }} {{ adduct }} </a></h2>
+            <h2> {{ standard }} </h2>
+            <h2> {% autoescape off %}{{ adduct.html_str }} {% endautoescape %} </h2>
+            <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }}</a></h2>
             <h3>m/z: {{ mz|floatformat:"4" }}</h3>
                 <div id='chart_id' class="specgraph"></div>
         </div>

@@ -17,21 +17,39 @@ class Adduct(models.Model):
     delta_atoms = models.TextField(default="") #net atom addition/loss
     charge = models.IntegerField(default=1)#overall charge after atom change
 
+    def charge_str(self):
+        if np.sign(self.charge)==1:
+            return "{}+".format(self.charge)
+        else:
+            return "{}-".format(np.abs(self.charge))
+
     def html_str(self):
-            return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge).replace("1","")
+            return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1","")
+    
     def __unicode__(self):
         return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
 
     def get_delta_atoms(self):
+        def addElement(elDict, element, number):
+            elDict.setdefault(element,[]).append(number)
         self.delta_formula = self.delta_formula.strip()
         if all([self.delta_formula.startswith("+"),self.delta_formula.startswith("-")]):
             self.delta_formula = "+"+self.delta_formula
         formula_split = re.split(u'([+-])',self.delta_formula)
+        logging.debug(formula_split)
         el_dict = {}
         for sign,el in zip(formula_split[1::2],formula_split[2::2]):
-            el_dict.update(pyisocalc.process_sf(sign+el))
+            this_el_dict = dict([(segment.element().name(), int("{}1".format(sign))*segment.amount()) for segment in pyisocalc.parseSumFormula(el).get_segments()])
+            for this_el in this_el_dict:
+                logging.debug(el_dict)
+                addElement(el_dict,this_el, this_el_dict[this_el])
         sign_dict = {1:"+",-1:"-"}
-        return "".join(["{}{}{}".format(sign_dict[np.sign(el_dict[el])],el,abs(el_dict[el])) for el in el_dict if el_dict[el]!=0])
+        for this_el in el_dict:
+            el_dict[this_el]=sum(el_dict[this_el])
+        logging.debug(el_dict)
+        el_string = "".join(["{}{}{}".format(sign_dict[np.sign(el_dict[el])],el,abs(el_dict[el])) for el in el_dict if el_dict[el]!=0])
+        logging.debug(el_string)
+        return el_string
 
     def save(self,*args,**kwargs):
         self.delta_atoms = self.get_delta_atoms()
