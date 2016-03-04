@@ -195,6 +195,7 @@ class FragmentationSpectrum(models.Model):
     ms1_intensity = models.FloatField(default=0.0)
     _centroid_mzs = models.TextField()
     _centroid_ints = models.TextField()
+    collision_energy = models.TextField(default="")
     dataset = models.ForeignKey(Dataset)
     standard = models.ForeignKey(Standard,blank=True, null=True)
     adduct = models.ForeignKey(Adduct,blank=True, null=True)

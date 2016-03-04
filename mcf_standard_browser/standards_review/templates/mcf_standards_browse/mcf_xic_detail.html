@@ -10,7 +10,7 @@
     <div class="page-header-extras">
         <small><a href="{% url 'MCFdataset-detail' dataset.pk %}">return to list</a></small>
     </div>
-    <div class="center">
+    <div class="container">
         <h1> Curation Detail</h1>
         <div class="main-content">
             <h2> {{ standard }} </h2>
@@ -32,8 +32,8 @@
                         <th>Precursor <br>mass </th>
                         <th>Retention <br>time</th>
                         <th>Precursor <br>Fraction </th>
-                        <th>Fragmentation <br>Spectrum</th>
-                        <th>Acceptance <br> Status</th>
+                        <th>Fragmentation Spectrum {{ spec.collision_energy }}</th>
+                        <th>Status</th>
                     </tr>
                     {% for spec in frag_specs %}
                         <tr>
@@ -54,9 +54,9 @@
                                         {% else %}
                                             {{ spec.standard }}
                                         {% endif %}
+                                        Status set by {{ spec.last_editor }} on {{ spec.date_edited }}
                                     {% endif %}
                                 {% endif %}
-                                Status set by {{ spec.last_editor }} on {{ spec.date_edited }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -83,6 +83,7 @@
         });
     });
 </script>
+
 {% for spec in frag_spec_highchart %}
     <script>
         $(document).ready(function() {

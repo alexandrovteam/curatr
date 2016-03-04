@@ -92,13 +92,13 @@ def handle_uploaded_files(metadata,file):
                                 ce_type = element.items()
                             elif element.get('accession') == "MS:1000045":
                                 ce_energy = dict(element.items())
-                        ce_str = "{}: {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
+                        ce_str = "{} {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
                         if ppm_ints_sum == 0:
                             pre_fraction=0
                         else:
                             pre_fraction = sum(ppm_ints)/sum(quad_ints)
                         f = FragmentationSpectrum(precursor_mz=pre_mz,
-                              rt = spectrum['scan start time'], dataset=d, spec_num=spec_n, precursor_quad_fraction=pre_fraction, ms1_intensity=ms1_intensity)
+                              rt = spectrum['scan start time'], dataset=d, spec_num=spec_n, precursor_quad_fraction=pre_fraction, ms1_intensity=ms1_intensity, collision_energy=ce_str)
                         f.set_centroid_mzs(spectrum.mz)
                         f.set_centroid_ints(spectrum.i)
                         f.collision = ce_str

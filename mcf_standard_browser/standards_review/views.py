@@ -333,7 +333,11 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
                 "yAxis": {"title": {"text": 'Intensity'}},
                 "series": [
                         {"name": 'xic', "data": [[ii, jj ] for ii,jj in zip (np.round(chartdata[0]['x'],5), chartdata[0]['y'])]},
-                        {"name": 'ms2', "data": [[spec.rt, 0 ] for spec in frag_specs]}
+                        {"name": 'ms2', "data": [[frag_specs[ii].rt, 0] for ii in np.argsort([spec.rt for spec in frag_specs])],
+                          'lineColor':'black',
+                         "marker":{ "symbol": 'triangle',
+                                    }
+                         }
                     ],
             },
             "mz":mz,
