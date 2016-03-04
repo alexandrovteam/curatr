@@ -18,6 +18,9 @@ from django.template import loader, Context
 def home_page(request):
     return render(request,'mcf_standards_browse/home_page.html',)
 
+def about(request):
+    return render(request,'mcf_standards_browse/about.html',)
+
 
 def MCFStandard_list(request):
     standards = Standard.objects.all()#.order_by('MCFID')
@@ -421,3 +424,4 @@ def fragmentSpectrum_export(request):
     else:
         form=ExportLibrary()
     return render(request, 'mcf_standards_browse/export_library.html', {'form':form})
+
