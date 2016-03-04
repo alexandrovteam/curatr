@@ -295,7 +295,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
     delta_mz = mz*dataset.mass_accuracy_ppm*1e-6
     #xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
     xics = Xic.objects.all().filter(standard=standard,adduct=adduct,dataset=dataset)
-    frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz)
+    frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(precursor_mz__gte=mz-delta_mz).filter(precursor_mz__lte=mz+delta_mz).order_by('-ms1_intensity')[:20]
     form = FragSpecReview(request.POST or None, extra=list([fs.pk for fs in frag_specs]), user=request.user)
     if form.is_valid():
         for (fragSpecId, response) in form.get_response():

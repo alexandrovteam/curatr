@@ -25,7 +25,7 @@ class Adduct(models.Model):
 
     def html_str(self):
             return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1","")
-    
+
     def __unicode__(self):
         return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
 
@@ -139,6 +139,7 @@ class Dataset(models.Model):
     standards_present = models.ManyToManyField(Standard,blank=True)
     mass_accuracy_ppm = models.FloatField(default=10.0)
     quad_window_mz = models.FloatField(default=1.0)
+    intrument = models.TextField(default="")
     #(for xic search)
     def __unicode__(self):
         return self.name
@@ -156,6 +157,7 @@ class Xic(models.Model):
 
     standard = models.ForeignKey(Standard,blank=True, null=True)
     adduct = models.ForeignKey(Adduct,blank=True, null=True)
+    collision = models.TextField(default='')
 
     def set_xic(self, xic):
         xic = np.asarray(xic,dtype=np.float64)
@@ -190,6 +192,7 @@ class Xic(models.Model):
 
 class FragmentationSpectrum(models.Model):
     precursor_mz = models.FloatField(null=True)
+    ms1_intensity = models.FloatField(default=0.0)
     _centroid_mzs = models.TextField()
     _centroid_ints = models.TextField()
     dataset = models.ForeignKey(Dataset)

@@ -40,7 +40,10 @@ def handle_uploaded_files(metadata,file):
             mz_upper[standard][adduct] = mz[standard][adduct]+delta_mz
             mz_lower[standard][adduct] = mz[standard][adduct]-delta_mz
     logging.debug('adding dataset')
+    instrument = ''
+
     d = Dataset(name=file, mass_accuracy_ppm = ppm)
+    d.instrument = instrument
     d.save()
     for standard in standards:
         d.standards_present.add(standard)
@@ -74,6 +77,7 @@ def handle_uploaded_files(metadata,file):
                     if any((abs(pre_mz - mz[standard][adduct]) <= mz_tol_this_adduct, abs(pre_mz - mz[standard][adduct]) <= mz_tol_quad)): # frag spectrum probably the target
                         add_msms=True
                     if add_msms:
+                        ms1_intensity = xics[standard][adduct][-1]
                         mzs = spectrum.mz
                         ints = spectrum.i
                         quad_ints = [ii for m,ii in zip(mzs,ints) if all((m>=pre_mz-mz_tol_quad       , m<=pre_mz+mz_tol_quad))]
@@ -87,15 +91,17 @@ def handle_uploaded_files(metadata,file):
                             if element.get('accession') == "MS:1000133":
                                 ce_type = element.items()
                             elif element.get('accession') == "MS:1000045":
-                                ce_energy = element.items()
+                                ce_energy = dict(element.items())
+                        ce_str = "{}: {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
                         if ppm_ints_sum == 0:
                             pre_fraction=0
                         else:
                             pre_fraction = sum(ppm_ints)/sum(quad_ints)
                         f = FragmentationSpectrum(precursor_mz=pre_mz,
-                              rt = spectrum['scan start time'], dataset=d, spec_num=spec_n, precursor_quad_fraction=pre_fraction)
+                              rt = spectrum['scan start time'], dataset=d, spec_num=spec_n, precursor_quad_fraction=pre_fraction, ms1_intensity=ms1_intensity)
                         f.set_centroid_mzs(spectrum.mz)
                         f.set_centroid_ints(spectrum.i)
+                        f.collision = ce_str
                         f.save()
     logging.debug("adding xics")
     for standard in standards:
