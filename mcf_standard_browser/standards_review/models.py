@@ -4,7 +4,7 @@ import logging
 import base64
 import numpy as np
 import re
-from pyMS.pyisocalc import pyisocalc
+from pyMSpec.pyisocalc import pyisocalc
 import json
 from django.contrib.auth.models import User
 from django.utils import timezone
