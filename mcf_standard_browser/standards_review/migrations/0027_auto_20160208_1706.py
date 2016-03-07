@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='inventory',
             name='standard',
-            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.CASCADE, to='standards_review.Standard'),
+            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE,
+                                    to='standards_review.Standard'),
         ),
     ]
