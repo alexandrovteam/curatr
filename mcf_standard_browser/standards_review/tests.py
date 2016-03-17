@@ -176,7 +176,9 @@ class FragmentationSpectrumModelTest(TestCase):
         np.testing.assert_array_almost_equal(ints,f1.centroid_ints)
 
 
-from .tools import add_batch_standard
+from tasks import add_batch_standard
+
+
 class DataImportTest(TestCase):
     def test_batch_add(self):
         csv_filename = "./media/Standard_Library_MCF_Inhouse_metabolites.csv"
