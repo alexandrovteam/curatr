@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+
+import tasks
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
 from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
 import numpy as np
 import tools
-import sys
-sys.path.append('/Users/palmer/Documents/python_codebase/django-highcharts/django-highcharts/highcharts/')
 import logging
 from django.views.generic import TemplateView, ListView
 from django.contrib.auth.decorators import login_required
@@ -177,12 +177,9 @@ def MCFStandard_add_batch(request):
     if request.method == "POST":
         form = MCFStandardBatchForm(request.POST, request.FILES)
         if form.is_valid():
-            error_list = tools.process_batch_standard({'username': request.user.username}, request.FILES['semicolon_delimited_file'])
-            logging.debug(error_list)
-            if not error_list:
-                return redirect('MCFStandard-list')
-            else:
-                return render(request, 'mcf_standards_browse/upload_error.html', {'error_list': error_list})
+            tasks.process_batch_standard.delay({'username': request.user.username}, request.FILES[
+                'semicolon_delimited_file'])
+            return redirect('MCFStandard-list')
     else:
         form = MCFStandardBatchForm()
     return render(request,'mcf_standards_browse/mcf_standard_add.html', {'form':form, 'form_type':'batch'})

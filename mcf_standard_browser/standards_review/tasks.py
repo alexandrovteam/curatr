@@ -1,14 +1,55 @@
 import logging
 
 import dateutil
+import os
 from celery import shared_task
+from django.conf import settings
 
 from models import Molecule, Standard
+from tools import pipe_file_to_disk
 
 
 @shared_task
-def add_batch_standard_async(csv_filename):
-    return add_batch_standard(csv_filename)
+def process_batch_standard(metadata, file_):
+    """
+    handle a csv fil of standards
+    header line should be "mcfid","name","formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id". "date","location","lot_num"
+
+    To Be Set:
+    ### Standard
+    # mandatory
+    molecule = models.ForeignKey(Molecule, default=Molecule.objects.all().filter(name='DUMMY'))
+    MCFID = models.IntegerField(null=True, blank=True)# if blank MCFID == Standard.pk
+    # optional
+    vendor = models.TextField(null=True, blank=True)
+    vendor_cat = models.TextField(null=True, blank=True)
+    lot_num = models.TextField(null=True, blank=True)
+    location = models.TextField(null=True, blank=True)
+    purchase_date = models.DateField(null=True, blank=True)
+
+    If Not Existing:
+    ### Molecule
+    # mandatory
+    name = models.TextField(default = "")
+    sum_formula = models.TextField(null=True)
+    pubchem_id = models.TextField(null=True, blank=True)
+    # Optional
+    inchi_code = models.TextField(default="")
+    exact_mass = models.FloatField(default=0.0)
+    solubility = models.TextField(null=True, blank=True)
+    # External reference numbers
+    hmdb_id = models.TextField(null=True, blank=True)
+    chebi_id = models.TextField(null=True, blank=True)
+    lipidmaps_id = models.TextField(null=True, blank=True)
+    cas_id = models.TextField(null=True, blank=True)
+    :param csv_file:
+    :return:
+    """
+    csv_filepath = os.path.join(settings.MEDIA_ROOT, "tmp_csv.csv")
+    pipe_file_to_disk(csv_filepath, file_)
+    errors = add_batch_standard(csv_filepath)
+    os.remove(csv_filepath)
+    return errors
 
 
 def add_batch_standard(csv_filename):

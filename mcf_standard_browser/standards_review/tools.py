@@ -1,15 +1,13 @@
-from tasks import add_batch_standard
-
-import tasks
-
 __author__ = 'palmer'
-from .models import Dataset, Standard, Adduct, Xic, FragmentationSpectrum, Molecule
-from django.conf import settings
+import logging
+
+import numpy as np
 import os
 import pymzml
-import numpy as np
-import logging
+from django.conf import settings
 from django.contrib.auth.models import User
+
+from .models import Dataset, Standard, Adduct, Xic, FragmentationSpectrum, Molecule
 
 
 def handle_uploaded_files(metadata,file):
@@ -150,88 +148,6 @@ def pipe_file_to_disk(filename, file):
             destination.write(chunk)
 
 
-def process_batch_standard(metadata, file):
-    """
-    handle a csv fil of standards
-    header line should be "mcfid","name","formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id". "date","location","lot_num"
-
-    To Be Set:
-    ### Standard
-    # mandatory
-    molecule = models.ForeignKey(Molecule, default=Molecule.objects.all().filter(name='DUMMY'))
-    MCFID = models.IntegerField(null=True, blank=True)# if blank MCFID == Standard.pk
-    # optional
-    vendor = models.TextField(null=True, blank=True)
-    vendor_cat = models.TextField(null=True, blank=True)
-    lot_num = models.TextField(null=True, blank=True)
-    location = models.TextField(null=True, blank=True)
-    purchase_date = models.DateField(null=True, blank=True)
-
-    If Not Existing:
-    ### Molecule
-    # mandatory
-    name = models.TextField(default = "")
-    sum_formula = models.TextField(null=True)
-    pubchem_id = models.TextField(null=True, blank=True)
-    # Optional
-    inchi_code = models.TextField(default="")
-    exact_mass = models.FloatField(default=0.0)
-    solubility = models.TextField(null=True, blank=True)
-    # External reference numbers
-    hmdb_id = models.TextField(null=True, blank=True)
-    chebi_id = models.TextField(null=True, blank=True)
-    lipidmaps_id = models.TextField(null=True, blank=True)
-    cas_id = models.TextField(null=True, blank=True)
-    :param csv_file:
-    :return:
-    """
-    csv_filename = os.path.join(settings.MEDIA_ROOT,"tmp_csv.csv")
-    pipe_file_to_disk(csv_filename, file)
-    error_list = add_batch_standard(csv_filename)
-    return error_list
-
-
-def process_batch_standard_async(metadata, file):
-    """
-    handle a csv fil of standards
-    header line should be "mcfid","name","formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id". "date","location","lot_num"
-
-    To Be Set:
-    ### Standard
-    # mandatory
-    molecule = models.ForeignKey(Molecule, default=Molecule.objects.all().filter(name='DUMMY'))
-    MCFID = models.IntegerField(null=True, blank=True)# if blank MCFID == Standard.pk
-    # optional
-    vendor = models.TextField(null=True, blank=True)
-    vendor_cat = models.TextField(null=True, blank=True)
-    lot_num = models.TextField(null=True, blank=True)
-    location = models.TextField(null=True, blank=True)
-    purchase_date = models.DateField(null=True, blank=True)
-
-    If Not Existing:
-    ### Molecule
-    # mandatory
-    name = models.TextField(default = "")
-    sum_formula = models.TextField(null=True)
-    pubchem_id = models.TextField(null=True, blank=True)
-    # Optional
-    inchi_code = models.TextField(default="")
-    exact_mass = models.FloatField(default=0.0)
-    solubility = models.TextField(null=True, blank=True)
-    # External reference numbers
-    hmdb_id = models.TextField(null=True, blank=True)
-    chebi_id = models.TextField(null=True, blank=True)
-    lipidmaps_id = models.TextField(null=True, blank=True)
-    cas_id = models.TextField(null=True, blank=True)
-    :param csv_file:
-    :return:
-    """
-    csv_filename = os.path.join(settings.MEDIA_ROOT,"tmp_csv.csv")
-    pipe_file_to_disk(csv_filename, file)
-    async = tasks.add_batch_standard_async.delay(csv_filename)
-    async.get()
-
-
 def to_unicode(s):
     return s.encode("utf-8", errors="ignore")
 
@@ -241,5 +157,3 @@ def update_mzs():
     for molecule in molecules:
         molecule.set_adduct_mzs()
         molecule.save()
-
-
