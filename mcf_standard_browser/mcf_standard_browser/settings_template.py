@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
-import sys
-sys.path.append("/Users/palmer/Documents/python_codebase/django-nvd3/")
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -59,7 +57,7 @@ INSTALLED_APPS = [
     #'eztables',
     'highcharts',
     'django_static_jquery',
-
+    'djcelery',
 
 ]
 
@@ -152,3 +150,8 @@ MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/'
+
+BROKER_URL = "amqp://"
+
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
