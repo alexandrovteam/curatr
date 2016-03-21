@@ -1,16 +1,15 @@
 import logging
+import sys
 
 import dateutil
-import os
+import pandas as pd
 from celery import shared_task
-from django.conf import settings
 
 from models import Molecule, Standard
-from tools import pipe_file_to_disk
 
 
 @shared_task
-def process_batch_standard(metadata, file_):
+def add_batch_standard(metadata, csv_file):
     """
     handle a csv fil of standards
     header line should be "mcfid","name","formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id". "date","location","lot_num"
@@ -45,18 +44,8 @@ def process_batch_standard(metadata, file_):
     :param csv_file:
     :return:
     """
-    csv_filepath = os.path.join(settings.MEDIA_ROOT, "tmp_csv.csv")
-    pipe_file_to_disk(csv_filepath, file_)
-    errors = add_batch_standard(csv_filepath)
-    os.remove(csv_filepath)
-    return errors
-
-
-def add_batch_standard(csv_filename):
-    import pandas as pd
-    import sys
     error_list = []
-    df = pd.read_csv(csv_filename, sep="\t", dtype=unicode)
+    df = pd.read_csv(csv_file, sep="\t", dtype=unicode)
     df.columns = [x.replace(" ", "_").lower() for x in df.columns]
     df = df.fillna("")
     # df = df.applymap(to_unicode)
@@ -114,7 +103,6 @@ def add_batch_standard(csv_filename):
             s.save()
         except:
             error_list.append([entry['name'], sys.exc_info()[1]])
-            # error_list.append([[''.join([i if ord(i) < 128 else ' ' for i in entry['name']])], slugify(sys.exc_info()[1]).encode('utf-8').strip()])
             logging.debug("Failed for: {} with {}".format(entry['name'], sys.exc_info()[1]))
 
     return error_list

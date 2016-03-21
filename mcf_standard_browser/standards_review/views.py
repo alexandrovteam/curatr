@@ -177,7 +177,7 @@ def MCFStandard_add_batch(request):
     if request.method == "POST":
         form = MCFStandardBatchForm(request.POST, request.FILES)
         if form.is_valid():
-            tasks.process_batch_standard.delay({'username': request.user.username}, request.FILES[
+            tasks.add_batch_standard.delay({'username': request.user.username}, request.FILES[
                 'semicolon_delimited_file'])
             return redirect('MCFStandard-list')
     else:
