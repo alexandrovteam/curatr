@@ -134,6 +134,7 @@ class Standard(models.Model):
 
 
 class Dataset(models.Model):
+    processing_finished = models.BooleanField(default=False)
     name = models.TextField(default="")
     adducts_present = models.ManyToManyField(Adduct,blank=True)
     standards_present = models.ManyToManyField(Standard,blank=True)
