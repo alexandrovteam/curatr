@@ -10,11 +10,15 @@ from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileFo
 import numpy as np
 import tools
 import logging
+import os
+import time
 from django.views.generic import TemplateView, ListView
 from django.contrib.auth.decorators import login_required
 import csv
+import zipfile
 from django.http import StreamingHttpResponse
 from django.template import loader, Context
+from django.conf import settings
 
 # Create your views here.
 
@@ -419,7 +423,7 @@ def fragmentSpectrum_export(request):
                 response['Content-Disposition'] = 'attachment; filename=mcf_spectra.mgf'
                 t = loader.get_template('mcf_standards_browse/mgf_template.mgf')
                 response.write(t.render(c))
-            if data_format_id   == 1: #mgf
+            elif data_format_id   == 1: #mgf
                 content_type = "text/txt"
                 response=HttpResponse(content_type=content_type)
                 response['Content-Disposition'] = 'attachment; filename=mcf_spectra.msp'
@@ -431,6 +435,30 @@ def fragmentSpectrum_export(request):
                 response = StreamingHttpResponse((writer.writerow([spectrum.pk, spectrum.centroid_mzs, spectrum.centroid_ints]) for spectrum in spectra),
                                      content_type=content_type)
                 response['Content-Disposition'] = 'attachment; filename=mcf_spectra.csv'
+            elif data_format_id == 3: #ebi json
+                # if you wanted to do this in memory
+                # in_memory = StringIO()
+                # zip = ZipFile(in_memory, "w")
+                zf_n = os.path.join(settings.MEDIA_ROOT,'tmp_ebi_export.zip')
+                zf = zipfile.ZipFile(zf_n, mode="w")
+                for ii,cc in enumerate(c['spec_data']):
+                    logging.debug("export_spec_{}.json".format(ii))
+                    t = loader.get_template('mcf_standards_browse/export_template_ebi.json')
+                    r = t.render({'spec_data':[cc,]})
+                    info = zipfile.ZipInfo("export_spec_{}.json".format(ii),
+                           date_time=time.localtime(time.time()),
+                           )
+                    info.compress_type=zipfile.ZIP_DEFLATED
+                    info.comment='Remarks go here'
+                    info.create_system=0
+                    zf.writestr(info, r)
+                zf.close()
+                logging.debug('open file: ')
+                zfr = zipfile.ZipFile(zf_n, 'r')
+                logging.debug(zfr.read('export_spec_1.json'))
+                response = HttpResponse(content_type="application/zip")
+                response['Content-Disposition'] = 'attachment; filename="mcf_spectra.zip"'
+                response.write(open(zf_n,'r').read())
             return response
     else:
         form=ExportLibrary()
