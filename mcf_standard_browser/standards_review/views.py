@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -27,7 +30,9 @@ def about(request):
 
 
 def MCFStandard_list(request):
-    standards = Standard.objects.all()#.order_by('MCFID')
+    #page_size = 10
+    #pagenr = int(request.GET["pagenr"])
+    standards = Standard.objects.all()#[pagenr * page_size:(pagenr + 1) * page_size]
     adducts = Adduct.objects.all()
     adduct_names = [adduct for adduct in adducts]
     standard_data = []
@@ -373,8 +378,13 @@ def dataset_upload(request):
                     "standards": post_dict['standards'],
                     "mass_accuracy_ppm": post_dict['mass_accuracy_ppm'][0],
                     "quad_window_mz": post_dict['quad_window_mz'][0]}
-            r= tools.handle_uploaded_files(data, request.FILES['mzml_file'])
-            logging.debug("added = {}".format(r))
+            uploaded_file = request.FILES['mzml_file']
+            mzml_filename = os.path.join(settings.MEDIA_ROOT, uploaded_file.name)
+            with open(mzml_filename, 'w') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+            tasks.handle_uploaded_files.delay(data, mzml_filename)
+
             return redirect('MCFdataset-list')
     else:
         form = UploadFileForm(initial={"mass_accuracy_ppm":10.0, 'quad_window_mz':1.0})

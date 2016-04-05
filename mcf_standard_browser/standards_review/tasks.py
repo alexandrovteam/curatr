@@ -3,8 +3,10 @@ import sys
 
 import dateutil
 import pandas as pd
+import pymzml
 from celery import shared_task
 
+from models import Adduct, Dataset, FragmentationSpectrum, Xic
 from models import Molecule, Standard
 
 
@@ -82,7 +84,7 @@ def add_batch_standard(metadata, csv_file):
                     pubchem_id=entry["pubchem_id"],
                 )
                 molecule.save()
-                print("Successfully saved " + molecule.name)
+                logging.debug("Successfully saved " + molecule.name)
 
             s = Standard.objects.all().filter(MCFID=entry['id'])
             if s.exists():  # standard already added, overwrite
@@ -101,8 +103,119 @@ def add_batch_standard(metadata, csv_file):
             else:
                 s.MCFID = entry['id']
             s.save()
-        except:
-            error_list.append([entry['name'], sys.exc_info()[1]])
-            logging.debug("Failed for: {} with {}".format(entry['name'], sys.exc_info()[1]))
+        except Exception as e:
+            error_list.append([entry['name'], str(e)])
+            logging.warning("Failed for: {} with '{}'".format(entry['name'], e))
 
     return error_list
+
+
+@shared_task
+def handle_uploaded_files(metadata, mzml_filename):
+    logging.debug("mzML filename: " + mzml_filename)
+    msrun = pymzml.run.Reader(mzml_filename)
+    ppm = float(metadata['mass_accuracy_ppm'])
+    mz_tol_quad = float(metadata['quad_window_mz'])
+    scan_time = []
+    standards = Standard.objects.all().filter(pk__in=metadata['standards'])
+    adducts = Adduct.objects.all().filter(pk__in=metadata['adducts'])
+    mz_upper = {}
+    mz_lower = {}
+    mz = {}
+    logging.debug(standards.count())
+    for standard in standards:
+        mz_upper[standard] = {}
+        mz_lower[standard] = {}
+        mz[standard] = {}
+        for adduct in adducts:
+            mz[standard][adduct] = standard.molecule.get_mz(adduct)
+
+            logging.debug(standard)
+            logging.debug(mz[standard][adduct])
+            delta_mz = mz[standard][adduct] * ppm * 1e-6
+            mz_upper[standard][adduct] = mz[standard][adduct] + delta_mz
+            mz_lower[standard][adduct] = mz[standard][adduct] - delta_mz
+    logging.debug('adding dataset')
+    instrument = ''
+
+    d = Dataset(name=mzml_filename, mass_accuracy_ppm=ppm, processing_finished=False)
+    d.instrument = instrument
+    d.save()
+    for standard in standards:
+        d.standards_present.add(standard)
+    for adduct in adducts:
+        d.adducts_present.add(adduct)
+    d.save()
+    logging.debug('adding msms')
+    xics = {}
+    spec_n = 0
+    for spectrum in msrun:
+        spec_n += 1
+        if spectrum['ms level'] == 1:
+            scan_time.append(spectrum['scan start time'])
+        # Iterate adducts/standards and get values as required
+        for standard in standards:
+            if standard not in xics:
+                xics[standard] = {}
+            for adduct in adducts:
+                if adduct not in xics[standard]:
+                    xics[standard][adduct] = []
+                if spectrum['ms level'] == 1:
+                    x = 0
+                    for m, i in spectrum.centroidedPeaks:
+                        if all([m >= mz_lower[standard][adduct], m <= mz_upper[standard][adduct]]):
+                            x += i
+                    xics[standard][adduct].append(x)
+                if spectrum['ms level'] == 2:
+                    add_msms = False
+                    pre_mz = float(spectrum['precursors'][0]['mz'])
+                    mz_tol_this_adduct = mz[standard][adduct] * ppm * 1e-6
+                    if any((abs(pre_mz - mz[standard][adduct]) <= mz_tol_this_adduct,
+                            abs(pre_mz - mz[standard][adduct]) <= mz_tol_quad)):  # frag spectrum probably the target
+                        add_msms = True
+                    if add_msms:
+                        ms1_intensity = xics[standard][adduct][-1]
+                        mzs = spectrum.mz
+                        ints = spectrum.i
+                        quad_ints = [ii for m, ii in zip(mzs, ints) if
+                                     all((m >= pre_mz - mz_tol_quad, m <= pre_mz + mz_tol_quad))]
+                        ppm_ints = [ii for m, ii in zip(mzs, ints) if
+                                    all((m >= pre_mz - mz_tol_this_adduct, m <= pre_mz + mz_tol_this_adduct))]
+                        quad_ints_sum = sum(quad_ints)
+                        ppm_ints_sum = sum(ppm_ints)
+                        ce_type = ''
+                        ce_energy = ''
+                        ce_gas = ''
+                        for element in spectrum.xmlTree:
+                            if element.get('accession') == "MS:1000133":
+                                ce_type = element.items()
+                            elif element.get('accession') == "MS:1000045":
+                                ce_energy = dict(element.items())
+                        ce_str = "{} {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
+                        if ppm_ints_sum == 0:
+                            pre_fraction = 0
+                        else:
+                            pre_fraction = sum(ppm_ints) / sum(quad_ints)
+                        f = FragmentationSpectrum(precursor_mz=pre_mz,
+                                                  rt=spectrum['scan start time'], dataset=d, spec_num=spec_n,
+                                                  precursor_quad_fraction=pre_fraction, ms1_intensity=ms1_intensity,
+                                                  collision_energy=ce_str)
+                        f.set_centroid_mzs(spectrum.mz)
+                        f.set_centroid_ints(spectrum.i)
+                        f.collision = ce_str
+                        f.save()
+    logging.debug("adding xics")
+    for standard in standards:
+        for adduct in adducts:
+            # if np.sum(xics[standard][adduct]) > 0:
+            x = Xic(mz=standard.molecule.get_mz(adduct), dataset=d)
+            x.set_xic(xics[standard][adduct])
+            x.set_rt(scan_time)
+            x.standard = standard
+            x.adduct = adduct
+            x.save()
+    d.processing_finished = True
+    d.save()
+    logging.debug('done')
+    logging.debug("added = True")
+    return True

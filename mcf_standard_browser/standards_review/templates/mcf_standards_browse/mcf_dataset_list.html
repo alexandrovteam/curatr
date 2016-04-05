@@ -12,14 +12,21 @@
                     <tr>
                         <th>ID </th>
                         <th> Dataset </th>
-                        <th> </th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 {% for dataset in datasets %}
                     <tr>
                         <td>{{ dataset.pk }} </td>
                         <td>{{ dataset }} </td>
-                        <td><a href="{% url 'MCFdataset-detail' pk=dataset.pk %}" id="MCF"> View</a></td>
+                        <td>
+                            {% if dataset.processing_finished %}
+                                <a href="{% url 'MCFdataset-detail' pk=dataset.pk %}" id="MCF"> View</a>
+                            {% else %}
+                                processing...
+                            {% endif %}
+                        </td>
+
                     </tr>
                 {% endfor %}
             </table>
