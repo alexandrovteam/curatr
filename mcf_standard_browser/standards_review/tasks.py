@@ -103,9 +103,9 @@ def add_batch_standard(metadata, csv_file):
             else:
                 s.MCFID = entry['id']
             s.save()
-        except Exception as e:
-            error_list.append([entry['name'], str(e)])
-            logging.warning("Failed for: {} with '{}'".format(entry['name'], e))
+        except:
+            error_list.append([entry['name'], sys.exc_info()[1]])
+            logging.warning("Failed for: {} with {}".format(entry['name'], sys.exc_info()[1]))
 
     return error_list
 
