@@ -19,6 +19,7 @@ import zipfile
 from django.http import StreamingHttpResponse
 from django.template import loader, Context
 from django.conf import settings
+from django.db.models import Q
 
 # Create your views here.
 
@@ -203,7 +204,7 @@ def fragmentSpectrum_list(request):
     if request.method == "POST":
         logging.debug('got some post')
         logging.debug(request.POST)
-    fragmentSpectra = FragmentationSpectrum.objects.all()
+    fragmentSpectra = FragmentationSpectrum.objects.all().filter(~Q(standard=None))
     return  render(request,'mcf_standards_browse/mcf_fragmentSpectrum_list.html',{'fragmentSpectra':fragmentSpectra})
 
 
@@ -441,11 +442,23 @@ def fragmentSpectrum_export(request):
                 # zip = ZipFile(in_memory, "w")
                 zf_n = os.path.join(settings.MEDIA_ROOT,'tmp_ebi_export.zip')
                 zf = zipfile.ZipFile(zf_n, mode="w")
+                filename_list = []
                 for ii,cc in enumerate(c['spec_data']):
-                    logging.debug("export_spec_{}.json".format(ii))
+                    if cc[0].standard:
+                        export_filename = "MCFID{}".format(cc[0].standard.MCFID)
+                    else:
+                        export_filename = 'unknown_standard'
+                    ii=0
+                    _export_filename = export_filename
+                    while _export_filename in filename_list:
+                        _export_filename = "{}_{}".format(export_filename,ii)
+                        ii +=1
+                    export_filename = _export_filename
+                    filename_list.append(export_filename)
+                    logging.debug(export_filename)
                     t = loader.get_template('mcf_standards_browse/export_template_ebi.json')
                     r = t.render({'spec_data':[cc,]})
-                    info = zipfile.ZipInfo("export_spec_{}.json".format(ii),
+                    info = zipfile.ZipInfo(export_filename.format(ii),
                            date_time=time.localtime(time.time()),
                            )
                     info.compress_type=zipfile.ZIP_DEFLATED
@@ -455,7 +468,7 @@ def fragmentSpectrum_export(request):
                 zf.close()
                 logging.debug('open file: ')
                 zfr = zipfile.ZipFile(zf_n, 'r')
-                logging.debug(zfr.read('export_spec_1.json'))
+                logging.debug(zfr.read(export_filename))
                 response = HttpResponse(content_type="application/zip")
                 response['Content-Disposition'] = 'attachment; filename="mcf_spectra.zip"'
                 response.write(open(zf_n,'r').read())
@@ -463,4 +476,5 @@ def fragmentSpectrum_export(request):
     else:
         form=ExportLibrary()
     return render(request, 'mcf_standards_browse/export_library.html', {'form':form})
+
 
