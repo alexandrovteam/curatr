@@ -4,7 +4,7 @@ import logging
 import numpy as np
 from django.contrib.auth.models import User
 
-from .models import FragmentationSpectrum, Molecule
+from .models import FragmentationSpectrum, Molecule, Standard
 
 
 class ChartData(object):
@@ -30,6 +30,17 @@ def update_fragSpec(fragSpecId,response, standard, adduct, username):
         fs.reviewed = False
     fs.last_editor = User.objects.get(username=username)
     fs.save()
+
+
+def clear_molecules_without_standard():
+    clean_count = 0
+    remove_name = []
+    for molecule in Molecule.objects.all():
+        if not Standard.objects.all().filter(molecule=molecule):
+            remove_name.append(molecule.name)
+            molecule.delete()
+            clean_count +=1
+    return (clean_count, remove_name)
 
 
 def pipe_file_to_disk(filename, file):

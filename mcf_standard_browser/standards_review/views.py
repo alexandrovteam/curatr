@@ -478,3 +478,13 @@ def fragmentSpectrum_export(request):
     return render(request, 'mcf_standards_browse/export_library.html', {'form':form})
 
 
+@login_required()
+def MCFMolecule_cleandb(request):
+    n_clean, clean_name = tools.clear_molecules_without_standard()
+    logging.debug("{} molecules removed".format(n_clean))
+    error_list = []
+    for name in clean_name:
+        error_list.append([name, 'removed'])
+    logging.debug(error_list)
+    return render(request,'mcf_standards_browse/upload_error.html',{'error_list':error_list})
+
