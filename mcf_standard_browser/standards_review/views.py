@@ -72,11 +72,9 @@ class StandardListView(FeedDataView):
     def convert_queryset_to_values_list(self, queryset):
         initial_values_list = super(StandardListView, self).convert_queryset_to_values_list(queryset)
         for row, standard in zip(initial_values_list, queryset):
-            pass
+            for adduct in Adduct.objects.all():
+                row.append(np.round(standard.molecule.adduct_mzs[str(adduct)], decimals=5))
         return initial_values_list
-
-    def convert_context_to_json(self, context):
-        return super(StandardListView, self).convert_context_to_json(context)
 
 
 class IndexView(TemplateView):

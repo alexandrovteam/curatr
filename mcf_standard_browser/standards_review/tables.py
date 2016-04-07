@@ -1,14 +1,18 @@
+import numpy as np
 from django.core.urlresolvers import reverse_lazy
 from table import Table
 from table.columns import Column
 
-from models import Standard
+from models import Standard, Adduct
 
 
-class AdductMzsColumn(Column):
+class AdductMzColumn(Column):
+    def __init__(self, adduct):
+        super(AdductMzColumn, self).__init__(header=str(adduct), field='molecule.adduct_mz')
+
     def render(self, obj):
-        adduct_mzs = obj.molecule.adduct_mzs
-        return '\n'.join('{}: {}'.format(k, v) for k, v in adduct_mzs.items())
+        adduct_mz = obj.molecule.adduct_mzs[self.header]
+        return str(np.round(adduct_mz, decimals=5))
 
 
 class StandardTable(Table):
@@ -19,10 +23,14 @@ class StandardTable(Table):
     vendor = Column(field='vendor', header='Vendor')
     vendor_id = Column(field='vendor_cat', header='Vendor ID')
     pubchem_id = Column(field='molecule.pubchem_id', header='Pubchem ID')
-    adducts = AdductMzsColumn(field='molecule.adduct_mzs', header='Adduct m/z')
 
     class Meta:
         model = Standard
         ajax = True
         ajax_source = reverse_lazy('standard_table')
         sort = [(0, 'asc')]
+
+for adduct in Adduct.objects.all():
+    col = AdductMzColumn(adduct=adduct)
+    setattr(StandardTable, 'adduct{}'.format(adduct.id), col)
+    StandardTable.base_columns.append(col)
