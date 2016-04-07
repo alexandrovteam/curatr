@@ -1,9 +1,9 @@
 __author__ = 'palmer'
-from django.conf.urls.static import static
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
+
 from . import views
-from .views import MCFStandard_list_ez
+from .views import StandardListView
 
 urlpatterns = [
     url(r'^$', views.home_page),
@@ -29,6 +29,8 @@ urlpatterns = [
     url(r'^accounts/logout/$', auth_views.logout, {'next_page': '/'}),
     url(r'^errors/batch_molecule_upload/', views.error_page, name="batch-upload-error"),
     url(r'^about/', views.about, name="about"),
+    url(r'^table/', include('table.urls')),
+    url(r'^table_standard/data/$', StandardListView.as_view(), name='standard_table'),
     # url(r'^mol/mol(?P<pk>[0-9]+)/$', views.mol_detail, name='mol_detail'),
     # url(r'^sf/(?P<pk>[A-Z,0-9]+)/$', views.sf_detail, name='sf_detail'),
     # url(r'^ion/ion(?P<pk>[0-9]+)/$', views.ion_detail, name='ion_detail'),

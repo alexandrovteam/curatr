@@ -3,8 +3,10 @@ import os
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from table.views import FeedDataView
 
 import tasks
+from tables import StandardTable
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
 from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
 import numpy as np
@@ -33,18 +35,20 @@ def about(request):
 def MCFStandard_list(request):
     #page_size = 10
     #pagenr = int(request.GET["pagenr"])
-    standards = Standard.objects.all()#[pagenr * page_size:(pagenr + 1) * page_size]
-    adducts = Adduct.objects.all()
-    adduct_names = [adduct for adduct in adducts]
-    standard_data = []
-    for standard in standards:
-        precalc_adduct_mzs = standard.molecule.adduct_mzs
-        adduct_mzs=[]
-        for adduct in adducts:
-            adduct_mzs.append({"val": np.round(precalc_adduct_mzs[str(adduct)], decimals=5)})
-        standard_data.append([standard,adduct_mzs])
-
-    return  render(request,'mcf_standards_browse/mcf_standard_list.html',{'standards':standard_data, 'adduct_names':adduct_names,})
+    # standards = Standard.objects.all()#[pagenr * page_size:(pagenr + 1) * page_size]
+    # adducts = Adduct.objects.all()
+    # adduct_names = [adduct for adduct in adducts]
+    # standard_data = []
+    # for standard in standards:
+    #     precalc_adduct_mzs = standard.molecule.adduct_mzs
+    #     adduct_mzs=[]
+    #     for adduct in adducts:
+    #         adduct_mzs.append({"val": np.round(precalc_adduct_mzs[str(adduct)], decimals=5)})
+    #     standard_data.append([standard,adduct_mzs])
+    #
+    # return  render(request,'mcf_standards_browse/mcf_standard_list.html',{'standards':standard_data, 'adduct_names':adduct_names,})
+    table = StandardTable()
+    return render(request, "mcf_standards_browse/mcf_standard_list_dt.html", {'standard_list': table})
 
 def MCFMolecule_list(request):
     molecules = Molecule.objects.all()
@@ -61,6 +65,18 @@ def MCFMolecule_list(request):
 
     return  render(request,'mcf_standards_browse/mcf_molecule_list.html',{'standards':standard_data, 'adduct_names':adduct_names,})
 
+
+class StandardListView(FeedDataView):
+    token = StandardTable.token
+
+    def convert_queryset_to_values_list(self, queryset):
+        initial_values_list = super(StandardListView, self).convert_queryset_to_values_list(queryset)
+        for row, standard in zip(initial_values_list, queryset):
+            pass
+        return initial_values_list
+
+    def convert_context_to_json(self, context):
+        return super(StandardListView, self).convert_context_to_json(context)
 
 
 class IndexView(TemplateView):
