@@ -1,0 +1,5 @@
+{% spaceless %}
+"Dataset", "Precursor m/z", "Curatr Spec ID", "Scan Number", "Standard", "Monoisotopic Mass", "Adduct", "Spectrum"
+{% for spectrum,  mz_ii_pairs in spec_data %}{{spectrum.dataset}}, {{spectrum.precursor_mz}}, spec{{spectrum.pk}}, {{spectrum.spec_num}}, {{spectrum.standard}}, {{spectrum.standard.molecule.exact_mass}}, {{spectrum.adduct}},{% for mz_ii in mz_ii_pairs%}{{mz_ii.0}}	{{mz_ii.1}}	{% endfor %}
+{% endfor %}
+{% endspaceless %}
