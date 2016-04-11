@@ -6,7 +6,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from table.views import FeedDataView
 
 import tasks
-from tables import StandardTable, MoleculeTable
+from tables import StandardTable, MoleculeTable, SpectraTable
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
 from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
 import numpy as np
@@ -200,12 +200,15 @@ def error_page(request):
 
 
 def fragmentSpectrum_list(request):
-    logging.debug(request)
-    if request.method == "POST":
-        logging.debug('got some post')
-        logging.debug(request.POST)
-    fragmentSpectra = FragmentationSpectrum.objects.all().filter(~Q(standard=None))
-    return  render(request,'mcf_standards_browse/mcf_fragmentSpectrum_list.html',{'fragmentSpectra':fragmentSpectra})
+    table = SpectraTable()
+    return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_list_dt.html', {'spectra_list': table})
+
+
+class SpectraListView(FeedDataView):
+    token = SpectraTable.token
+
+    def filter_queryset(self, queryset):
+        return queryset.filter(~Q(standard=None))
 
 
 def fragmentSpectrum_detail(request,pk):

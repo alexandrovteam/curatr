@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 
 from . import views
-from .views import StandardListView, MoleculeListView
+from .views import StandardListView, MoleculeListView, SpectraListView
 
 urlpatterns = [
     url(r'^$', views.home_page),
@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^table/', include('table.urls')),
     url(r'^table_standard/data/$', StandardListView.as_view(), name='standard_table'),
     url(r'^table_molecule/data/$', MoleculeListView.as_view(), name='molecule_table'),
+    url(r'^table_spectra/data/$', SpectraListView.as_view(), name='spectra_table'),
     # url(r'^mol/mol(?P<pk>[0-9]+)/$', views.mol_detail, name='mol_detail'),
     # url(r'^sf/(?P<pk>[A-Z,0-9]+)/$', views.sf_detail, name='sf_detail'),
     # url(r'^ion/ion(?P<pk>[0-9]+)/$', views.ion_detail, name='ion_detail'),

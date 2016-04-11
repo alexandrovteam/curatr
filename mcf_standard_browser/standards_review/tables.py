@@ -1,9 +1,10 @@
 import numpy as np
 from django.core.urlresolvers import reverse_lazy
 from table import Table
-from table.columns import Column
+from table.columns import Column, LinkColumn, Link
+from table.utils import Accessor
 
-from models import Standard, Adduct, Molecule
+from models import Standard, Adduct, Molecule, FragmentationSpectrum
 
 
 class AdductMzColumn(Column):
@@ -13,6 +14,35 @@ class AdductMzColumn(Column):
     def render(self, obj):
         adduct_mz = obj.molecule.adduct_mzs[self.header]
         return str(np.round(adduct_mz, decimals=5))
+
+
+class StandardAdductColumn(Column):
+    def render(self, spectrum):
+        return "{} {}".format(spectrum.standard, spectrum.adduct.html_str)
+
+
+class ReviewStatusColumn(Column):
+    def render(self, spectrum):
+        if spectrum.reviewed:
+            if spectrum.standard == None:
+                return 'Rejected'
+            else:
+                return 'Confirmed'
+        else:
+            return 'Unrated'
+
+
+class MoleculeTable(Table):
+    name = Column(field='name', header='Name')
+    formula = Column(field='sum_formula', header='Formula')
+    exact_mass = Column(field='exact_mass', header='Exact Mass')
+    pubchem_id = Column(field='pubchem_id', header='Pubchem ID')
+
+    class Meta:
+        model = Molecule
+        ajax = True
+        ajax_source = reverse_lazy('molecule_table')
+        sort = [(0, 'asc')]
 
 
 class StandardTable(Table):
@@ -31,16 +61,18 @@ class StandardTable(Table):
         sort = [(0, 'asc')]
 
 
-class MoleculeTable(Table):
-    name = Column(field='name', header='Name')
-    formula = Column(field='sum_formula', header='Formula')
-    exact_mass = Column(field='exact_mass', header='Exact Mass')
-    pubchem_id = Column(field='pubchem_id', header='Pubchem ID')
+class SpectraTable(Table):
+    id = Column(field='pk', header='ID')
+    precursor_mz = Column(field='precursor_mz', header='Precursor m/z')
+    standard = StandardAdductColumn(field='standard_id', header='Ion')
+    review_status = ReviewStatusColumn(header='Review Status', sortable=False)
+    view = LinkColumn(header='', sortable=False,
+                      links=[Link(text='View', viewname='fragmentSpectrum-detail', kwargs={'pk': Accessor('pk')})])
 
     class Meta:
-        model = Molecule
+        model = FragmentationSpectrum
         ajax = True
-        ajax_source = reverse_lazy('molecule_table')
+        ajax_source = reverse_lazy('spectra_table')
         sort = [(0, 'asc')]
 
 
