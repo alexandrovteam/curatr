@@ -12,6 +12,9 @@
         <h1>Standard Inventory</h1>
         <br/>
         {% render_table standard_list %}
+        <a href="{% url 'MCFStandard-add' %}" id="add_standard_button">
+            <span class="glyphicon glyphicon-plus"> Add </span>
+        </a>
     </div>
 {% endblock %}
 
