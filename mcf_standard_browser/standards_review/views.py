@@ -6,8 +6,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from table.views import FeedDataView
 
 import tasks
-from tables import StandardTable, MoleculeTable, SpectraTable
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
+from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, MCFStandardBatchForm, ExportLibrary
 import numpy as np
 import tools
@@ -266,8 +266,8 @@ def fragmentSpectrum_detail(request,pk):
     return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_detail.html', data)
 
 def MCFdataset_list(request):
-    datasets = Dataset.objects.all()
-    return render(request,'mcf_standards_browse/mcf_dataset_list.html',{'datasets':datasets})
+    table = DatasetListTable()
+    return render(request, 'mcf_standards_browse/mcf_dataset_list_dt.html', {'dataset_list': table})
 
 def MCFdataset_detail(request, pk):
     dataset=get_object_or_404(Dataset, pk=pk)

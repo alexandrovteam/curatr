@@ -4,7 +4,7 @@ from table import Table
 from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
 
-from models import Standard, Adduct, Molecule, FragmentationSpectrum
+from models import Standard, Adduct, Molecule, FragmentationSpectrum, Dataset
 
 
 class AdductMzColumn(Column):
@@ -30,6 +30,14 @@ class ReviewStatusColumn(Column):
                 return 'Confirmed'
         else:
             return 'Unrated'
+
+
+class DatasetStatusColumn(LinkColumn):
+    def render(self, dataset):
+        if dataset.processing_finished:
+            return super(DatasetStatusColumn, self).render(dataset)
+        else:
+            return 'processing...'
 
 
 class MoleculeTable(Table):
@@ -73,6 +81,18 @@ class SpectraTable(Table):
         model = FragmentationSpectrum
         ajax = True
         ajax_source = reverse_lazy('spectra_table')
+        sort = [(0, 'asc')]
+
+
+class DatasetListTable(Table):
+    id = Column(field='id', header='ID')
+    name = Column(field='name', header='Dataset')
+    status = LinkColumn(field='processing_finished', header='Status',
+                        links=[Link(text='View', viewname='MCFdataset-detail', args=(Accessor('pk'),))])
+
+    class Meta:
+        model = Dataset
+        ajax = True
         sort = [(0, 'asc')]
 
 
