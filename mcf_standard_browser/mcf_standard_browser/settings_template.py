@@ -85,6 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django_settings_export.settings_export',
             ],
         },
     },
@@ -155,3 +156,9 @@ BROKER_URL = "amqp://"
 
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+INSTITUTE_NAME= '[EMBL - Metabolmoics Core Facility]'
+
+SETTINGS_EXPORT = [
+    'INSTITUTE_NAME',
+]
