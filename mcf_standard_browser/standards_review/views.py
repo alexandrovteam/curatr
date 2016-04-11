@@ -357,7 +357,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
                 "chart_id": 'frag_spec{}'.format(spec.id),
                 "chart": {"renderTo": 'chart_id', "type": chart_type, "height": 300, "zoomType": "x"},
                 "title": {"text": ''},
-                "xAxis":  {"title": {"text": 'm/z'},},
+                "xAxis":  {"title": {"text": 'm/z'},"max":spec.precursor_mz+2*spec.dataset.quad_window_mz},
                 "yAxis": {"title": {"text": 'Intensity'}},
                 "series": [
                         {"name": 'fragment spectrum', "data": [[x+d,y*m] for x,y in zip(np.round(spec.centroid_mzs,5), spec.centroid_ints) for d,m in zip([-0.00,0,0.00 ],[0,1,0])]
