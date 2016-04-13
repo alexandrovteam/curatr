@@ -54,8 +54,8 @@ class MoleculeTable(Table):
 
 
 class StandardTable(Table):
-    id = LinkColumn(field='pk', header='Inventory ID',
-                    links=[Link(text=Accessor('pk'), viewname='MCFStandard-detail', args=(Accessor('pk'),))])
+    id = LinkColumn(field='MCFID', header='Inventory ID',
+                    links=[Link(text=Accessor('MCFID'), viewname='MCFStandard-detail', args=(Accessor('MCFID'),))])
     molecule_name = Column(field='molecule.name', header='Name')
     molecular_formula = Column(field='molecule.sum_formula', header='Formula')
     mass = Column(field='molecule.exact_mass', header='Exact Mass')
