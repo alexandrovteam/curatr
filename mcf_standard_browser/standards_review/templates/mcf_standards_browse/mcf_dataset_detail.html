@@ -38,7 +38,8 @@
     <script>
         $(document).ready(function() {
             $('#id_list_table').DataTable({
-                    stateSave: true
+                    stateSave: true,
+                    order: [[ 2, 'desc' ]]
             });
         } );
     </script>
