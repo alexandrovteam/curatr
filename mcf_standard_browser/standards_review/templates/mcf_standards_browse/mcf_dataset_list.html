@@ -10,7 +10,7 @@
 {% block content %}
     <div class="main-content" style="margin-top: 10px">
         <h1>EMBL-MCF Standards:</h1>
-        <br/>
+        <br><br><br>
         {% render_table dataset_list %}
         <a href="{% url 'dataset-upload' %}" id="add_standard_button"><span class="glyphicon glyphicon-plus"> Upload </span></a>
     </div>
