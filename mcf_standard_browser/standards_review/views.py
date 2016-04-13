@@ -34,11 +34,11 @@ def about(request):
 
 def MCFStandard_list(request):
     table = StandardTable()
-    return render(request, "mcf_standards_browse/mcf_standard_list_dt.html", {'standard_list': table})
+    return render(request, "mcf_standards_browse/mcf_standard_list.html", {'standard_list': table})
 
 def MCFMolecule_list(request):
     table = MoleculeTable()
-    return  render(request,'mcf_standards_browse/mcf_molecule_list_dt.html',{'molecule_list': table})
+    return  render(request, 'mcf_standards_browse/mcf_molecule_list.html', {'molecule_list': table})
 
 
 class StandardListView(FeedDataView):
@@ -201,7 +201,7 @@ def error_page(request):
 
 def fragmentSpectrum_list(request):
     table = SpectraTable()
-    return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_list_dt.html', {'spectra_list': table})
+    return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_list.html', {'spectra_list': table})
 
 
 class SpectraListView(FeedDataView):
@@ -267,7 +267,7 @@ def fragmentSpectrum_detail(request,pk):
 
 def MCFdataset_list(request):
     table = DatasetListTable()
-    return render(request, 'mcf_standards_browse/mcf_dataset_list_dt.html', {'dataset_list': table})
+    return render(request, 'mcf_standards_browse/mcf_dataset_list.html', {'dataset_list': table})
 
 def MCFdataset_detail(request, pk):
     dataset=get_object_or_404(Dataset, pk=pk)
