@@ -9,11 +9,12 @@ from .models import FragmentationSpectrum, Molecule, Standard
 
 class ChartData(object):
     @classmethod
-    def get_avg_by_day(cls,):
+    def get_avg_by_day(cls, ):
         data = {'dates': range(20), 'values': np.random.rand(20)}
         return data
 
-def update_fragSpec(fragSpecId,response, standard, adduct, username):
+
+def update_fragSpec(fragSpecId, response, standard, adduct, username):
     fs = FragmentationSpectrum.objects.get(pk=fragSpecId)
     logging.debug(fs.dataset)
     if response == '0':
@@ -21,8 +22,8 @@ def update_fragSpec(fragSpecId,response, standard, adduct, username):
         fs.adduct = None
         fs.reviewed = True
     elif response == '1':
-        fs.standard=standard
-        fs.adduct=adduct
+        fs.standard = standard
+        fs.adduct = adduct
         fs.reviewed = True
     else:
         fs.standard = None
@@ -39,7 +40,7 @@ def clear_molecules_without_standard():
         if not Standard.objects.all().filter(molecule=molecule):
             remove_name.append(molecule.name)
             molecule.delete()
-            clean_count +=1
+            clean_count += 1
     return (clean_count, remove_name)
 
 

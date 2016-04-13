@@ -1,64 +1,70 @@
 from __future__ import unicode_literals
-from django.db import models
-import logging
+
 import base64
+import datetime
+import json
+import logging
+
 import numpy as np
 import re
-from pyMSpec.pyisocalc import pyisocalc
-import json
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
-import datetime
+from pyMSpec.pyisocalc import pyisocalc
+
 
 # Create your models here.
 class Adduct(models.Model):
     nM = models.IntegerField(default=1)
-    delta_formula = models.TextField(default="")# addition/loss groups per M (sum of +X-Y)
-    delta_atoms = models.TextField(default="") #net atom addition/loss
-    charge = models.IntegerField(default=1)#overall charge after atom change
+    delta_formula = models.TextField(default="")  # addition/loss groups per M (sum of +X-Y)
+    delta_atoms = models.TextField(default="")  # net atom addition/loss
+    charge = models.IntegerField(default=1)  # overall charge after atom change
 
     def charge_str(self):
-        if np.sign(self.charge)==1:
+        if np.sign(self.charge) == 1:
             return "{}+".format(self.charge)
         else:
             return "{}-".format(np.abs(self.charge))
 
     def html_str(self):
-            return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1","")
+        return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1", "")
 
     def __unicode__(self):
         return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
 
     def get_delta_atoms(self):
         def addElement(elDict, element, number):
-            elDict.setdefault(element,[]).append(number)
+            elDict.setdefault(element, []).append(number)
+
         self.delta_formula = self.delta_formula.strip()
-        if all([self.delta_formula.startswith("+"),self.delta_formula.startswith("-")]):
-            self.delta_formula = "+"+self.delta_formula
-        formula_split = re.split(u'([+-])',self.delta_formula)
+        if all([self.delta_formula.startswith("+"), self.delta_formula.startswith("-")]):
+            self.delta_formula = "+" + self.delta_formula
+        formula_split = re.split(u'([+-])', self.delta_formula)
         logging.debug(formula_split)
         el_dict = {}
-        for sign,el in zip(formula_split[1::2],formula_split[2::2]):
-            this_el_dict = dict([(segment.element().name(), int("{}1".format(sign))*segment.amount()) for segment in pyisocalc.parseSumFormula(el).get_segments()])
+        for sign, el in zip(formula_split[1::2], formula_split[2::2]):
+            this_el_dict = dict([(segment.element().name(), int("{}1".format(sign)) * segment.amount()) for segment in
+                                 pyisocalc.parseSumFormula(el).get_segments()])
             for this_el in this_el_dict:
                 logging.debug(el_dict)
-                addElement(el_dict,this_el, this_el_dict[this_el])
-        sign_dict = {1:"+",-1:"-"}
+                addElement(el_dict, this_el, this_el_dict[this_el])
+        sign_dict = {1: "+", -1: "-"}
         for this_el in el_dict:
-            el_dict[this_el]=sum(el_dict[this_el])
+            el_dict[this_el] = sum(el_dict[this_el])
         logging.debug(el_dict)
-        el_string = "".join(["{}{}{}".format(sign_dict[np.sign(el_dict[el])],el,abs(el_dict[el])) for el in el_dict if el_dict[el]!=0])
+        el_string = "".join(["{}{}{}".format(sign_dict[np.sign(el_dict[el])], el, abs(el_dict[el])) for el in el_dict if
+                             el_dict[el] != 0])
         logging.debug(el_string)
         return el_string
 
-    def save(self,*args,**kwargs):
+    def save(self, *args, **kwargs):
         self.delta_atoms = self.get_delta_atoms()
         super(Adduct, self).save(*args, **kwargs)
 
 
 class Molecule(models.Model):
     _adduct_mzs = models.TextField(default="")
-    name = models.TextField(default = "")
+    name = models.TextField(default="")
     sum_formula = models.TextField(null=True)
     inchi_code = models.TextField(default="")
     exact_mass = models.FloatField(default=0.0)
@@ -81,28 +87,25 @@ class Molecule(models.Model):
 
     adduct_mzs = property(get_adduct_mzs, set_adduct_mzs)
 
-
     def get_mass(self):
-        spec = pyisocalc.complete_isodist(pyisocalc.parseSumFormula(self.sum_formula),charge=0)
+        spec = pyisocalc.complete_isodist(pyisocalc.parseSumFormula(self.sum_formula), charge=0)
         mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
         return mass
 
     def __unicode__(self):
-        return u"".join([i for i in self.name if ord(i) <128])
-
-
+        return u"".join([i for i in self.name if ord(i) < 128])
 
     def html_str(self):
         return "{}".format(self.name)
 
-    def save(self,*args,**kwargs):
-        self.sum_formula=self.sum_formula.strip()
+    def save(self, *args, **kwargs):
+        self.sum_formula = self.sum_formula.strip()
         self.exact_mass = self.get_mass()
         self.set_adduct_mzs()
         super(Molecule, self).save(*args, **kwargs)
 
     def make_ion_formula(self, adduct):
-        formula = "({}){}{}".format(self.sum_formula,adduct.nM,adduct.delta_atoms)
+        formula = "({}){}{}".format(self.sum_formula, adduct.nM, adduct.delta_atoms)
         return formula
 
     def get_mz(self, adduct):
@@ -122,13 +125,14 @@ class Molecule(models.Model):
 
 
 class Standard(models.Model):
-    MCFID = models.IntegerField(null=True, blank=True)# MCFID == Standard.pk
+    MCFID = models.IntegerField(null=True, blank=True)  # MCFID == Standard.pk
     molecule = models.ForeignKey(Molecule, default=Molecule.objects.all().filter(name='DUMMY'))
     vendor = models.TextField(null=True, blank=True)
     vendor_cat = models.TextField(null=True, blank=True)
     lot_num = models.TextField(null=True, blank=True)
     location = models.TextField(null=True, blank=True)
     purchase_date = models.DateField(null=True, blank=True)
+
     def __unicode__(self):
         return "{}: {}".format(self.MCFID, self.molecule.name)
 
@@ -136,12 +140,13 @@ class Standard(models.Model):
 class Dataset(models.Model):
     processing_finished = models.BooleanField(default=False)
     name = models.TextField(default="")
-    adducts_present = models.ManyToManyField(Adduct,blank=True)
-    standards_present = models.ManyToManyField(Standard,blank=True)
+    adducts_present = models.ManyToManyField(Adduct, blank=True)
+    standards_present = models.ManyToManyField(Standard, blank=True)
     mass_accuracy_ppm = models.FloatField(default=10.0)
     quad_window_mz = models.FloatField(default=1.0)
     intrument = models.TextField(default="")
-    #(for xic search)
+
+    # (for xic search)
     def __unicode__(self):
         return self.name
 
@@ -150,23 +155,23 @@ class Xic(models.Model):
     mz = models.FloatField(default=0.0)
     dataset = models.ForeignKey(Dataset)
     _xic = models.TextField(
-            db_column='data',
-            blank=True)
+        db_column='data',
+        blank=True)
     _rt = models.TextField(
-            db_column='rt_data',
-            blank=True)
+        db_column='rt_data',
+        blank=True)
 
-    standard = models.ForeignKey(Standard,blank=True, null=True)
-    adduct = models.ForeignKey(Adduct,blank=True, null=True)
+    standard = models.ForeignKey(Standard, blank=True, null=True)
+    adduct = models.ForeignKey(Adduct, blank=True, null=True)
     collision = models.TextField(default='')
 
     def set_xic(self, xic):
-        xic = np.asarray(xic,dtype=np.float64)
+        xic = np.asarray(xic, dtype=np.float64)
         self._xic = base64.b64encode(xic)
 
-    def set_rt(self,rt):
-        rt = np.asarray(rt,dtype=np.float64)
-        self._rt  = base64.b64encode(rt)
+    def set_rt(self, rt):
+        rt = np.asarray(rt, dtype=np.float64)
+        self._rt = base64.b64encode(rt)
 
     def get_xic(self):
         r = base64.decodestring(self._xic)
@@ -179,16 +184,14 @@ class Xic(models.Model):
     xic = property(get_xic, set_xic)
     rt = property(get_rt, set_rt)
 
-    def check_mass(self,tol_ppm=100):
-        tol_mz = self.mz*tol_ppm*1e-6
+    def check_mass(self, tol_ppm=100):
+        tol_mz = self.mz * tol_ppm * 1e-6
         theor_mz = self.standard.molecule.get_mz(self.adduct)
         if np.abs(theor_mz - self.mz) > tol_mz:
-            raise ValueError('Mass tolerance not satisfied {} {}'.format(theor_mz,self.mz))
+            raise ValueError('Mass tolerance not satisfied {} {}'.format(theor_mz, self.mz))
         return True
-        #todo(An)
-    #extend save to check that standard+adduct mass == precursor
-
-
+        # todo(An)
+        # extend save to check that standard+adduct mass == precursor
 
 
 class FragmentationSpectrum(models.Model):
@@ -198,8 +201,8 @@ class FragmentationSpectrum(models.Model):
     _centroid_ints = models.TextField()
     collision_energy = models.TextField(default="")
     dataset = models.ForeignKey(Dataset)
-    standard = models.ForeignKey(Standard,blank=True, null=True)
-    adduct = models.ForeignKey(Adduct,blank=True, null=True)
+    standard = models.ForeignKey(Standard, blank=True, null=True)
+    adduct = models.ForeignKey(Adduct, blank=True, null=True)
     spec_num = models.IntegerField(blank=True, null=True)
     rt = models.FloatField(blank=True, null=True)
     precursor_quad_fraction = models.FloatField(blank=True, null=True)
@@ -212,7 +215,7 @@ class FragmentationSpectrum(models.Model):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)
 
     def set_centroid_mzs(self, mzs):
-        mzs = np.asarray(mzs,dtype=np.float64)
+        mzs = np.asarray(mzs, dtype=np.float64)
         self._centroid_mzs = base64.b64encode(mzs)
 
     def get_centroid_mzs(self):
@@ -222,8 +225,8 @@ class FragmentationSpectrum(models.Model):
     centroid_mzs = property(get_centroid_mzs, set_centroid_mzs)
 
     def set_centroid_ints(self, values):
-        values = np.asarray(values,dtype=np.float64)
-        self._centroid_ints =  base64.b64encode(values)
+        values = np.asarray(values, dtype=np.float64)
+        self._centroid_ints = base64.b64encode(values)
 
     def get_centroid_ints(self):
         r = base64.decodestring(self._centroid_ints)
@@ -234,7 +237,7 @@ class FragmentationSpectrum(models.Model):
     def get_centroids(self):
         return self.centroid_mzs, self.centroid_ints
 
-    def save(self,*args,**kwargs):
+    def save(self, *args, **kwargs):
         logging.debug(self.pk)
         if not self.pk:
             self.date_added = datetime.datetime.now()
