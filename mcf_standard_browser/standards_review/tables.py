@@ -88,8 +88,8 @@ class SpectraTable(Table):
 class DatasetListTable(Table):
     id = Column(field='id', header='ID')
     name = Column(field='name', header='Dataset')
-    status = LinkColumn(field='processing_finished', header='Status',
-                        links=[Link(text='View', viewname='MCFdataset-detail', args=(Accessor('pk'),))])
+    status = DatasetStatusColumn(field='processing_finished', header='Status',
+                                 links=[Link(text='View', viewname='MCFdataset-detail', args=(Accessor('pk'),))])
 
     class Meta:
         model = Dataset
