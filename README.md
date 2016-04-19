@@ -12,7 +12,7 @@ It is written in python using the django web framework and is being developed by
 
 ## Installation ##
 We recomment installing curatr and its python dependancies inside a virtual environment as follows,
-Create a convenient directory, for example `curatr' and clone the repository there:
+Create a convenient directory, for example `curatr` and clone the repository there:
 ```
 mkdir curatr
 cd curatr
@@ -46,14 +46,32 @@ Open `settings.py` and edit the following fields
       print ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
       ```
 
-### RabbitMQ Settings ###
-<todo>
-
-### Run Server ###
+### Initialize the DB ###
 ```
 python manage.py makemigrations
 python manage.py migrate
-python manage.py runserver
 ```
+
+### Set up a message broker (example: RabbitMQ) ##
+1. [Install RabbitMQ] (https://www.rabbitmq.com/download.html)
+2. (Optional) Configure a user
+```
+# RabbitMQ installs with a default username / password of guest / guest
+# you can change that by creating a new user
+rabbitmqctl add_user myuser mypassword
+rabbitmqctl add_vhost myvhost
+rabbitmqctl set_permissions -p myvhost myuser ".*" ".*" ".*"
+```
+And adjust the URL in settings.py: `BROKER_URL = "amqp://myuser:mypassword@localhost:5672/myvhost"`
+Find more details [here] (http://www.rabbitmq.com/man/rabbitmqctl.1.man.html)
+3. Sync your DB: `python manage.py migrate djcelery`
+
+### Run Server ###
+1. Start RabbitMQ: `sudo service rabbitmq-server start` (on Ubuntu)
+2. Start Celery: `python manage.py celeryd`. Useful parameters:
+    - `--verbosity=2`
+    - `--loglevel=DEBUG`
+3. Start the server: `python manage.py runserver`
+
 Curatr should now be visible on  [localhost:8000](http://localhost:8000)
 
