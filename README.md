@@ -55,15 +55,16 @@ python manage.py migrate
 ### Set up a message broker (example: RabbitMQ) ##
 1. [Install RabbitMQ] (https://www.rabbitmq.com/download.html)
 2. (Optional) Configure a user
-```
-# RabbitMQ installs with a default username / password of guest / guest
-# you can change that by creating a new user
-rabbitmqctl add_user myuser mypassword
-rabbitmqctl add_vhost myvhost
-rabbitmqctl set_permissions -p myvhost myuser ".*" ".*" ".*"
-```
-And adjust the URL in settings.py: `BROKER_URL = "amqp://myuser:mypassword@localhost:5672/myvhost"`
-Find more details [here] (http://www.rabbitmq.com/man/rabbitmqctl.1.man.html)
+    ```
+    # RabbitMQ installs with a default username / password of guest / guest
+    # you can change that by creating a new user
+    rabbitmqctl add_user myuser mypassword
+    rabbitmqctl add_vhost myvhost
+    rabbitmqctl set_permissions -p myvhost myuser ".*" ".*" ".*"
+    ```
+    
+    And adjust the URL in settings.py: `BROKER_URL = "amqp://myuser:mypassword@localhost:5672/myvhost"`.
+    Find more details [here] (http://www.rabbitmq.com/man/rabbitmqctl.1.man.html)
 3. Sync your DB: `python manage.py migrate djcelery`
 
 ### Run Server ###
