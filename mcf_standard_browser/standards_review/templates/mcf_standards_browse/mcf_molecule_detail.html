@@ -33,7 +33,7 @@
             {% for standard, spectra in standards %}
             <p>Standard ID: <a href="{% url 'standard-detail' standard.MCFID %}"> {{ standard }} </a></p>
                 {% for spectrum in spectra %}
-                    {{ spectrum.adduct.html_str }}
+                    {{ spectrum.adduct.html_str|safe }}
                     <div id="frag_spec{{ spectrum.id }}" class="xic_fraggraph"></div>
                     <a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}">View Spectrum Detail</a>
             <br>
