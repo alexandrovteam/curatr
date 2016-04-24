@@ -32,73 +32,74 @@
     </head>
 
     <body>
+        <!-- JavaScript -->
+        <script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"><\/script>')</script>
+        <script src="{% static 'js/bootstrap.min.js'  %}"></script>
+        {% block script %}
+        {% endblock %}
+        {% block extrajs %}
+        {% endblock %}
+        <!-- HTML -->
+
         <div id="wrapper">
-            <nav class="navbar navbar-inverse navbar-fixed-top">
-              <div class="container">
-                <div class="navbar-header" style="height:75px">
-                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                  </button>
-                  <a class="navbar-brand"  href = "/" id="home_link"><img src="{% static 'curatr_logo.png'  %}" alt="curatr_logo" style="width:75px;height:75px"/> Curatr </a>
-                </div>
+            <div class="container">
+                <nav class="navbar navbar-inverse navbar-fixed-top">
+                  <div class="container">
+                    <div class="navbar-header" style="height:75px">
+                      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                      </button>
+                      <a class="navbar-brand"  href = "/" id="home_link"><img src="{% static 'curatr_logo.png'  %}" alt="curatr_logo" style="width:75px;height:75px"/> Curatr </a>
+                    </div>
 
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav navbar-left">
+                    <div id="navbar" class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav navbar-left">
 
-                        <li>
-                            <a href="{% url 'library-home' %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Spectral Library <span class="caret"></span></a>
-                                  <ul class="dropdown-menu">
-                                    <li><a href="{% url 'molecule-list' %}">Browse Molecules</a></li>
-                                    <li><a href="{% url 'fragmentSpectrum-list' %}">Browse Fragmentation Spectra</a></li>
-                                  </ul>
+                            <li>
+                                <a href="{% url 'library-home' %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Spectral Library <span class="caret"></span></a>
+                                      <ul class="dropdown-menu">
+                                        <li><a href="{% url 'molecule-list' %}">Browse Molecules</a></li>
+                                        <li><a href="{% url 'fragmentSpectrum-list' %}">Browse Fragmentation Spectra</a></li>
+                                      </ul>
+                            </li>
+                            <li>
+                                <a href="{% url 'curate-home' %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Curate <span class="caret"></span></a>
+                                      <ul class="dropdown-menu">
+                                        <li><a href="{% url 'standard-add' %}">Add Standard</a></li>
+                                        <li><a href="{% url 'dataset-upload' %}">Upload Dataset</a></li>
+                                        <li><a href="{% url 'dataset-list' %}">Curate Dataset</a></li>
+                                      </ul>
+                            </li>
+                        </ul>
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                            {% if user.is_authenticated %}
+                                <small style="float:right"><a href="{% url 'django.contrib.auth.views.logout' %}">(log out)</a></small>
+                                <h2 style="float:right; color:#ffffff">welcome: {{ user }}</h2>
+                            {% else %}
+                                <a href="{% url 'django.contrib.auth.views.login' %}?next={% firstof request.path '/' %}" style="float:right"><small>Log in <span class="glyphicon glyphicon-lock"></span></small></a>
+                            {% endif %}
                         </li>
-                        <li>
-                            <a href="{% url 'curate-home' %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Curate <span class="caret"></span></a>
-                                  <ul class="dropdown-menu">
-                                    <li><a href="{% url 'standard-add' %}">Add Standard</a></li>
-                                    <li><a href="{% url 'dataset-upload' %}">Upload Dataset</a></li>
-                                    <li><a href="{% url 'dataset-list' %}">Curate Dataset</a></li>
-                                  </ul>
-                        </li>
-                    </ul>
+                        </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                        {% if user.is_authenticated %}
-                            <small style="float:right"><a href="{% url 'django.contrib.auth.views.logout' %}">(log out)</a></small>
-                            <h2 style="float:right; color:#ffffff">welcome: {{ user }}</h2>
-                        {% else %}
-                            <a href="{% url 'django.contrib.auth.views.login' %}?next={% firstof request.path '/' %}" style="float:right"><small>Log in <span class="glyphicon glyphicon-lock"></span></small></a>
-                        {% endif %}
-                    </li>
-                    </ul>
-
-                </div> <!--/.navbar-collapse -->
-              </div> <!-- /container -->
-            </nav>
-
-            <div class="center">
-                {% block content %}
-                {% endblock %}
-                <div id="footer">
-                    <p> <a href="https://github.com/andy-d-palmer/curatr" > powered by curatr </a> </p>
+                    </div> <!--/.navbar-collapse -->
+                  </div> <!-- /container -->
+                </nav>
+            </div>
+            <div class="body">
+                <div class="center">
+                    {% block content %}
+                    {% endblock %}
                 </div>
             </div>
-
-
+            <div id="footer">
+                <p> <a href="{% url 'about-curatr' %}" > powered by curatr </a> </p>
+            </div>
         </div>
-    <!-- JavaScript -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"><\/script>')</script>
-    <script src="{% static 'js/bootstrap.min.js'  %}"></script>
-    {% block script %}
-    {% endblock %}
-    {% block extrajs %}
-    {% endblock %}
-
 
     </body>
 </html>
