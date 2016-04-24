@@ -3,21 +3,29 @@
 {% block content %}
  <div class="center">
      <h1> Add Standard{% if form_type == 'batch' %}s{% endif %}</h1>
+     <div class="main-content">
+        Curatr associates fragmentation spectra with a specific chemical source, this is usually a standard of a particular molecule purchased from a supplier.
+     </div>
      {% if user.is_authenticated %}
-
+     <div class="main-content">
+        {% if form_type == 'single' %}
+            <p> You are currently adding a single standard, there is also the option to
+            <br>
+            <a href="{% url 'standard-add-batch' %}"> Add Batch</a></p>
+        {% else %}
+            <p> You are currently adding a batch standard, there is also the option to
+            <br>
+            <a href="{% url 'standard-add' %}"> Add Single</a></p>
+        {% endif %}
+     </div>
      <div class="main-content">
          <h2>Instructions</h2>
         {% if form_type == 'single' %}
-            <p> Complete the fields below. It will complain if mandatory fields are not completed
-            <br>
-            <a href="{% url 'standard-add-batch' %}"> Add Batch</a></p>
-
+            <p> Complete all field in the form:
         {% else %}
-            The standards to add should be formatted as a tab-separated .txt file.
+            The standards to add should be formatted as a tab delimited.txt file.
             <br>
-            This file <b>must</b> contain the fields: "id","name","formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id" <b>but</b> the values can be blank.
-            <br>
-            <a href="{% url 'standard-add' %}"> Add Single</a>
+            This file <b>must</b> contain the fields: "id", "name";"formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id" <b>but</b> the values can be blank.
         {% endif %}
      </div>
 
