@@ -34,6 +34,10 @@ def about(request):
 def curate_home(request):
     return render(request,'mcf_standards_browse/curate_home.html', )
 
+def library_home(request):
+    return render(request,'mcf_standards_browse/library_home.html', )
+
+
 def MCFStandard_list(request):
     table = StandardTable()
     return render(request, "mcf_standards_browse/mcf_standard_list.html", {'standard_list': table})
@@ -163,8 +167,22 @@ def MCFStandard_edit(request, pk):
             return redirect('MCFStandard-list')
     else:
         form = MCFStandardForm(instance=standard)
-    logging.debug(form)
+    logging.debug(form.keys())
     return render(request, 'mcf_standards_browse/mcf_standard_edit.html', {'form': form,})
+
+
+@login_required()
+def MCFMolecule_add(request):
+    logging.debug('add molecule')
+    if request.method == "POST":
+        form = MCFMoleculeForm(request.POST)
+        if form.is_valid():
+            molecule = form.save()
+            molecule.save()
+            return redirect('MCFMolecule-list')
+    else:
+        form = MCFMoleculeForm()
+    return render(request, 'mcf_standards_browse/mcf_molecule_add.html', {'form': form, 'form_type': 'single'})
 
 
 @login_required()
@@ -208,7 +226,7 @@ def MCFStandard_add_batch(request):
         form = MCFStandardBatchForm(request.POST, request.FILES)
         if form.is_valid():
             tasks.add_batch_standard.delay({'username': request.user.username}, request.FILES[
-                'semicolon_delimited_file'])
+                'tab_delimited_file'])
             return redirect('MCFStandard-list')
     else:
         form = MCFStandardBatchForm()

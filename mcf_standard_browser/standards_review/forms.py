@@ -1,8 +1,8 @@
 __author__ = 'palmer'
 from django import forms
 from .models import Standard, Adduct, FragmentationSpectrum, Molecule
-import os
 import logging
+from django.utils.safestring import mark_safe
 
 
 class MCFMoleculeForm(forms.ModelForm):
@@ -10,10 +10,15 @@ class MCFMoleculeForm(forms.ModelForm):
         model = Molecule
         fields = ('name', 'sum_formula', 'lipidmaps_id', 'pubchem_id', 'cas_id', 'chebi_id', 'hmdb_id', 'inchi_code', 'solubility')
 
+
 class MCFStandardForm(forms.ModelForm):
     class Meta:
         model = Standard
         fields = ('MCFID','molecule','vendor','vendor_cat','lot_num' ,'location' ,'purchase_date')
+        help_texts = {
+            'molecule': mark_safe('Molecule not in the list? <a href="/molecule/add/"> add it </a>')
+            }
+
 
 class MCFAdductForm(forms.ModelForm):
     class Meta:
@@ -22,7 +27,7 @@ class MCFAdductForm(forms.ModelForm):
 
 
 class MCFStandardBatchForm(forms.Form):
-    semicolon_delimited_file = forms.FileField()
+    tab_delimited_file = forms.FileField()
 
 
 class UploadFileForm(forms.Form):
