@@ -5,13 +5,13 @@ import logging
 from django.utils.safestring import mark_safe
 
 
-class MCFMoleculeForm(forms.ModelForm):
+class MoleculeForm(forms.ModelForm):
     class Meta:
         model = Molecule
         fields = ('name', 'sum_formula', 'lipidmaps_id', 'pubchem_id', 'cas_id', 'chebi_id', 'hmdb_id', 'inchi_code', 'solubility')
 
 
-class MCFStandardForm(forms.ModelForm):
+class StandardForm(forms.ModelForm):
     class Meta:
         model = Standard
         fields = ('MCFID','molecule','vendor','vendor_cat','lot_num' ,'location' ,'purchase_date')
@@ -20,13 +20,13 @@ class MCFStandardForm(forms.ModelForm):
             }
 
 
-class MCFAdductForm(forms.ModelForm):
+class AdductForm(forms.ModelForm):
     class Meta:
         model = Adduct
         fields = ('nM', 'delta_formula', 'charge')
 
 
-class MCFStandardBatchForm(forms.Form):
+class StandardBatchForm(forms.Form):
     tab_delimited_file = forms.FileField()
 
 

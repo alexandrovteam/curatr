@@ -17,8 +17,8 @@ import tasks
 import tools
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
-from .forms import MCFAdductForm, MCFMoleculeForm, MCFStandardForm, UploadFileForm, FragSpecReview, \
-    MCFStandardBatchForm, ExportLibrary
+from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
+    StandardBatchForm, ExportLibrary
 
 
 # Create your views here.
@@ -41,12 +41,12 @@ def library_home(request):
     return render(request,'mcf_standards_browse/library_home.html', )
 
 
-def MCFStandard_list(request):
+def standard_list(request):
     table = StandardTable()
     return render(request, "mcf_standards_browse/mcf_standard_list.html", {'standard_list': table})
 
 
-def MCFMolecule_list(request):
+def molecule_list(request):
     table = MoleculeTable()
     return render(request, 'mcf_standards_browse/mcf_molecule_list.html', {'molecule_list': table})
 
@@ -83,7 +83,7 @@ class ServerSideView(TemplateView):
     context_object_name = 'browsers'
 
 
-class MCFStandard_list_ez(ListView):
+class Standard_list_ez(ListView):
     template_name = 'eztables/client_side.html'
     model = Standard
     # fields = ('name',
@@ -92,7 +92,7 @@ class MCFStandard_list_ez(ListView):
     context_object_name = 'standards'
 
 
-def MCFStandard_detail(request, pk):
+def standard_detail(request, pk):
     standard = get_object_or_404(Standard, MCFID=pk)
     frag_specs = FragmentationSpectrum.objects.all().filter(standard=standard)
     chart_type = 'line'
@@ -117,7 +117,7 @@ def MCFStandard_detail(request, pk):
     return render(request, 'mcf_standards_browse/mcf_standard_detail.html', data)
 
 
-def MCFMolecule_detail(request, pk):
+def molecule_detail(request, pk):
     molecule = get_object_or_404(Molecule, pk=pk)
     standards = Standard.objects.all().filter(molecule=molecule)
     frag_specs = []
@@ -147,67 +147,67 @@ def MCFMolecule_detail(request, pk):
 
 
 @login_required()
-def MCFStandard_add(request):
+def standard_add(request):
     if request.method == "POST":
-        form = MCFStandardForm(request.POST)
+        form = StandardForm(request.POST)
         if form.is_valid():
             standard = form.save()
             standard.save()
-            return redirect('MCFStandard-list')
+            return redirect('Standard-list')
     else:
-        form = MCFStandardForm()
+        form = StandardForm()
     return render(request, 'mcf_standards_browse/mcf_standard_add.html', {'form': form, 'form_type': 'single'})
 
 
 @login_required()
-def MCFStandard_edit(request, pk):
+def standard_edit(request, pk):
     standard = get_object_or_404(Standard, MCFID=pk)
     if request.method == "POST":
-        form = MCFStandardForm(request.POST)
+        form = StandardForm(request.POST)
         if form.is_valid():
             standard = form.save()
             standard.save()
-            return redirect('MCFStandard-list')
+            return redirect('Standard-list')
     else:
-        form = MCFStandardForm(instance=standard)
+        form = StandardForm(instance=standard)
     logging.debug(form.keys())
     return render(request, 'mcf_standards_browse/mcf_standard_edit.html', {'form': form,})
 
 
 @login_required()
-def MCFMolecule_add(request):
+def molecule_add(request):
     logging.debug('add molecule')
     if request.method == "POST":
-        form = MCFMoleculeForm(request.POST)
+        form = MoleculeForm(request.POST)
         if form.is_valid():
             molecule = form.save()
             molecule.save()
-            return redirect('MCFMolecule-list')
+            return redirect('Molecule-list')
     else:
-        form = MCFMoleculeForm()
+        form = MoleculeForm()
     return render(request, 'mcf_standards_browse/mcf_molecule_add.html', {'form': form, 'form_type': 'single'})
 
 
 @login_required()
-def MCFMolecule_edit(request, pk):
+def molecule_edit(request, pk):
     molecule = get_object_or_404(Molecule, pk=pk)
     standards = Standard.objects.all().filter(molecule=molecule)
     if request.method == "POST":
-        form = MCFMoleculeForm(request.POST)
+        form = MoleculeForm(request.POST)
         if form.is_valid():
             standard = form.save()
             standard.save()
-            return redirect('MCFStandard-list')
+            return redirect('Standard-list')
     else:
-        form = MCFMoleculeForm(instance=molecule)
+        form = MoleculeForm(instance=molecule)
     return render(request, 'mcf_standards_browse/mcf_molecule_edit.html',
                   {'form': form, 'standards': standards, 'molecule': molecule})
 
 
 @login_required()
-def MCFAdduct_add(request):
+def adduct_add(request):
     if request.method == "POST":
-        form = MCFAdductForm(request.POST)
+        form = AdductForm(request.POST)
         if form.is_valid():
             if Adduct.objects.filter(nM=request.POST['nM'], delta_formula=request.POST['delta_formula']).exists():
                 error_list = [
@@ -218,21 +218,21 @@ def MCFAdduct_add(request):
             tools.update_mzs()
         return redirect("/")
     else:
-        form = MCFAdductForm()
+        form = AdductForm()
     return render(request, 'mcf_standards_browse/mcf_adduct_add.html', {'form': form})
 
 
 @login_required()
-def MCFStandard_add_batch(request):
+def standard_add_batch(request):
     logging.debug(request.FILES)
     if request.method == "POST":
-        form = MCFStandardBatchForm(request.POST, request.FILES)
+        form = StandardBatchForm(request.POST, request.FILES)
         if form.is_valid():
             tasks.add_batch_standard.delay({'username': request.user.username}, request.FILES[
                 'tab_delimited_file'])
-            return redirect('MCFStandard-list')
+            return redirect('Standard-list')
     else:
-        form = MCFStandardBatchForm()
+        form = StandardBatchForm()
     return render(request, 'mcf_standards_browse/mcf_standard_add.html', {'form': form, 'form_type': 'batch'})
 
 
@@ -308,12 +308,12 @@ def fragmentSpectrum_detail(request, pk):
     return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_detail.html', data)
 
 
-def MCFdataset_list(request):
+def dataset_list(request):
     table = DatasetListTable()
     return render(request, 'mcf_standards_browse/mcf_dataset_list.html', {'dataset_list': table})
 
 
-def MCFdataset_detail(request, pk):
+def dataset_detail(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
     adducts = dataset.adducts_present.all()
     standards = dataset.standards_present.all().order_by('MCFID')
@@ -342,7 +342,7 @@ def MCFdataset_detail(request, pk):
 
 
 @ensure_csrf_cookie
-def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
+def xic_detail(request, dataset_pk, standard_pk, adduct_pk):
     dataset = get_object_or_404(Dataset, pk=dataset_pk)
     standard = get_object_or_404(Standard, pk=standard_pk)
     adduct = get_object_or_404(Adduct, pk=adduct_pk)
@@ -358,7 +358,7 @@ def MCFxic_detail(request, dataset_pk, standard_pk, adduct_pk):
             # todo update fields in frag spectra
             logging.debug((form.user, fragSpecId, response))
             tools.update_fragSpec(fragSpecId, response, standard, adduct, request.user.username)
-        return redirect('MCFdataset-detail', dataset_pk)
+        return redirect('dataset-detail', dataset_pk)
     else:
         chartdata = []
         for xic in xics:
@@ -442,7 +442,7 @@ def dataset_upload(request):
                     destination.write(chunk)
             tasks.handle_uploaded_files.delay(data, mzml_filename)
 
-            return redirect('MCFdataset-list')
+            return redirect('dataset-list')
     else:
         form = UploadFileForm(initial={"mass_accuracy_ppm": 10.0, 'quad_window_mz': 1.0})
     return render(request, 'mcf_standards_browse/dataset_upload.html', {'form': form})
@@ -540,7 +540,7 @@ def fragmentSpectrum_export(request):
 
 
 @login_required()
-def MCFMolecule_cleandb(request):
+def molecule_cleandb(request):
     n_clean, clean_name = tools.clear_molecules_without_standard()
     logging.debug("{} molecules removed".format(n_clean))
     error_list = []
