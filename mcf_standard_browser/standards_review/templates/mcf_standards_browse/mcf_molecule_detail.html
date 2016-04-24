@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="page-header-extras">
-        <small><a href="{% url 'MCFMolecule-list' %}">return to molecule catalogue</a></small>
+        <small><a href="{% url 'molecule-list' %}">return to molecule list</a></small>
     </div>
     <div class="center">
          <div class="main-content">
@@ -31,9 +31,8 @@
         </div>
         <div class="main-content">
             {% for standard, spectra in standards %}
-            <p>Standard ID: <a href="{% url 'MCFStandard-detail' standard.MCFID %}"> {{ standard }} </a></p>
+            <p>Standard ID: <a href="{% url 'standard-detail' standard.MCFID %}"> {{ standard }} </a></p>
                 {% for spectrum in spectra %}
-
                     {{ spectrum.adduct.html_str }}
                     <div id="frag_spec{{ spectrum.id }}" class="xic_fraggraph"></div>
                     <a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}">View Spectrum Detail</a>
@@ -42,9 +41,9 @@
             {% endfor %}
         </div>
         {% if user.is_authenticated %}
-        <div class="main-content">
-            <a href="{% url 'MCFMolecule-edit' pk=molecule.pk %}" class="btn btn-default">Edit Standard</a>
-        </div>
+            <div class="main-content">
+                <a href="{% url 'molecule-edit' pk=molecule.pk %}" class="btn btn-default">Edit Molecule</a>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

@@ -8,14 +8,14 @@
 
 {% block content %}
     <div class="page-header-extras">
-        <small><a href="{% url 'MCFdataset-detail' dataset.pk %}">return to list</a></small>
+        <small><a href="{% url 'dataset-detail' dataset.pk %}">return to list</a></small>
     </div>
     <div class="container">
         <h1> Curation Detail</h1>
         <div class="main-content">
             <h2> {{ standard }} </h2>
             <h2> {% autoescape off %}{{ adduct.html_str }} {% endautoescape %} </h2>
-            <h2>Dataset: <a href="{% url 'MCFdataset-detail' dataset.pk %}"> {{ dataset.name }}</a></h2>
+            <h2>Dataset: <a href="{% url 'dataset-detail' dataset.pk %}"> {{ dataset.name }}</a></h2>
             <h3>m/z: {{ mz|floatformat:"4" }}</h3>
                 <div id='chart_id' class="specgraph"></div>
         </div>

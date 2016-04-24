@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     <div class="page-header-extras">
-        <small><a href="{% url 'MCFdataset-list' %}">return to list</a></small>
+        <small><a href="{% url 'dataset-list' %}">return to list</a></small>
     </div>
     <h1> Dataset Detail: {{dataset.pk}}</h1>
     <h2>{{ dataset.name }}</h2>
@@ -23,13 +23,13 @@
                 <td>{{ item.0 }} {% autoescape off %}{{ item.1.html_str }}{% endautoescape%} </td>
                 <td>{{ item.2 }}</td>
                 <td>{{ item.3 }}</td>
-                <td><a href="{% url 'MCFxic-detail' dataset_pk=dataset.pk standard_pk=item.0.pk adduct_pk=item.1.pk%}">View</a></td>
+                <td><a href="{% url 'xic-detail' dataset_pk=dataset.pk standard_pk=item.0.pk adduct_pk=item.1.pk%}">View</a></td>
             </tr>
         {% endfor %}
 
     </table>
     <div class="page-header-extras">
-        <small><a href="{% url 'MCFdataset-list' %}">return to list</a></small>
+        <small><a href="{% url 'dataset-list' %}">return to list</a></small>
     </div>
 {% endblock %}
 

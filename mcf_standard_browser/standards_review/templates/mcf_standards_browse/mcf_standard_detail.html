@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="page-header-extras">
-        <small><a href="{% url 'MCFStandard-list' %}">return to standard list</a></small>
+        <small><a href="{% url 'standard-list' %}">return to standard list</a></small>
     </div>
     <div class="center">
         <h2> Standard Detail</h2>
@@ -40,7 +40,7 @@
 
         {% if user.is_authenticated %}
             <div class="main-content">
-                <a href="{% url 'MCFStandard-edit' pk=standard.MCFID %}" class="btn btn-default">Edit Standard</a>
+                <a href="{% url 'standard-edit' pk=standard.MCFID %}" class="btn btn-default">Edit Standard</a>
             </div>
         </div>
         {% endif %}

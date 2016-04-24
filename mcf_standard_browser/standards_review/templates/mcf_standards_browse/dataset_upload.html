@@ -1,23 +1,23 @@
 {% extends 'mcf_standards_browse/base.html' %}
 
 {% block content %}
-
+<div class="main-content" style="margin-top: 10px">
     <div id = welcome>
         <h2>Upload Dataset</h2>
         <p>Process of submitting data:
             <ol>
-                <li>Ensure the standards in the dataset are in the <a href="{% url 'MCFStandard-list' %}">MCF Standard Library</a></li>
+                <li>Ensure the standards in the dataset are in the <a href="{% url 'standard-list' %}">Standard Library</a></li>
                 <li>Convet the MS dataset to .mzML</li>
                 <li>Select the datafile (.mzml) and standards from the list below</li>
                 <li>Click 'Upload'</li>
             </ol>
         </p>
-        <p><b>Warning:</b> after upload the whole server will hang for ~5 minutes whilst it processes the data</p>
     </div>
     <form method="POST" class="data_upload-form" enctype="multipart/form-data">{% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Upload</button>
     </form>
+</div>
 {% endblock %}
 
 

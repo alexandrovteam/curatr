@@ -10,14 +10,14 @@
         {% if form_type == 'single' %}
             <p> Complete the fields below. It will complain if mandatory fields are not completed
             <br>
-            <a href="{% url 'MCFStandard-add-batch' %}"> Add Batch</a></p>
+            <a href="{% url 'standard-add-batch' %}"> Add Batch</a></p>
 
         {% else %}
             The standards to add should be formatted as a tab-separated .txt file.
             <br>
             This file <b>must</b> contain the fields: "id","name","formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id" <b>but</b> the values can be blank.
             <br>
-            <a href="{% url 'MCFStandard-add' %}"> Add Single</a>
+            <a href="{% url 'standard-add' %}"> Add Single</a>
         {% endif %}
      </div>
 

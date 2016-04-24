@@ -31,6 +31,9 @@ def about(request):
     return render(request, 'mcf_standards_browse/about.html', )
 
 
+def curate_home(request):
+    return render(request,'mcf_standards_browse/curate_home.html', )
+
 def MCFStandard_list(request):
     table = StandardTable()
     return render(request, "mcf_standards_browse/mcf_standard_list.html", {'standard_list': table})
@@ -425,12 +428,10 @@ def dataset_upload(request):
 
 
 class Echo(object):
-    """An object that implements just the write method of the file-like
-    interface.
-    """
+    #An object that implements just the write method of the file-like interface.
 
     def write(self, value):
-        """Write the value by returning it, instead of storing in a buffer."""
+        #Write the value by returning it, instead of storing in a buffer.
         return value
 
 

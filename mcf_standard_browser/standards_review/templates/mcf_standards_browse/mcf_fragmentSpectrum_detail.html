@@ -14,7 +14,7 @@
             <h3>Scan number: {{ specdata.spectrum.spec_num }}</h3>
             <p>Precursor m/z: {{ specdata.spectrum.precursor_mz }}</p>
             <p>Ion (Standard, Adduct): {{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct }}</p>
-            <p>Raw data: <a href="{% url 'MCFdataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} <{{ specdata.spectrum.spec_num }}></a></p>
+            <p>Raw data: <a href="{% url 'dataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} <{{ specdata.spectrum.spec_num }}></a></p>
             <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
         </div>
     </div>

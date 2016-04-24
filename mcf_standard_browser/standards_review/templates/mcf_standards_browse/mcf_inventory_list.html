@@ -7,12 +7,12 @@
 
 {% block content %}
     <div class="center">
-        <h2> EMBL-MCF Standards: </h2>
+        <h2> Standards: </h2>
         <div class="main-content">
             <table id="id_list_table" class="display" cellspacing="0" width="100%">
                 <thead>
                     <tr>
-                        <th>MCF-ID </th>
+                        <th>ID </th>
                         <th>Name </th>
                         <th>Formula </th>
                         <th>Exact Mass</th>
@@ -27,7 +27,7 @@
                 <tbody>
                 {% for standard, adduct_mzs in standards %}
                     <tr>
-                        <td><a href="{% url 'MCFStandard-detail' pk=standard.MCFID %}" id="MCF"> {{ standard.MCFID|add:"0"|stringformat:"04d" }} </a> </td>
+                        <td><a href="{% url 'standard-detail' pk=standard.MCFID %}" id="MCF"> {{ standard.MCFID|add:"0"|stringformat:"04d" }} </a> </td>
                         <td>{{ standard.molecule}} </td>
                         <td>{{ standard.molecule.sum_formula }} </td>
                         <td>{{ standard.molecule.exact_mass }} </td>

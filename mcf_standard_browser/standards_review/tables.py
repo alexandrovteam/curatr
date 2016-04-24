@@ -41,7 +41,8 @@ class DatasetStatusColumn(LinkColumn):
 
 
 class MoleculeTable(Table):
-    name = Column(field='name', header='Name')
+    name = LinkColumn(field='name', header='name',
+                    links=[Link(text=Accessor('name'), viewname='molecule-detail', args=(Accessor('id'),))])
     formula = Column(field='sum_formula', header='Formula')
     exact_mass = Column(field='exact_mass', header='Exact Mass')
     pubchem_id = Column(field='pubchem_id', header='Pubchem ID')
@@ -55,7 +56,7 @@ class MoleculeTable(Table):
 
 class StandardTable(Table):
     id = LinkColumn(field='MCFID', header='Inventory ID',
-                    links=[Link(text=Accessor('MCFID'), viewname='MCFStandard-detail', args=(Accessor('MCFID'),))])
+                    links=[Link(text=Accessor('MCFID'), viewname='standard-detail', args=(Accessor('MCFID'),))])
     molecule_name = Column(field='molecule.name', header='Name')
     molecular_formula = Column(field='molecule.sum_formula', header='Formula')
     mass = Column(field='molecule.exact_mass', header='Exact Mass')
@@ -89,7 +90,7 @@ class DatasetListTable(Table):
     id = Column(field='id', header='ID')
     name = Column(field='name', header='Dataset')
     status = DatasetStatusColumn(field='processing_finished', header='Status',
-                                 links=[Link(text='View', viewname='MCFdataset-detail', args=(Accessor('pk'),))])
+                                 links=[Link(text='View', viewname='dataset-detail', args=(Accessor('pk'),))])
 
     class Meta:
         model = Dataset
