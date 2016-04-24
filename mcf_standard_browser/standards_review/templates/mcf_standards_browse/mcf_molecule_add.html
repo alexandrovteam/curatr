@@ -1,0 +1,20 @@
+{% extends 'mcf_standards_browse/base.html' %}
+
+{% block content %}
+ <div class="center">
+     <h1> Add Molecule </h1>
+     {% if user.is_authenticated %}
+        <div class="main-content">
+            <form method="POST" class="data_upload-form" enctype="multipart/form-data">{% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="save btn btn-default">Save</button>
+            </form>
+        </div>
+     {% else %}
+        <div class="main-content">
+            You must be logged in to add a molecule
+        </div>
+     {% endif %}
+
+</div>
+{% endblock %}
