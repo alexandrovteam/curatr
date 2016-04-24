@@ -13,15 +13,20 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
+                  <h2>Add Standard</h2>
+                  <p>Add a standard to the laboratory chemicals inventory</p>
+                  <p><a class="btn btn-default" href="{% url 'standard-add' %}" role="button">Add &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
                   <h2>Upload Data</h2>
                   <p>Upload a dataset for curation</p>
                   <p><a class="btn btn-default" href="{% url 'dataset-upload' %}" role="button">Upload &raquo;</a></p>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                   <h2>Curate Dataset</h2>
                   <p>Curate spectra for the library</p>
-                  <p><a class="btn btn-default" href="{% url 'dataset-list' %}" role="button">Go &raquo;</a></p>
+                  <p><a class="btn btn-default" href="{% url 'dataset-list' %}" role="button">Curate &raquo;</a></p>
             </div>
         </div>
     </div>
