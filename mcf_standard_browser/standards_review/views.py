@@ -30,6 +30,9 @@ def home_page(request):
 def about(request):
     return render(request, 'mcf_standards_browse/about.html', )
 
+def about_curatr(request):
+    return render(request, 'mcf_standards_browse/about_curatr.html', )
+
 
 def curate_home(request):
     return render(request,'mcf_standards_browse/curate_home.html', )

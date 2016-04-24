@@ -1,0 +1,50 @@
+{% extends 'mcf_standards_browse/base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <div class="row">
+                    <h1>About Curatr</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{% static 'standards_review/user_1.png' %}" alt="data_flow" style="width:90%;max-width:200px"/>
+                    </div>
+                    <div class="col-md-8" style="vertical-align:center">
+                        <p>As a <b>mass spectrometrist</b> I want an <b>intuitive way </b> to <b>select high quality fragmentation spectra for the standards I analysed</b> </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{% static 'standards_review/user_2.png' %}" alt="data_flow" style="width:90%;max-width:200px"/>
+                    </div>
+                    <div class="col-md-8" style="vertical-align:center">
+                         <p> As a <b>spectral library owner</b> I want to <b> export spectra corresponding to known standards</b> so <b>they can be incorporated in my library</b></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{% static 'standards_review/user_3.png' %}" alt="data_flow" style="width:90%;max-width:200px"/>
+                    </div>
+                    <div class="col-md-8" style="vertical-align:center">
+                        <p>As a <b>user</b> I want <b>to browse/search the spectra for my compound</b> so <b>I can check what peaks are present</b></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+            <img src="{% static 'standards_review/data_flow.png' %}" alt="data_flow" style="width:90%;max-width:500px"/>
+            <div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
