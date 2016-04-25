@@ -471,7 +471,7 @@ def fragmentSpectrum_export(request):
             #    spectra = FragmentationSpectrum.objects.all()
             #else:
             #    raise ValueError('export code not known')
-            class_to_export_id = int(post_dict['spectra_to_export'][0])
+            class_to_export_id = int(post_dict['class_to_export'][0])
             if class_to_export_id == 0: # all
                 spectra = spectra
             if class_to_export_id == 1: # positive
