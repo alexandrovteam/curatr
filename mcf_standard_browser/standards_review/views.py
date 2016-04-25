@@ -475,9 +475,9 @@ def fragmentSpectrum_export(request):
             if class_to_export_id == 0: # all
                 spectra = spectra
             if class_to_export_id == 1: # positive
-                spectra = spectra.objects.all().filter(adduct__charge__gte=0)
+                spectra = spectra.exclude(adduct__charge__lte=0)
             if class_to_export_id == 2: # negative
-                spectra = spectra.objects.all().filter(adduct__charge__lte=0)
+                spectra = spectra.exclude(adduct__charge__gte=0)
             pseudo_buffer = Echo()
             data_format_id = int(post_dict['data_format'][0])
             spec_pairs = [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints)] for spectrum in spectra]
