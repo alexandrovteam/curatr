@@ -25,22 +25,26 @@ class Adduct(models.Model):
             c_sign = "+"
         else:
             c_sign = "-"
-        n_charges = abs(self.charge)
+        n_charges = np.abs(self.charge)
         if n_charges == 1:
             n_charges=""
         return "{}{}".format(n_charges,c_sign)
+
+    def nice_str(self):
+        _nM = self.nM
+        _charge = self.charge
+        if _nM == 1:
+            _nM = ""
+        if np.abs(_charge) == 1:
+            _charge = self.charge_str()
+        return "[{}M{}]{}".format(_nM, self.delta_formula, _charge)
 
     def html_str(self):
         return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1", "")
 
     def __unicode__(self):
-        _nM = self.nM
-        _charge = self.charge
-        if _nM==1:
-            _nM = ""
-        if _charge==1:
-            _charge = self.charge_str()
-        return "[{}M{}]{}".format(_nM, self.delta_formula, _charge)
+        #!! don't edit this - I'm an idiot so it's used as a key in Molecule!!#
+        return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
 
     def get_delta_atoms(self):
         def addElement(elDict, element, number):
