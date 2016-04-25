@@ -3,7 +3,7 @@
 Name: {{ spectrum.standard.molecule.name }}
 Compound Id: {{ spectrum.spec_num }}
 Precursor Type: {{ spectrum.adduct }}
-Comment: {{spectrum.rt}}
+Comment: {{spectrum.rt}}_{{spectrump.precursor_mz}}m/z
 Formula: {{ spectrum.standard.molecule.sum_formula }}
 Num Peaks: {{ spectrum.centroid_mzs|length }}{% for mz_ii in mz_ii_pairs%}
 {{mz_ii.0}} {{mz_ii.1}}{% endfor %}

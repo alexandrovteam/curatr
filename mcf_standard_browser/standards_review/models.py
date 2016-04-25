@@ -22,15 +22,25 @@ class Adduct(models.Model):
 
     def charge_str(self):
         if np.sign(self.charge) == 1:
-            return "{}+".format(self.charge)
+            c_sign = "+"
         else:
-            return "{}-".format(np.abs(self.charge))
+            c_sign = "-"
+        n_charges = abs(self.charge)
+        if n_charges == 1:
+            n_charges=""
+        return "{}{}".format(n_charges,c_sign)
 
     def html_str(self):
         return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1", "")
 
     def __unicode__(self):
-        return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
+        _nM = self.nM
+        _charge = self.charge
+        if _nM==1:
+            _nM = ""
+        if _charge==1:
+            _charge = self.charge_str()
+        return "[{}M{}]{}".format(_nM, self.delta_formula, _charge)
 
     def get_delta_atoms(self):
         def addElement(elDict, element, number):
