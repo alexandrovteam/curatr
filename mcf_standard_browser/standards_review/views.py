@@ -495,9 +495,9 @@ def fragmentSpectrum_export(request):
                 t = loader.get_template('mcf_standards_browse/mgf_template.msp')
                 response.write(t.render(c))
             elif data_format_id == 2:  # csv
-                content_type = "text/csv"
+                content_type = "text/tsv"
                 response = HttpResponse(content_type=content_type)
-                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.csv'
+                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.tsv'
                 t = loader.get_template('mcf_standards_browse/spectra_export_template.csv')
                 response.write(t.render(c))
                 # writer = csv.writer(pseudo_buffer, dialect='excel')

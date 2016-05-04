@@ -136,7 +136,7 @@ def handle_uploaded_files(metadata, mzml_filename):
             mz_upper[standard][adduct] = mz[standard][adduct] + delta_mz
             mz_lower[standard][adduct] = mz[standard][adduct] - delta_mz
     logging.debug('adding dataset')
-    instrument = ''
+    instrument = metadata['instrument_information']
 
     d = Dataset(name=mzml_filename, mass_accuracy_ppm=ppm, processing_finished=False)
     d.instrument = instrument
