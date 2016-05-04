@@ -1,7 +1,7 @@
 {% spaceless %}
 {% for spectrum,  mz_ii_pairs in spec_data %}
 Name: {{ spectrum.standard.molecule.name }}
-Compound Id: {{ spectrum.standard.molecule.pk }}
+Compound Id: {{ spectrum.standard.molecule.pubchem_id }}
 Precursor Type: {{ spectrum.adduct.nice_str }}
 Comment: {{spectrum.rt}}_{{spectrum.precursor_mz}}m/z
 Formula: {{ spectrum.standard.molecule.sum_formula }}
