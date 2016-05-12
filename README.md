@@ -48,7 +48,6 @@ Open `settings.py` and edit the following fields
 
 ### Initialize the DB ###
 ```
-python manage.py makemigrations
 python manage.py migrate
 ```
 
