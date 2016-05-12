@@ -1,5 +1,6 @@
 import numpy as np
 from django.core.urlresolvers import reverse_lazy
+from django.db.utils import OperationalError
 from table import Table
 from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
@@ -97,12 +98,14 @@ class DatasetListTable(Table):
         ajax = True
         sort = [(0, 'asc')]
 
-
-for adduct in Adduct.objects.all():
-    # dynamically add one column per adduct
-    col = AdductMzColumn(adduct=adduct, field='molecule.adduct_mz')
-    setattr(StandardTable, 'adduct{}'.format(adduct.id), col)
-    StandardTable.base_columns.append(col)
-    col = AdductMzColumn(adduct=adduct, field='adduct_mz')
-    setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
-    MoleculeTable.base_columns.append(col)
+try:
+    for adduct in Adduct.objects.all():
+        # dynamically add one column per adduct
+        col = AdductMzColumn(adduct=adduct, field='molecule.adduct_mz')
+        setattr(StandardTable, 'adduct{}'.format(adduct.id), col)
+        StandardTable.base_columns.append(col)
+        col = AdductMzColumn(adduct=adduct, field='adduct_mz')
+        setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
+        MoleculeTable.base_columns.append(col)
+except OperationalError:
+    pass
