@@ -102,8 +102,12 @@ class Molecule(models.Model):
     adduct_mzs = property(get_adduct_mzs, set_adduct_mzs)
 
     def get_mass(self):
-        spec = pyisocalc.complete_isodist(pyisocalc.parseSumFormula(self.sum_formula), charge=0)
+        logging.info(self.sum_formula)
+        logging.info(pyisocalc.parseSumFormula(self.sum_formula))
+        spec = pyisocalc.perfect_pattern(pyisocalc.parseSumFormula(self.sum_formula), charge=0)
+        logging.info(spec)
         mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
+        logging.info(mass)
         return mass
 
     def __unicode__(self):
@@ -113,9 +117,13 @@ class Molecule(models.Model):
         return "{}".format(self.name)
 
     def save(self, *args, **kwargs):
+        logging.info('starting save')
         self.sum_formula = self.sum_formula.strip()
+        logging.info('starting sf')
         self.exact_mass = self.get_mass()
+        logging.info('starting adduct')
         self.set_adduct_mzs()
+        logging.info('ready to save')
         super(Molecule, self).save(*args, **kwargs)
 
     def make_ion_formula(self, adduct):
@@ -130,7 +138,7 @@ class Molecule(models.Model):
         """
         try:
             formula = self.make_ion_formula(adduct)
-            spec = pyisocalc.complete_isodist(pyisocalc.parseSumFormula(formula), charge=adduct.charge)
+            spec = pyisocalc.perfect_pattern(pyisocalc.parseSumFormula(formula), charge=adduct.charge)
             mass = spec.get_spectrum(source='centroids')[0][np.argmax(spec.get_spectrum(source='centroids')[1])]
             return mass
         except:
@@ -140,7 +148,7 @@ class Molecule(models.Model):
 
 class Standard(models.Model):
     MCFID = models.IntegerField(null=True, blank=True)  # MCFID == Standard.pk
-    molecule = models.ForeignKey(Molecule, default=Molecule.objects.all().filter(name='DUMMY'))
+    molecule = models.ForeignKey(Molecule)
     vendor = models.TextField(null=True, blank=True)
     vendor_cat = models.TextField(null=True, blank=True)
     lot_num = models.TextField(null=True, blank=True)
@@ -154,6 +162,7 @@ class Standard(models.Model):
 class Dataset(models.Model):
     processing_finished = models.BooleanField(default=False)
     name = models.TextField(default="")
+    path = models.TextField(default="")
     adducts_present = models.ManyToManyField(Adduct, blank=True)
     standards_present = models.ManyToManyField(Standard, blank=True)
     mass_accuracy_ppm = models.FloatField(default=10.0)
