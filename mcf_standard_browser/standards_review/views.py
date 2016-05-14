@@ -431,17 +431,18 @@ def dataset_upload(request):
             post_dict = dict(request.POST)
             files_dict = dict(request.FILES)
             logging.debug(files_dict)
+            logging.debug(post_dict)
             data = {"adducts": post_dict['adducts'],
                     "standards": post_dict['standards'],
                     "mass_accuracy_ppm": post_dict['mass_accuracy_ppm'][0],
-                    "quad_window_mz": post_dict['quad_window_mz'][0]}
+                    "quad_window_mz": post_dict['quad_window_mz'][0],
+                    "instrument_information": post_dict['instrument_information']}
             uploaded_file = request.FILES['mzml_file']
             mzml_filename = os.path.join(settings.MEDIA_ROOT, uploaded_file.name)
             with open(mzml_filename, 'w') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
             tasks.handle_uploaded_files.delay(data, mzml_filename)
-
             return redirect('dataset-list')
     else:
         form = UploadFileForm(initial={"mass_accuracy_ppm": 10.0, 'quad_window_mz': 1.0})
