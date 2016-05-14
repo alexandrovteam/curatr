@@ -1,17 +1,15 @@
 from __future__ import unicode_literals
-
 import base64
 import datetime
 import json
 import logging
-
+from django.utils import safestring
 import numpy as np
 import re
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from pyMSpec.pyisocalc import pyisocalc
-
 
 # Create your models here.
 class Adduct(models.Model):
@@ -40,7 +38,7 @@ class Adduct(models.Model):
         return "[{}M{}]{}".format(_nM, self.delta_formula, _charge)
 
     def html_str(self):
-        return "[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1", "")
+        return safestring.mark_safe("[{}M{}]<sup>{}</sup>".format(self.nM, self.delta_formula, self.charge_str()).replace("1", ""))
 
     def __unicode__(self):
         #!! don't edit this - I'm an idiot so it's used as a key in Molecule!!#
@@ -114,7 +112,7 @@ class Molecule(models.Model):
         return u"".join([i for i in self.name if ord(i) < 128])
 
     def html_str(self):
-        return "{}".format(self.name)
+        return safestring.mark_safe("{}".format(self.name))
 
     def save(self, *args, **kwargs):
         logging.info('starting save')
