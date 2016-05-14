@@ -4,13 +4,13 @@ from django.db.utils import OperationalError
 from table import Table
 from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
-
+import logging
 from models import Standard, Adduct, Molecule, FragmentationSpectrum, Dataset
 
 
 class AdductMzColumn(Column):
     def __init__(self, adduct, field):
-        super(AdductMzColumn, self).__init__(header=str(adduct), field=field, sortable=False)
+        super(AdductMzColumn, self).__init__(header=adduct.html_str, field=field, sortable=False)
 
     def render(self, obj):
         adduct_mz = obj.molecule.adduct_mzs[self.header]
@@ -20,6 +20,16 @@ class AdductMzColumn(Column):
 class StandardAdductColumn(Column):
     def render(self, spectrum):
         return "{} {}".format(spectrum.standard, spectrum.adduct.html_str)
+
+
+class SpectrumCountColumn(Column):
+    def __init__(self,):
+        super(SpectrumCountColumn, self).__init__(header=str("Spectra Count"), sortable=False)
+
+    def render(self, obj):
+        logging.debug(obj)
+        num_fragment_spectra = obj.molecule.num_spectra
+        return str('test')
 
 
 class ReviewStatusColumn(Column):
@@ -47,7 +57,6 @@ class MoleculeTable(Table):
     formula = Column(field='sum_formula', header='Formula')
     exact_mass = Column(field='exact_mass', header='Exact Mass')
     pubchem_id = Column(field='pubchem_id', header='Pubchem ID')
-
     class Meta:
         model = Molecule
         ajax = True
@@ -100,12 +109,21 @@ class DatasetListTable(Table):
 
 try:
     for adduct in Adduct.objects.all():
+        logging.debug(adduct)
         # dynamically add one column per adduct
         col = AdductMzColumn(adduct=adduct, field='molecule.adduct_mz')
         setattr(StandardTable, 'adduct{}'.format(adduct.id), col)
         StandardTable.base_columns.append(col)
         col = AdductMzColumn(adduct=adduct, field='adduct_mz')
-        setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
         MoleculeTable.base_columns.append(col)
+        setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
+    #MoleculeTable.base_columns.append(col)
+    #setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
+    col = SpectrumCountColumn()
+    logging.debug(col)
+    #col = AdductMzColumn(adduct=adduct, field='adduct_mz')
+    logging.debug(col)
+    MoleculeTable.base_columns.append(col)
+    setattr(MoleculeTable, 'number_of_spectra'.format(adduct.id), col)
 except OperationalError:
     pass

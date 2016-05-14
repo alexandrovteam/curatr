@@ -12,7 +12,6 @@ from django.template import loader, Context
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView, ListView
 from table.views import FeedDataView
-
 import tasks
 import tools
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
@@ -70,6 +69,14 @@ class MoleculeListView(FeedDataView):
         for row, molecule in zip(initial_values_list, queryset):
             for adduct in Adduct.objects.all():
                 row.append(np.round(molecule.adduct_mzs[str(adduct)], decimals=5))
+            spec_count = 0
+            logging.debug(molecule)
+            try:
+                spec_count = FragmentationSpectrum.objects.filter(standard__molecule=molecule).count()
+            except Exception as e:
+                logging.debug(e)
+                pass
+            row.append(spec_count)
         return initial_values_list
 
 
