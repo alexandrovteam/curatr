@@ -13,9 +13,21 @@
             <h2>Fragmentation Spectrum Detail</h2>
             <h3>Scan number: {{ specdata.spectrum.spec_num }}</h3>
             <p>Precursor m/z: {{ specdata.spectrum.precursor_mz }}</p>
+            <p>Retention time: {{ specdata.spectrum.rt }}</p>
+            <p>Collision energy: {{ specdata.spectrum.collision_energy }}</p>
             <p>Ion: <a href="{% url 'standard-detail' specdata.spectrum.standard.MCFID %}">{{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct }}</a></p>
-            <p>Raw data: <a href="{% url 'dataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} <{{ specdata.spectrum.spec_num }}></a></p>
+            <p>Raw data: <a href="{% url 'dataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} </a></p>
             <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
+        </div>
+        <br>
+        <div class = "mol">
+            <h3>Review Information </h3>
+            <p>MS1 intensity: {{ specdata.spectrum.ms1_intensity }}</p>
+            <p>Quadrupole Fraction: {{ specdata.spectrum.precursor_quad_fraction }}</p>
+            <p>Curate Status: {{ specdata.spectrum.reviewed }}</p>
+            <p>Date added: {{ specdata.spectrum.date_added }}</p>
+            <p>Date curated: {{ specdata.spectrum.date_edited }}</p>
+            <p>Curatr: {{ specdata.spectrum.last_editor }}</p>
         </div>
     </div>
     <div class="main-content">
