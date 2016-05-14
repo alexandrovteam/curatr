@@ -34,6 +34,7 @@ class UploadFileForm(forms.Form):
     mzml_file = forms.FileField()
     adducts = forms.ModelMultipleChoiceField(queryset=Adduct.objects.all())
     standards = forms.ModelMultipleChoiceField(queryset=Standard.objects.all().order_by('MCFID'))
+    instrument_information = forms.CharField(required=False)
     mass_accuracy_ppm = forms.FloatField(min_value=0.000001)
     quad_window_mz = forms.FloatField(min_value=0.000001)
 
