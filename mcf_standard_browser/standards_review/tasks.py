@@ -2,6 +2,7 @@ import logging
 import sys
 
 import dateutil
+import os
 import pandas as pd
 import pymzml
 from celery import shared_task
@@ -48,11 +49,14 @@ def add_batch_standard(metadata, csv_file):
     """
     error_list = []
     df = pd.read_csv(csv_file, sep="\t", dtype=unicode)
+    logging.info( 'I read the file')
     df.columns = [x.replace(" ", "_").lower() for x in df.columns]
+    logging.info("I replaced columns")
     df = df.fillna("")
     # df = df.applymap(to_unicode)
-    logging.debug("Shape: {}".format(df.shape))
+    logging.info("Shape: {}".format(df.shape))
     for row in df.iterrows():
+        logging.info("row: {}".format(row))
         try:
             # clean up input
             entry = row[1]
@@ -83,8 +87,10 @@ def add_batch_standard(metadata, csv_file):
                     cas_id=entry["cas_id"],
                     pubchem_id=entry["pubchem_id"],
                 )
+                logging.info("about to save " + molecule.name)
+                logging.info(molecule)
                 molecule.save()
-                logging.debug("Successfully saved " + molecule.name)
+                logging.info("Successfully saved " + molecule.name)
 
             s = Standard.objects.all().filter(MCFID=entry['id'])
             if s.exists():  # standard already added, overwrite
@@ -113,6 +119,8 @@ def add_batch_standard(metadata, csv_file):
 @shared_task
 def handle_uploaded_files(metadata, mzml_filename):
     logging.debug("mzML filename: " + mzml_filename)
+    name = os.path.basename(mzml_filename)
+    logging.debug(name)
     msrun = pymzml.run.Reader(mzml_filename)
     ppm = float(metadata['mass_accuracy_ppm'])
     mz_tol_quad = float(metadata['quad_window_mz'])
@@ -129,7 +137,6 @@ def handle_uploaded_files(metadata, mzml_filename):
         mz[standard] = {}
         for adduct in adducts:
             mz[standard][adduct] = standard.molecule.get_mz(adduct)
-
             logging.debug(standard)
             logging.debug(mz[standard][adduct])
             delta_mz = mz[standard][adduct] * ppm * 1e-6
@@ -138,7 +145,7 @@ def handle_uploaded_files(metadata, mzml_filename):
     logging.debug('adding dataset')
     instrument = metadata['instrument_information']
 
-    d = Dataset(name=mzml_filename, mass_accuracy_ppm=ppm, processing_finished=False)
+    d = Dataset(name=name, path=mzml_filename, mass_accuracy_ppm=ppm, processing_finished=False)
     d.instrument = instrument
     d.save()
     for standard in standards:
