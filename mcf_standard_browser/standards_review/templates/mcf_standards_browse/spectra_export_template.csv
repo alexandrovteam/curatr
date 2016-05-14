@@ -1,5 +1,5 @@
 {% spaceless %}
 "Dataset"	 "Standard"	 "Adduct"	 "Monoisotopic Mass"	 "Sum Formula"	 "PUBCHEM"	 "INCHI"	 "ChEBI"	 "Precursor m/z"	 "Retention time"	 "Curatr Spec ID"	 "Scan Number"	 "Collision Energy"	"Spectrum"
-{% for spectrum,  mz_ii_pairs in spec_data %}{{spectrum.dataset}}	 {{spectrum.standard}}	 {{spectrum.adduct}}	 {{spectrum.standard.molecule.exact_mass}}	 {{spectrum.standard.molecule.sum_formula}}	 {{spectrum.standard.molecule.pubchem_id}}	 {{spectrum.standard.molecule.chebi_id}}	  {{spectrum.precursor_mz}}	 {{spectrum.rt}}	 spec{{spectrum.pk}}	 {{spectrum.spec_num}}	 {{spectrum.collision_energy}}	 {% for mz_ii in mz_ii_pairs%}{{mz_ii.0}}	{{mz_ii.1}}	{% endfor %}
+{% for spectrum,  mz_ii_pairs in spec_data %}{{spectrum.dataset}}	 {{spectrum.standard}}	 {{spectrum.adduct}}	 {{spectrum.standard.molecule.exact_mass}}	 {{spectrum.standard.molecule.sum_formula}}	 {{spectrum.standard.molecule.pubchem_id}}	 {{spectrum.standard.molecule.inchi_code}}	 {{spectrum.standard.molecule.chebi_id}}	  {{spectrum.precursor_mz}}	 {{spectrum.rt}}	 spec{{spectrum.pk}}	 {{spectrum.spec_num}}	 {{spectrum.collision_energy}}	 {% for mz_ii in mz_ii_pairs%}{{mz_ii.0}}	{{mz_ii.1}}	{% endfor %}
 {% endfor %}
 {% endspaceless %}
