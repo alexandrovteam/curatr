@@ -8,13 +8,12 @@
 
 {% block content %}
     <div class="page-header-extras">
-        <small><a href="{% url 'dataset-detail' dataset.pk %}">return to list</a></small>
+        <small><a href="{% url 'dataset-detail' dataset.pk %}">return to dataset list</a></small>
     </div>
     <div class="container">
         <h1> Curation Detail</h1>
         <div class="main-content">
-            <h2> {{ standard }} </h2>
-            <h2> {% autoescape off %}{{ adduct.html_str }} {% endautoescape %} </h2>
+            <h2> {{ standard }} {% autoescape off %}{{ adduct.html_str }} {% endautoescape %} </h2>
             <h2>Dataset: <a href="{% url 'dataset-detail' dataset.pk %}"> {{ dataset.name }}</a></h2>
             <h3>m/z: {{ mz|floatformat:"4" }}</h3>
                 <div id='chart_id' class="specgraph"></div>
@@ -28,19 +27,21 @@
                 {% endif %}
                     <table id="id_list_table">
                     <tr>
-                        <th>Scan No</th>
-                        <th>Precursor <br>mass </th>
-                        <th>Retention <br>time</th>
-                        <th>Precursor <br>Fraction </th>
-                        <th>Fragmentation Spectrum {{ spec.collision_energy }}</th>
+                        <th>Info</th>
+                        <th>Fragmentation Spectrum </th>
                         <th>Status</th>
                     </tr>
                     {% for spec in frag_specs %}
                         <tr>
-                            <td class="table_c"> {{ spec.spec_num }}</td>
-                            <td class="table_c"> <a href="{% url 'fragmentSpectrum-detail' spec.id %}">{{ spec.precursor_mz|floatformat:"4"  }}</a> </td>
-                            <td class="table_c"> {{ spec.rt |floatformat:"2" }}</td>
-                            <td class="table_c"> {{ spec.precursor_quad_fraction|floatformat:"2" }} </td>
+                            <td>
+                                <div>
+                                    <p > Scan Number {{ spec.spec_num }}</p>
+                                    <p > Precursor m/z: {{ spec.precursor_mz|floatformat:"4"  }} </p>
+                                    <p > Retention time: {{ spec.rt |floatformat:"2" }}</p>
+                                    <p > Quad Fraction: {{ spec.precursor_quad_fraction|floatformat:"2" }} </p>
+                                    <p > {{ spec.collision_energy }}</p>
+                                </div>
+                            </td>
                             <td> <div id="frag_spec{{ spec.id }}" class="xic_fraggraph"></div></td>
                             <td>
                                 {% if user.is_authenticated %}
