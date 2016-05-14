@@ -1,9 +1,13 @@
 {% extends 'mcf_standards_browse/base.html' %}
+{% load staticfiles %}
 {% load xic_extras %}
 {% block head %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
-    <script src="http://github.highcharts.com/highcharts.js"></script>
+    <!--<script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://github.highcharts.com/highcharts.js"></script>-->
+    <script src="{% static 'highcharts/js/highcharts.js' %}"></script>
+    <!--<script src="{{ STATIC_URL }}highcharts/js/modules/exporting.js"></script>-->
+
 {% endblock %}
 
 {% block content %}
