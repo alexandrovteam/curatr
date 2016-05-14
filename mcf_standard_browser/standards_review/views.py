@@ -153,7 +153,7 @@ def standard_add(request):
         if form.is_valid():
             standard = form.save()
             standard.save()
-            return redirect('Standard-list')
+            return redirect('standard-list')
     else:
         form = StandardForm()
     return render(request, 'mcf_standards_browse/mcf_standard_add.html', {'form': form, 'form_type': 'single'})
@@ -167,7 +167,7 @@ def standard_edit(request, pk):
         if form.is_valid():
             standard = form.save()
             standard.save()
-            return redirect('Standard-list')
+            return redirect('standard-list')
     else:
         form = StandardForm(instance=standard)
     logging.debug(form.keys())
@@ -182,7 +182,7 @@ def molecule_add(request):
         if form.is_valid():
             molecule = form.save()
             molecule.save()
-            return redirect('Molecule-list')
+            return redirect('molecule-list')
     else:
         form = MoleculeForm()
     return render(request, 'mcf_standards_browse/mcf_molecule_add.html', {'form': form, 'form_type': 'single'})
@@ -197,7 +197,7 @@ def molecule_edit(request, pk):
         if form.is_valid():
             standard = form.save()
             standard.save()
-            return redirect('Standard-list')
+            return redirect('standard-list')
     else:
         form = MoleculeForm(instance=molecule)
     return render(request, 'mcf_standards_browse/mcf_molecule_edit.html',
@@ -230,7 +230,7 @@ def standard_add_batch(request):
         if form.is_valid():
             tasks.add_batch_standard.delay({'username': request.user.username}, request.FILES[
                 'tab_delimited_file'])
-            return redirect('Standard-list')
+            return redirect('standard-list')
     else:
         form = StandardBatchForm()
     return render(request, 'mcf_standards_browse/mcf_standard_add.html', {'form': form, 'form_type': 'batch'})
