@@ -42,8 +42,8 @@ class UploadFileForm(forms.Form):
     adducts = forms.ModelMultipleChoiceField(queryset=Adduct.objects.all())
     standards = forms.ModelMultipleChoiceField(queryset=Standard.objects.all().order_by('MCFID'))
     instrument_information = forms.CharField(required=False)
-    mass_accuracy_ppm = forms.FloatField(min_value=0.000001)
-    quad_window_mz = forms.FloatField(min_value=0.000001)
+    mass_accuracy_ppm = forms.FloatField(min_value=0.000001, label="MS1 mass accuracy (ppm)")
+    quad_window_mz = forms.FloatField(min_value=0.000001, label='Precursor Window (m/z)')
 
 
 class FragSpecReview(forms.Form):
