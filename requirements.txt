@@ -1,7 +1,7 @@
 celery
 django
 django-celery
-django-datatable
+django-datatable>=0.2.1
 django-highcharts
 django-static-jquery
 numpy
