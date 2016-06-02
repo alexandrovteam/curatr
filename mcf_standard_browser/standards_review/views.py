@@ -47,7 +47,9 @@ def standard_list(request):
 
 def molecule_list(request):
     table = MoleculeTable()
-    return render(request, 'mcf_standards_browse/mcf_molecule_list.html', {'molecule_list': table})
+    molecules_with_spectra = MoleculeSpectraCount.objects.filter(spectra_count__gt=0).count()
+    return render(request, 'mcf_standards_browse/mcf_molecule_list.html',
+                  {'molecule_list': table, 'molecules_with_spectra': molecules_with_spectra})
 
 
 class StandardListView(FeedDataView):
