@@ -250,7 +250,7 @@ class SpectraListView(FeedDataView):
     token = SpectraTable.token
 
     def filter_queryset(self, queryset):
-        return queryset.filter(~Q(standard=None))
+        return super(SpectraListView, self).filter_queryset(queryset).filter(~Q(standard=None))
 
 
 def fragmentSpectrum_detail(request, pk):

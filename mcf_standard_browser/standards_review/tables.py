@@ -79,9 +79,9 @@ class StandardTable(Table):
 class SpectraTable(Table):
     id = Column(field='pk', header='ID')
     precursor_mz = Column(field='precursor_mz', header='Precursor m/z')
-    standard = StandardAdductColumn(field='standard_id', header='Ion')
-    review_status = ReviewStatusColumn(header='Review Status', sortable=False)
-    view = LinkColumn(header='', sortable=False,
+    standard = StandardAdductColumn(field='standard_id', header='Ion', searchable=False)
+    review_status = ReviewStatusColumn(header='Review Status', sortable=False, searchable=False)
+    view = LinkColumn(header='', sortable=False, searchable=False,
                       links=[Link(text='View', viewname='fragmentSpectrum-detail', kwargs={'pk': Accessor('pk')})])
 
     class Meta:
