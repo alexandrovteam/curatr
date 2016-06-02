@@ -1,11 +1,13 @@
+import logging
+
 import numpy as np
 from django.core.urlresolvers import reverse_lazy
 from django.db.utils import OperationalError
 from table import Table
 from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
-import logging
-from models import Standard, Adduct, Molecule, FragmentationSpectrum, Dataset
+
+from models import Standard, Adduct, MoleculeSpectraCount, FragmentationSpectrum, Dataset
 
 
 class AdductMzColumn(Column):
@@ -20,16 +22,6 @@ class AdductMzColumn(Column):
 class StandardAdductColumn(Column):
     def render(self, spectrum):
         return "{} {}".format(spectrum.standard, spectrum.adduct.html_str)
-
-
-class SpectrumCountColumn(Column):
-    def __init__(self,):
-        super(SpectrumCountColumn, self).__init__(header=str("Spectra Count"), sortable=False)
-
-    def render(self, obj):
-        logging.debug(obj)
-        num_fragment_spectra = obj.molecule.num_spectra
-        return str('test')
 
 
 class ReviewStatusColumn(Column):
@@ -52,13 +44,16 @@ class DatasetStatusColumn(LinkColumn):
 
 
 class MoleculeTable(Table):
-    name = LinkColumn(field='name', header='name',
-                    links=[Link(text=Accessor('name'), viewname='molecule-detail', args=(Accessor('id'),))])
-    formula = Column(field='sum_formula', header='Formula')
-    exact_mass = Column(field='exact_mass', header='Exact Mass')
-    pubchem_id = Column(field='pubchem_id', header='Pubchem ID')
+    name = LinkColumn(field='molecule.name', header='name',
+                      links=[Link(text=Accessor('molecule.name'), viewname='molecule-detail',
+                                  args=(Accessor('molecule.pk'),))])
+    formula = Column(field='molecule.sum_formula', header='Formula')
+    exact_mass = Column(field='molecule.exact_mass', header='Exact Mass')
+    pubchem_id = Column(field='molecule.pubchem_id', header='Pubchem ID')
+    spectra_count = Column(field='spectra_count', header="Spectra Count")
+
     class Meta:
-        model = Molecule
+        model = MoleculeSpectraCount
         ajax = True
         ajax_source = reverse_lazy('molecule_table')
         sort = [(0, 'asc')]
@@ -112,18 +107,7 @@ try:
         logging.debug(adduct)
         # dynamically add one column per adduct
         col = AdductMzColumn(adduct=adduct, field='molecule.adduct_mz')
-        setattr(StandardTable, 'adduct{}'.format(adduct.id), col)
-        StandardTable.base_columns.append(col)
-        col = AdductMzColumn(adduct=adduct, field='adduct_mz')
         MoleculeTable.base_columns.append(col)
         setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
-    #MoleculeTable.base_columns.append(col)
-    #setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
-    col = SpectrumCountColumn()
-    logging.debug(col)
-    #col = AdductMzColumn(adduct=adduct, field='adduct_mz')
-    logging.debug(col)
-    MoleculeTable.base_columns.append(col)
-    setattr(MoleculeTable, 'number_of_spectra'.format(adduct.id), col)
 except OperationalError:
     pass

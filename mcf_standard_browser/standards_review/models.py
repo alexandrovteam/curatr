@@ -143,6 +143,9 @@ class Molecule(models.Model):
             logging.debug(self.name, adduct)
             return -1.
 
+    def spectra_count(self):
+        return FragmentationSpectrum.objects.all().filter(standard__molecule=self).count()
+
 
 class Standard(models.Model):
     MCFID = models.IntegerField(null=True, blank=True)  # MCFID == Standard.pk
@@ -264,3 +267,11 @@ class FragmentationSpectrum(models.Model):
             self.date_added = datetime.datetime.now()
         self.date_edited = datetime.datetime.now()
         super(FragmentationSpectrum, self).save(*args, **kwargs)
+
+
+class MoleculeSpectraCount(models.Model):
+    molecule = models.ForeignKey(Molecule, primary_key=True)
+    spectra_count = models.IntegerField()
+
+    class Meta:
+        managed = False

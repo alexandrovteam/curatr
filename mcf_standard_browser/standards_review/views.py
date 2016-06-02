@@ -14,7 +14,7 @@ from django.views.generic import TemplateView, ListView
 from table.views import FeedDataView
 import tasks
 import tools
-from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule
+from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
     StandardBatchForm, ExportLibrary
@@ -66,17 +66,9 @@ class MoleculeListView(FeedDataView):
 
     def convert_queryset_to_values_list(self, queryset):
         initial_values_list = super(MoleculeListView, self).convert_queryset_to_values_list(queryset)
-        for row, molecule in zip(initial_values_list, queryset):
+        for row, molcount in zip(initial_values_list, queryset):
             for adduct in Adduct.objects.all():
-                row.append(np.round(molecule.adduct_mzs[str(adduct)], decimals=5))
-            spec_count = 0
-            logging.debug(molecule)
-            try:
-                spec_count = FragmentationSpectrum.objects.filter(standard__molecule=molecule).count()
-            except Exception as e:
-                logging.debug(e)
-                pass
-            row.append(spec_count)
+                row.append(np.round(molcount.molecule.adduct_mzs[str(adduct)], decimals=5))
         return initial_values_list
 
 
