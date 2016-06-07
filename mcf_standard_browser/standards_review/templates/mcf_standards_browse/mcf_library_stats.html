@@ -15,9 +15,8 @@
                 <h2>Fragmentation Spectra</h2>
             </div>
             <div class="row" style="margin-top: 20px;">
-                <div class="col-sm-1"></div>
                 <div class="col-sm-4">
-                    <canvas id="chart1" width="100%"></canvas>
+                    <canvas id="chart1" width="100%" height="100%"></canvas>
                 </div>
                 <div class="col-sm-2"></div>
                 <div class="col-sm-2">
@@ -26,15 +25,34 @@
                         {{ total_spectra }}
                     </p>
                     <p>
-                        spectra in total
-                    </p>
-                    <p style="font-size: 42px;">
-                        {{ percent_curated }}%
-                    </p>
-                    <p>
-                        curated
+                        spectra
                     </p>
                 </div>
+                <div class="col-sm-2">
+                    <div style="margin-top: 60px"></div>
+                    <p style="font-size: 42px;">
+                        {{ total_annotations }}
+                    </p>
+                    <p>
+                        curated (total)
+                    </p>
+                    <p style="font-size: 42px;">
+                        {{ percent_spectra_curated }}%
+                    </p>
+                    <p>
+                        curated (percent)
+                    </p>
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+
+            <div style="margin-top: 100px;"></div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-sm-4">
+                    <canvas id="chart2" width="100%" height="100%"></canvas>
+                </div>
+                <div class="col-sm-2"></div>
                 <div class="col-sm-2">
                     <div style="margin-top: 60px"></div>
                     <p style="font-size: 42px;">
@@ -43,14 +61,23 @@
                     <p>
                         molecules
                     </p>
+                </div>
+                <div class="col-sm-2">
+                    <div style="margin-top: 60px"></div>
                     <p style="font-size: 42px;">
-                        {{ total_standards }}
+                        {{ total_annotated }}
                     </p>
                     <p>
-                        standards
+                        annotated (total)
+                    </p>
+                    <p style="font-size: 42px;">
+                        {{ percent_molecules_annotated }}%
+                    </p>
+                    <p>
+                        annotated (percent)
                     </p>
                 </div>
-                <div class="col-sm-1"></div>
+                <div class="col-sm-2"></div>
             </div>
         </div>
     </div>
@@ -62,7 +89,8 @@
         <script>
             $('document').ready(function () {
                 const ctx1 = document.getElementById("chart1");
-                const data = {
+                const ctx2 = document.getElementById("chart2");
+                const data1 = {
                     labels: {{ chart1.labels }},
                     datasets: [{
                         data: {{ chart1.data }},
@@ -81,9 +109,28 @@
                         ]
                     }]
                 };
+                const data2 = {
+                    labels: {{ chart2.labels }},
+                    datasets: [{
+                        label: '# of molecules with this many annotations',
+                        data: {{ chart2.data }}
+                    }]
+                };
                 const chart = new Chart(ctx1, {
                     type: 'doughnut',
-                    data: data,
+                    data: data1,
+                    options: {
+                        animation: {
+                            animateScale: true
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                });
+                const chart2 = new Chart(ctx2, {
+                    type: 'bar',
+                    data: data2,
                     options: {
                         animation: {
                             animateScale: true

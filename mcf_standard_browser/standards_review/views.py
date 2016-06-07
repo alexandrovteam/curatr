@@ -1,6 +1,7 @@
 import logging
 import time
 import zipfile
+from collections import Counter
 
 import numpy as np
 import os
@@ -563,7 +564,7 @@ def molecule_cleandb(request):
 def library_stats(request):
     spectra = FragmentationSpectrum.objects
     molecules = Molecule.objects
-    standards = Standard.objects
+    annotated_molecules = molecules.filter(moleculespectracount__spectra_count__gt=0)
     reviewed = spectra.filter(reviewed=1)
     accepted = reviewed.filter(standard_id__isnull=False)
     rejected = reviewed.filter(standard_id__isnull=True)
@@ -571,14 +572,24 @@ def library_stats(request):
     total_rejected = rejected.count()
     total_spectra = spectra.count()
     total_reviewed = reviewed.count()
+    total_annotated = annotated_molecules.count()
+    total_molecules = molecules.count()
+    annotation_count_histo = Counter(
+        [d['spectra_count'] for d in MoleculeSpectraCount.objects.values() if d['spectra_count'] > 0])
     data = {
         "chart1": {
             'data': [total_accepted, total_rejected, total_spectra - total_reviewed],
             'labels': ['accepted', 'rejected', 'unreviewed'],
         },
+        "chart2": {
+            'data': annotation_count_histo.values(),
+            'labels': annotation_count_histo.keys()
+        },
         "total_spectra": total_spectra,
-        "total_molecules": molecules.count(),
-        "total_standards": standards.count(),
-        "percent_curated": round((100.0 * total_reviewed) / total_spectra, ndigits=2)
+        "total_molecules": total_molecules,
+        "total_annotated": total_annotated,
+        "total_annotations": total_reviewed,
+        "percent_spectra_curated": round((100.0 * total_reviewed) / total_spectra, ndigits=2),
+        "percent_molecules_annotated": round((100.0 * total_annotated) / total_molecules, ndigits=2)
     }
     return render(request, 'mcf_standards_browse/mcf_library_stats.html', data)
