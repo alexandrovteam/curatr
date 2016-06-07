@@ -572,6 +572,10 @@ def library_stats(request):
     total_spectra = spectra.count()
     total_reviewed = reviewed.count()
     data = {
+        "chart1": {
+            'data': [total_accepted, total_rejected, total_spectra - total_reviewed],
+            'labels': ['accepted', 'rejected', 'unreviewed'],
+        },
         "total_spectra": total_spectra,
         "total_molecules": molecules.count(),
         "total_standards": standards.count(),

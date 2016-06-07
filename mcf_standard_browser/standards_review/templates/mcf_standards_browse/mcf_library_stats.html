@@ -55,3 +55,45 @@
         </div>
     </div>
 {% endblock %}
+
+{% block script %}
+    {% autoescape off %}
+        <script src="{% static 'js/chart.js' %}"></script>
+        <script>
+            $('document').ready(function () {
+                const ctx1 = document.getElementById("chart1");
+                const data = {
+                    labels: {{ chart1.labels }},
+                    datasets: [{
+                        data: {{ chart1.data }},
+                        backgroundColor: [
+                            "#FF6384",
+                            "#36A2EB",
+                            "#FFCE56"
+                        ],
+                        hoverBackgroundColor: [
+                            "#FF6384",
+                            "#36A2EB",
+                            "#FFCE56"
+                        ],
+                        borderWidth: [
+                            0, 0, 0
+                        ]
+                    }]
+                };
+                const chart = new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: data,
+                    options: {
+                        animation: {
+                            animateScale: true
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                });
+            })
+        </script>
+    {% endautoescape %}
+{% endblock %}
