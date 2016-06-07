@@ -558,3 +558,23 @@ def molecule_cleandb(request):
         error_list.append([name, 'removed'])
     logging.debug(error_list)
     return render(request, 'mcf_standards_browse/upload_error.html', {'error_list': error_list})
+
+
+def library_stats(request):
+    spectra = FragmentationSpectrum.objects
+    molecules = Molecule.objects
+    standards = Standard.objects
+    reviewed = spectra.filter(reviewed=1)
+    accepted = reviewed.filter(standard_id__isnull=False)
+    rejected = reviewed.filter(standard_id__isnull=True)
+    total_accepted = accepted.count()
+    total_rejected = rejected.count()
+    total_spectra = spectra.count()
+    total_reviewed = reviewed.count()
+    data = {
+        "total_spectra": total_spectra,
+        "total_molecules": molecules.count(),
+        "total_standards": standards.count(),
+        "percent_curated": round((100.0 * total_reviewed) / total_spectra, ndigits=2)
+    }
+    return render(request, 'mcf_standards_browse/mcf_library_stats.html', data)
