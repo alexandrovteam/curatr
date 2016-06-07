@@ -76,4 +76,4 @@ python manage.py migrate
 Curatr should now be visible on  [localhost:8000](http://localhost:8000)
 
 ## Licence
-The source code in this repository is distributed under [the Apache 2.0 licence](https://github.com/alexandrovteam/pySM/blob/master/licence).
+The source code in this repository is distributed under [the Apache 2.0 licence](http://www.apache.org/licenses/LICENSE-2.0).
