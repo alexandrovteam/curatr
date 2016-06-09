@@ -13,15 +13,20 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                   <h2>Browse Molecules</h2>
                   <p>View a list of molecules contained in the library along with any annotated fragmentation spectra</p>
                   <p><a class="btn btn-default" href="{% url 'molecule-list' %}" role="button">Go &raquo;</a></p>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                   <h2>Browse Fragmentation Spectra</h2>
                   <p>View a list of all annotated fragmentation spectra</p>
                   <p><a class="btn btn-default" href="{% url 'fragmentSpectrum-list' %}" role="button">Go &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
+                  <h2>Library statistics</h2>
+                  <p>Get and overview of the library size and the curation progress</p>
+                  <p><a class="btn btn-default" href="{% url 'stats' %}" role="button">Go &raquo;</a></p>
             </div>
 
         </div>

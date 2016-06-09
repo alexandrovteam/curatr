@@ -7,7 +7,7 @@ from .views import StandardListView, MoleculeListView, SpectraListView
 
 urlpatterns = [
     url(r'^$', views.home_page),
-    url(r'^stats/$', views.library_stats),
+    url(r'^stats/$', views.library_stats, name='stats'),
     url(r'^adduct/add/$', views.adduct_add, name='adduct-add'),
     url(r'^inventory/$', views.standard_list, name='standard-list'),
     url(r'^inventory/add/$', views.standard_add, name='standard-add'),
