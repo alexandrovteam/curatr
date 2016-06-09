@@ -10,3 +10,4 @@ pymspec
 pymzml
 python-dateutil
 # mysql-python  # only if mysql is used (http://stackoverflow.com/questions/5178292/pip-install-mysql-python-fails-with-environmenterror-mysql-config-not-found#5178698)
+sqlparse
