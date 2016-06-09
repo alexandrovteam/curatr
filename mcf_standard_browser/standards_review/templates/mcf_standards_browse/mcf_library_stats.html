@@ -1,11 +1,19 @@
 {% extends 'mcf_standards_browse/base.html' %}
 {% load static %}
 
-{#<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">#}
-{#<script src="{% static 'js/bootstrap.min.js' %}"></script>#}
-{#<script type='text/javascript' src='https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>#}
-
 {% block content %}
+    <style type="text/css">
+        .margin1 {
+            margin-top: 60px
+        }
+
+        .big-number {
+            font-size: 42px;
+        }
+
+        .number-description {
+        }
+    </style>
     <div class="main-content" style="margin-top: 10px;">
         <div class="container">
             <div class="row">
@@ -20,28 +28,28 @@
                 </div>
                 <div class="col-sm-2"></div>
                 <div class="col-sm-2">
-                    <div style="margin-top: 60px"></div>
-                    <p style="font-size: 42px;">
-                        {{ total_spectra }}
-                    </p>
-                    <p>
-                        spectra
-                    </p>
+                    <div class="margin1"></div>
+                    <div class="big-number">
+                        <p>{{ total_spectra }}</p>
+                    </div>
+                    <div class="number-description">
+                        <p>spectra</p>
+                    </div>
                 </div>
                 <div class="col-sm-2">
-                    <div style="margin-top: 60px"></div>
-                    <p style="font-size: 42px;">
-                        {{ total_annotations }}
-                    </p>
-                    <p>
-                        curated (total)
-                    </p>
-                    <p style="font-size: 42px;">
-                        {{ percent_spectra_curated }}%
-                    </p>
-                    <p>
-                        curated (percent)
-                    </p>
+                    <div class="margin1"></div>
+                    <div class="big-number">
+                        <p>{{ total_annotations }}</p>
+                    </div>
+                    <div class="number-description">
+                        <p>curated (total)</p>
+                    </div>
+                    <div class="big-number">
+                        <p>{{ percent_spectra_curated }}%</p>
+                    </div>
+                    <div class="number-description">
+                        <p>curated (percent)</p>
+                    </div>
                 </div>
                 <div class="col-sm-2"></div>
             </div>
@@ -57,28 +65,28 @@
                 </div>
                 <div class="col-sm-2"></div>
                 <div class="col-sm-2">
-                    <div style="margin-top: 60px"></div>
-                    <p style="font-size: 42px;">
-                        {{ total_molecules }}
-                    </p>
-                    <p>
-                        molecules
-                    </p>
+                    <div class="margin1"></div>
+                    <div class="big-number">
+                        <p>{{ total_molecules }}</p>
+                    </div>
+                    <div class="number-description">
+                        <p>molecules</p>
+                    </div>
                 </div>
                 <div class="col-sm-2">
-                    <div style="margin-top: 60px"></div>
-                    <p style="font-size: 42px;">
-                        {{ total_annotated }}
-                    </p>
-                    <p>
-                        annotated (total)
-                    </p>
-                    <p style="font-size: 42px;">
-                        {{ percent_molecules_annotated }}%
-                    </p>
-                    <p>
-                        annotated (percent)
-                    </p>
+                    <div class="margin1"></div>
+                    <div class="big-number">
+                        <p>{{ total_annotated }}</p>
+                    </div>
+                    <div class="number-description">
+                        <p>annotated (total)</p>
+                    </div>
+                    <div class="big-number">
+                        <p>{{ percent_molecules_annotated }}%</p>
+                    </div>
+                    <div class="number-description">
+                        <p>annotated (percent)</p>
+                    </div>
                 </div>
                 <div class="col-sm-2"></div>
             </div>
@@ -91,8 +99,8 @@
         <script src="{% static 'js/chart.js' %}"></script>
         <script>
             $('document').ready(function () {
-                const ctx1 = document.getElementById("chart1");
-                const ctx2 = document.getElementById("chart2");
+                const spectra_pie_chart = document.getElementById("chart1");
+                const molecules_bar_chart = document.getElementById("chart2");
                 const data1 = {
                     labels: {{ chart1.labels }},
                     datasets: [{
@@ -119,29 +127,23 @@
                         data: {{ chart2.data }}
                     }]
                 };
-                const chart = new Chart(ctx1, {
+                const common_options = {
+                    animation: {
+                        animateScale: true
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                };
+                new Chart(spectra_pie_chart, {
                     type: 'doughnut',
                     data: data1,
-                    options: {
-                        animation: {
-                            animateScale: true
-                        },
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
+                    options: common_options
                 });
-                const chart2 = new Chart(ctx2, {
+                new Chart(molecules_bar_chart, {
                     type: 'bar',
                     data: data2,
-                    options: {
-                        animation: {
-                            animateScale: true
-                        },
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
+                    options: common_options
                 });
             })
         </script>

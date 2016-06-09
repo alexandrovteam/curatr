@@ -574,8 +574,11 @@ def library_stats(request):
     total_reviewed = reviewed.count()
     total_annotated = annotated_molecules.count()
     total_molecules = molecules.count()
+
+    # maps number of annotations to how many molecules exists with that amount of annotations, excluding 0
     annotation_count_histo = Counter(
-        [d['spectra_count'] for d in MoleculeSpectraCount.objects.values() if d['spectra_count'] > 0])
+        [d['spectra_count'] for d in MoleculeSpectraCount.objects.filter(spectra_count__gt=0).values()])
+
     data = {
         "chart1": {
             'data': [total_accepted, total_rejected, total_spectra - total_reviewed],
@@ -589,7 +592,11 @@ def library_stats(request):
         "total_molecules": total_molecules,
         "total_annotated": total_annotated,
         "total_annotations": total_reviewed,
-        "percent_spectra_curated": round((100.0 * total_reviewed) / total_spectra, ndigits=2),
-        "percent_molecules_annotated": round((100.0 * total_annotated) / total_molecules, ndigits=2)
+        "percent_spectra_curated": _percent(total_reviewed, total_spectra),
+        "percent_molecules_annotated": _percent(total_annotated, total_molecules)
     }
     return render(request, 'mcf_standards_browse/mcf_library_stats.html', data)
+
+
+def _percent(numerator, total_spectra, ndigits=2):
+    return round((100.0 * numerator) / total_spectra, ndigits=ndigits)
