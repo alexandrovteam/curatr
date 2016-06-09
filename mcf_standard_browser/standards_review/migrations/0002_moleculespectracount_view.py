@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL("""
             DROP VIEW IF EXISTS {};
-            CREATE VIEW IF NOT EXISTS {} AS
+            CREATE VIEW {} AS
                 SELECT std.molecule_id, COUNT(DISTINCT spec.id) spectra_count
                 FROM standards_review_standard std
                   LEFT OUTER JOIN standards_review_fragmentationspectrum spec

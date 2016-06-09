@@ -577,7 +577,7 @@ def library_stats(request):
 
     # maps number of annotations to how many molecules exists with that amount of annotations, excluding 0
     annotation_count_histo = Counter(
-        [d['spectra_count'] for d in MoleculeSpectraCount.objects.filter(spectra_count__gt=0).values()])
+        [int(d['spectra_count']) for d in MoleculeSpectraCount.objects.filter(spectra_count__gt=0).values()])
 
     data = {
         "chart1": {
