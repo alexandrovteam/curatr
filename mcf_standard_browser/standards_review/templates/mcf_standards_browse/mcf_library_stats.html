@@ -70,7 +70,7 @@
                         <p>{{ total_annotated }}</p>
                     </div>
                     <div class="number-description">
-                        <p>annotated (total)</p>
+                        <p>with spectra (total)</p>
                     </div>
                 </div>
                 <div class="col-sm-2">
@@ -85,7 +85,7 @@
                         <p>{{ percent_molecules_annotated }}%</p>
                     </div>
                     <div class="number-description">
-                        <p>annotated (percent)</p>
+                        <p>with spectra (percent)</p>
                     </div>
                 </div>
                 <div class="col-sm-2"></div>
@@ -123,7 +123,7 @@
                 const data2 = {
                     labels: {{ chart2.labels }},
                     datasets: [{
-                        label: '# of molecules with this many annotations',
+                        label: 'Number of spectra per molecule',
                         data: {{ chart2.data }}
                     }]
                 };
