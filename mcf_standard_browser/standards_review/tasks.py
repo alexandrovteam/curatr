@@ -7,6 +7,7 @@ import pandas as pd
 import pymzml
 from celery import shared_task
 
+from tools import DatabaseLogHandler
 from models import Adduct, Dataset, FragmentationSpectrum, Xic
 from models import Molecule, Standard
 
@@ -118,9 +119,14 @@ def add_batch_standard(metadata, csv_file):
 
 @shared_task
 def handle_uploaded_files(metadata, mzml_filename):
-    logging.debug("mzML filename: " + mzml_filename)
+    d = Dataset(path=mzml_filename, processing_finished=False)
+    d.save()
+    logger = logging.getLogger(__file__ + str(d.id))
+    logger.addHandler(DatabaseLogHandler(d, level=logging.ERROR))
+
+    logger.debug("mzML filename: " + mzml_filename)
     name = os.path.basename(mzml_filename)
-    logging.debug(name)
+    logger.debug(name)
     msrun = pymzml.run.Reader(mzml_filename)
     ppm = float(metadata['mass_accuracy_ppm'])
     mz_tol_quad = float(metadata['quad_window_mz'])
@@ -130,22 +136,23 @@ def handle_uploaded_files(metadata, mzml_filename):
     mz_upper = {}
     mz_lower = {}
     mz = {}
-    logging.debug(standards.count())
+    logger.debug(standards.count())
     for standard in standards:
         mz_upper[standard] = {}
         mz_lower[standard] = {}
         mz[standard] = {}
         for adduct in adducts:
             mz[standard][adduct] = standard.molecule.get_mz(adduct)
-            logging.debug(standard)
-            logging.debug(mz[standard][adduct])
+            logger.debug(standard)
+            logger.debug(mz[standard][adduct])
             delta_mz = mz[standard][adduct] * ppm * 1e-6
             mz_upper[standard][adduct] = mz[standard][adduct] + delta_mz
             mz_lower[standard][adduct] = mz[standard][adduct] - delta_mz
-    logging.debug('adding dataset')
+    logger.debug('adding dataset')
     instrument = metadata['instrument_information']
 
-    d = Dataset(name=name, path=mzml_filename, mass_accuracy_ppm=ppm, processing_finished=False)
+    d.name = name
+    d.mass_accuracy_ppm = ppm
     d.instrument = instrument
     d.save()
     for standard in standards:
@@ -153,7 +160,7 @@ def handle_uploaded_files(metadata, mzml_filename):
     for adduct in adducts:
         d.adducts_present.add(adduct)
     d.save()
-    logging.debug('adding msms')
+    logger.debug('adding msms')
     xics = {}
     spec_n = 0
     for spectrum in msrun:
@@ -211,7 +218,7 @@ def handle_uploaded_files(metadata, mzml_filename):
                         f.set_centroid_ints(spectrum.i)
                         f.collision = ce_str
                         f.save()
-    logging.debug("adding xics")
+    logger.debug("adding xics")
     for standard in standards:
         for adduct in adducts:
             # if np.sum(xics[standard][adduct]) > 0:
@@ -223,6 +230,6 @@ def handle_uploaded_files(metadata, mzml_filename):
             x.save()
     d.processing_finished = True
     d.save()
-    logging.debug('done')
-    logging.debug("added = True")
+    logger.debug('done')
+    logger.debug("added = True")
     return True

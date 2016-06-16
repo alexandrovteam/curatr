@@ -275,3 +275,8 @@ class MoleculeSpectraCount(models.Model):
 
     class Meta:
         managed = False
+
+
+class ProcessingError(models.Model):
+    dataset = models.ForeignKey(Dataset)
+    message = models.TextField()

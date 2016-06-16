@@ -4,7 +4,7 @@ import logging
 import numpy as np
 from django.contrib.auth.models import User
 
-from .models import FragmentationSpectrum, Molecule, Standard
+from .models import FragmentationSpectrum, Molecule, Standard, ProcessingError
 
 
 class ChartData(object):
@@ -59,3 +59,13 @@ def update_mzs():
     for molecule in molecules:
         molecule.set_adduct_mzs()
         molecule.save()
+
+
+class DatabaseLogHandler(logging.Handler):
+    def __init__(self, dataset, level=logging.ERROR):
+        super(DatabaseLogHandler, self).__init__(level=level)
+        self.dataset = dataset
+
+    def emit(self, record):
+        err = ProcessingError(dataset=self.dataset, message=record.getMessage())
+        err.save()
