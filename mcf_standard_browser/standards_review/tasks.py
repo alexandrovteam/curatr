@@ -153,7 +153,7 @@ def handle_uploaded_files(metadata, mzml_filename):
 
     d.name = name
     d.mass_accuracy_ppm = ppm
-    d.instrument = instrument
+    d.intrument = instrument
     d.save()
     for standard in standards:
         d.standards_present.add(standard)
