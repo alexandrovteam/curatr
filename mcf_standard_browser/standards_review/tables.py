@@ -3,6 +3,7 @@ import logging
 import numpy as np
 from django.core.urlresolvers import reverse_lazy
 from django.db.utils import OperationalError
+from django.utils import safestring
 from table import Table
 from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
@@ -41,6 +42,14 @@ class DatasetStatusColumn(LinkColumn):
             return super(DatasetStatusColumn, self).render(dataset)
         else:
             return 'processing...'
+
+
+class ProcessingErrorColumn(Column):
+    def render(self, dataset):
+        if dataset.processingerror_set.count() == 0:
+            return
+        else:
+            return safestring.mark_safe('<div class="big-red"><strong> ! </strong></div>')
 
 
 class MoleculeTable(Table):
@@ -96,6 +105,7 @@ class DatasetListTable(Table):
     name = Column(field='name', header='Dataset')
     status = DatasetStatusColumn(field='processing_finished', header='Status',
                                  links=[Link(text='View', viewname='dataset-detail', args=(Accessor('pk'),))])
+    errors = ProcessingErrorColumn(header='', searchable=False, sortable=False)
 
     class Meta:
         model = Dataset
