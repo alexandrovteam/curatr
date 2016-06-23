@@ -20,6 +20,11 @@ class AdductMzColumn(Column):
         return str(np.round(adduct_mz, decimals=5))
 
 
+class AdductColumn(Column):
+    def render(self, spectrum):
+        return spectrum.adduct.html_str()
+
+
 class ReviewStatusColumn(Column):
     def render(self, spectrum):
         if spectrum.reviewed:
@@ -84,7 +89,7 @@ class SpectraTable(Table):
     mcfid = Column(field='standard.MCFID', header='MCF ID')
     precursor_mz = Column(field='precursor_mz', header='Precursor m/z')
     molecule = Column(field='standard.molecule.name', header='Molecule')
-    adduct = Column(field='adduct', header='Adduct', searchable=False)
+    adduct = AdductColumn(field='adduct', header='Adduct', searchable=False)
     review_status = ReviewStatusColumn(header='Review Status', sortable=False, searchable=False)
     view = LinkColumn(header='', sortable=False, searchable=False,
                       links=[Link(text='View', viewname='fragmentSpectrum-detail', kwargs={'pk': Accessor('pk')})])
