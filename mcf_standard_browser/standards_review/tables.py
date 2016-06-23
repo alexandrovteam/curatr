@@ -25,17 +25,6 @@ class AdductColumn(Column):
         return spectrum.adduct.html_str()
 
 
-class ReviewStatusColumn(Column):
-    def render(self, spectrum):
-        if spectrum.reviewed:
-            if spectrum.standard == None:
-                return 'Rejected'
-            else:
-                return 'Confirmed'
-        else:
-            return 'Unrated'
-
-
 class DatasetStatusColumn(LinkColumn):
     def render(self, dataset):
         if dataset.processing_finished:
@@ -87,10 +76,9 @@ class StandardTable(Table):
 
 class SpectraTable(Table):
     mcfid = Column(field='standard.MCFID', header='MCF ID')
-    precursor_mz = Column(field='precursor_mz', header='Precursor m/z')
     molecule = Column(field='standard.molecule.name', header='Molecule')
-    adduct = AdductColumn(field='adduct', header='Adduct', searchable=False)
-    review_status = ReviewStatusColumn(header='Review Status', sortable=False, searchable=False)
+    precursor_mz = Column(field='precursor_mz', header='Precursor m/z')
+    adduct = AdductColumn(field='adduct.delta_formula', header='Adduct')
     view = LinkColumn(header='', sortable=False, searchable=False,
                       links=[Link(text='View', viewname='fragmentSpectrum-detail', kwargs={'pk': Accessor('pk')})])
 
