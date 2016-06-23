@@ -8,6 +8,7 @@ import os
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.template import loader, Context
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -316,6 +317,15 @@ def dataset_list(request):
 
 
 def dataset_detail(request, pk):
+    if request.method == 'GET':
+        return dataset_detail_show(request, pk)
+    elif request.method == 'POST':
+        return dataset_delete(request, pk)
+    else:
+        raise Http404()
+
+
+def dataset_detail_show(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
     adducts = dataset.adducts_present.all()
     standards = dataset.standards_present.all().order_by('MCFID')
@@ -341,6 +351,13 @@ def dataset_detail(request, pk):
             'dataset': dataset}
     logging.debug(table_list)
     return render(request, 'mcf_standards_browse/mcf_dataset_detail.html', data)
+
+
+@login_required()
+def dataset_delete(request, pk):
+    dataset = get_object_or_404(Dataset, pk=pk)
+    dataset.delete()
+    return redirect('/dataset')
 
 
 @ensure_csrf_cookie

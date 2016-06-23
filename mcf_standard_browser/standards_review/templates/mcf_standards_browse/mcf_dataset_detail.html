@@ -70,6 +70,12 @@
             {% endif %}
         </div>
     </div>
+    {% if user.is_authenticated %}
+    <form method="post" onsubmit="return confirm('Do you REALLY want to delete this dataset? This cannot be undone!')">
+        {% csrf_token %}
+        <input type="submit" value="Delete">
+    </form>
+    {% endif %}
 
     <div class="page-header-extras">
         <small><a href="{% url 'dataset-list' %}">return to list</a></small>
