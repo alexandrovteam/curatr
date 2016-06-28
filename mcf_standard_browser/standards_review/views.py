@@ -2,6 +2,7 @@ import logging
 import time
 import zipfile
 from collections import Counter
+from uuid import uuid4
 
 import numpy as np
 import os
@@ -457,11 +458,12 @@ def dataset_upload(request):
                     "quad_window_mz": post_dict['quad_window_mz'][0],
                     "instrument_information": post_dict['instrument_information']}
             uploaded_file = request.FILES['mzml_file']
-            mzml_filename = os.path.join(settings.MEDIA_ROOT, uploaded_file.name)
-            with open(mzml_filename, 'w') as destination:
+            mzml_filename = "{}-{}".format(str(uuid4()), uploaded_file.name)
+            mzml_filepath = os.path.join(settings.MEDIA_ROOT, mzml_filename)
+            with open(mzml_filepath, 'w') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
-            tasks.handle_uploaded_files.delay(data, mzml_filename)
+            tasks.handle_uploaded_files.delay(data, mzml_filepath)
             return redirect('dataset-list')
     else:
         form = UploadFileForm(initial={"mass_accuracy_ppm": 10.0, 'quad_window_mz': 1.0})
