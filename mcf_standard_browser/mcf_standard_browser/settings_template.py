@@ -156,6 +156,7 @@ BROKER_URL = "amqp://guest:guest@localhost:5672//"
 
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+CELERYD_CONCURRENCY = 1
 
 INSTITUTE_NAME= '[EMBL - Metabolmoics Core Facility]'
 

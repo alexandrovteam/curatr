@@ -47,6 +47,7 @@ Open `settings.py` and edit the following fields
       ```python
       print ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
       ```
+ * CELERYD_CONCURRENCY: set this number to the desired amount of workers (degree of parallelism) or remove the line to use all CPUs  
 
 ### Initialize the DB ###
 ```
