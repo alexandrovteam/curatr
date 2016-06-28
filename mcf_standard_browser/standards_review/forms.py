@@ -1,8 +1,15 @@
+from django.core.exceptions import ValidationError
+
 __author__ = 'palmer'
 from django import forms
 from .models import Standard, Adduct, FragmentationSpectrum, Molecule
 import logging
 from django.utils.safestring import mark_safe
+
+
+def mzml_filename_validator(fn):
+    if len(fn.name) < 6 or fn.name[-5:].lower() != ".mzml":
+        raise ValidationError("Not a valid mzML file name: " + fn.name)
 
 
 class MoleculeForm(forms.ModelForm):
@@ -31,7 +38,7 @@ class StandardBatchForm(forms.Form):
 
 
 class UploadFileForm(forms.Form):
-    mzml_file = forms.FileField()
+    mzml_file = forms.FileField(validators=[mzml_filename_validator])
     adducts = forms.ModelMultipleChoiceField(queryset=Adduct.objects.all())
     standards = forms.ModelMultipleChoiceField(queryset=Standard.objects.all().order_by('MCFID'))
     instrument_information = forms.CharField(required=False)
@@ -62,8 +69,6 @@ class FragSpecReview(forms.Form):
         for name, value in self.cleaned_data.items():
             if name.startswith('yesno_'):
                 yield (self.fields[name].label, value)
-
-
 
 
 class ExportLibrary(forms.Form):
