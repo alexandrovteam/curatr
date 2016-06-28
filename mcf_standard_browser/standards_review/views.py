@@ -459,13 +459,18 @@ def dataset_upload(request):
                     "instrument_information": post_dict['instrument_information']}
             uploaded_file = request.FILES['mzml_file']
             base_name, extension = os.path.splitext(uploaded_file.name)
-            uuid = str(uuid4())
-            mzml_filename = "{}-{}{}".format(base_name, uuid, extension)
+            d = Dataset(name=uploaded_file.name, processing_finished=False)
+            d.save()
+            mzml_filename = "{}-{}{}".format(base_name, d.id, extension)
             mzml_filepath = os.path.join(settings.MEDIA_ROOT, mzml_filename)
+            logging.debug("mzML filepath: " + mzml_filepath)
+            logging.debug("original mzML filename: " + uploaded_file.name)
             with open(mzml_filepath, 'w') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
-            tasks.handle_uploaded_files.delay(data, mzml_filepath, uploaded_file.name)
+            d.path = mzml_filepath
+            d.save()
+            tasks.handle_uploaded_files.delay(data, mzml_filepath, d)
             return redirect('dataset-list')
     else:
         form = UploadFileForm(initial={"mass_accuracy_ppm": 10.0, 'quad_window_mz': 1.0})

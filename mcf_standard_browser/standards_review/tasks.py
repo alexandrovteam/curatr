@@ -118,14 +118,10 @@ def add_batch_standard(metadata, csv_file):
 
 
 @shared_task
-def handle_uploaded_files(metadata, mzml_filepath, orig_name):
-    d = Dataset(path=mzml_filepath, name=orig_name, processing_finished=False)
-    d.save()
+def handle_uploaded_files(metadata, mzml_filepath, d):
     logger = logging.getLogger(__file__ + str(d.id))
     logger.addHandler(DatabaseLogHandler(d, level=logging.ERROR))
 
-    logger.debug("mzML filepath: " + mzml_filepath)
-    logger.debug("original mzML filename: " + orig_name)
     msrun = pymzml.run.Reader(mzml_filepath)
     ppm = float(metadata['mass_accuracy_ppm'])
     mz_tol_quad = float(metadata['quad_window_mz'])
