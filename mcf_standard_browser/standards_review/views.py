@@ -357,7 +357,9 @@ def dataset_detail_show(request, pk):
 @login_required()
 def dataset_delete(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
+    path = dataset.path
     dataset.delete()
+    os.remove(path)
     return redirect('/dataset')
 
 
