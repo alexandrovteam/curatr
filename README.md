@@ -11,23 +11,25 @@ It is written in python using the django web framework and is being developed by
 * RabbitMQ 3.6
 
 ## Installation ##
-We recomment installing curatr and its python dependancies inside a virtual environment as follows,
-Create a convenient directory, for example `curatr` and clone the repository there:
-```
-mkdir curatr
-cd curatr
-git clone https://github.com/alexandrovteam/curatr
-```
-Initialize and activate a 'curatr' environment with all python dependancies
-```
-pip install virtualenv
-virtualenv venv
-source venv/bin/activate
-pip install --upgrade pip
-pip install pip-tools
-cd curatr
-pip-sync
-```
+We recommend installing curatr and its python dependencies inside a virtual environment as follows:
+
+1. Create a convenient directory, for example `curatr` and clone the repository there:
+    ```
+    mkdir curatr
+    cd curatr
+    git clone https://github.com/alexandrovteam/curatr
+    ```
+2. Initialize and activate a 'curatr' environment with all python dependencies
+    ```
+    pip install virtualenv
+    virtualenv venv
+    source venv/bin/activate
+    pip install --upgrade pip
+    pip install pip-tools
+    cd curatr
+    pip-sync
+    ```
+    
 ## Run Server in debug mode ##
 ### Django Settings ###
 Make and edit a local copy of the django settings file
