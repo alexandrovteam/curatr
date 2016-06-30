@@ -102,7 +102,7 @@ class DatasetListTable(Table):
         sort = [(0, 'asc')]
 
 try:
-    for adduct in Adduct.objects.all():
+    for adduct in Adduct.objects.all().order_by("charge"):
         logging.debug(adduct)
         # dynamically add one column per adduct
         col = AdductMzColumn(adduct=adduct, field='molecule.adduct_mz')
