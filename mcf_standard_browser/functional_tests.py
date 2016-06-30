@@ -1,6 +1,7 @@
 __author__ = 'palmer'
 import os
 from django.core.wsgi import get_wsgi_application
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mcf_standard_browser.settings")
 application = get_wsgi_application()
 
@@ -8,7 +9,6 @@ from selenium import webdriver
 import unittest
 from django.core.urlresolvers import resolve
 from standards_review.views import home_page, MCFStandard_list
-
 
 
 class URLResolverTest(unittest.TestCase):
@@ -43,10 +43,11 @@ class SiteFunction(unittest.TestCase):
         # Somewhere there's a button to add a new one todo: if user logged in
         button = self.browser.find_element_by_id('add_standard_button')
         # Clicking add takes you to a form '/library/add/
-        self.browser.get('http://localhost:8000/library/add/') #todo: wire this test into the button url
+        self.browser.get('http://localhost:8000/library/add/')  # todo: wire this test into the button url
         # Adds a new standard
         # Submitting returns to the home page
         # New standard is visible
 
-if __name__ == '__main__':  #7
+
+if __name__ == '__main__':  # 7
     unittest.main()
