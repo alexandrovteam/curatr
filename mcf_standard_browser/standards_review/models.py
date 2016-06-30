@@ -270,7 +270,7 @@ class FragmentationSpectrum(models.Model):
 
 
 class MoleculeSpectraCount(models.Model):
-    molecule = models.ForeignKey(Molecule, primary_key=True)
+    molecule = models.ForeignKey(Molecule, primary_key=True, on_delete=models.DO_NOTHING)
     spectra_count = models.IntegerField()
 
     class Meta:
