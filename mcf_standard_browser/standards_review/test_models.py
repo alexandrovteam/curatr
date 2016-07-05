@@ -51,14 +51,20 @@ class StandardModelTest(TestCase):
 
 
 class AdductModelTest(TestCase):
-    def test_add_adduct(self):
-        a1 = Adduct(nM=1, delta_formula='+H+K', charge=-2)
-        a1.save()
-        a2 = Adduct(nM=1, delta_formula='-Na-P', charge=2)
-        a2.save()
-        self.assertEqual(a1.delta_atoms, "+H1+K1")
-        self.assertEqual(a2.delta_atoms, "-Na1-P1")
-        self.assertEqual(Adduct.objects.all().count(), 2)
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Adduct(nM=1, delta_formula='+H+K', charge=-2)
+        cls.a2 = Adduct(nM=1, delta_formula='-Na-P', charge=2)
+        cls.a1.save()
+        cls.a2.save()
+
+    def test_delta_atoms(self):
+        self.assertEqual(self.a1.delta_atoms, "+H1+K1")
+        self.assertEqual(self.a2.delta_atoms, "-Na1-P1")
+
+    def test_nice_str(self):
+        self.assertEqual(self.a1.nice_str(), "[M+H+K]-2")
+        self.assertEqual(self.a2.nice_str(), "[M-Na-P]2")
 
 
 class DatasetModelTest(TestCase):
