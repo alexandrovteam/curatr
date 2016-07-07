@@ -1,5 +1,3 @@
-import logging
-
 from django.test import TestCase
 
 from models import Molecule, Standard
@@ -16,5 +14,4 @@ class MoleculeCleanTest(TestCase):
         s1 = Standard(molecule=m1, MCFID="0")
         s1.save()
         clear_molecules_without_standard()
-        logging.debug("Number after cleaning: {}".format(Molecule.objects.all().count()))
-        assert Molecule.objects.all().count() == 1
+        self.assertEqual(Molecule.objects.all().count(), 1)

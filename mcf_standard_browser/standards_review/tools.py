@@ -1,21 +1,13 @@
 __author__ = 'palmer'
 import logging
 
-import numpy as np
 from django.contrib.auth.models import User
 
 from .models import FragmentationSpectrum, Molecule, Standard, ProcessingError
 
 
-class ChartData(object):
-    @classmethod
-    def get_avg_by_day(cls, ):
-        data = {'dates': range(20), 'values': np.random.rand(20)}
-        return data
-
-
-def update_fragSpec(fragSpecId, response, standard, adduct, username):
-    fs = FragmentationSpectrum.objects.get(pk=fragSpecId)
+def update_fragSpec(frag_spec_id, response, standard, adduct, username):
+    fs = FragmentationSpectrum.objects.get(pk=frag_spec_id)
     logging.debug(fs.dataset)
     if response == '0':
         fs.standard = None
@@ -41,17 +33,7 @@ def clear_molecules_without_standard():
             remove_name.append(molecule.name)
             molecule.delete()
             clean_count += 1
-    return (clean_count, remove_name)
-
-
-def pipe_file_to_disk(filename, file):
-    with open(filename, 'w') as destination:
-        for chunk in file.chunks():
-            destination.write(chunk)
-
-
-def to_unicode(s):
-    return s.encode("utf-8", errors="ignore")
+    return clean_count, remove_name
 
 
 def update_mzs():
