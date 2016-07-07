@@ -67,6 +67,21 @@ class AdductModelTest(TestCase):
         self.assertEqual(self.a2.nice_str(), "[M-Na-P]2")
 
 
+class MoleculeModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        Adduct.objects.create(nM=1, delta_formula='-H', charge=1)
+        cls.m1 = Molecule(sum_formula="H2O")
+        cls.m1.save()
+
+    def test_mass(self):
+        self.assertAlmostEqual(self.m1.get_mass(), 18.010564, places=5)
+        self.assertAlmostEqual(self.m1.exact_mass, 18.010564, places=5)
+
+    def test_adduct_mzs(self):
+        self.assertAlmostEqual(self.m1.adduct_mzs['[1M-H]1'], 17.002191, places=5)
+
+
 class DatasetModelTest(TestCase):
     def test_add_dataset(self):
         # create standards
@@ -183,3 +198,35 @@ class FragmentationSpectrumModelTest(TestCase):
         f1.save()
         np.testing.assert_array_almost_equal(mzs, f1.centroid_mzs)
         np.testing.assert_array_almost_equal(ints, f1.centroid_ints)
+
+
+class MoleculeSpectraCountModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        d1 = Dataset(name='Dataset1')
+        d1.save()
+        m1 = Molecule(sum_formula='H2O')
+        m1.save()
+        m2 = Molecule(sum_formula='O2')
+        m2.save()
+        s1 = Standard(molecule=m1)
+        s1.save()
+        s2 = Standard(molecule=m1)
+        s2.save()
+        s3 = Standard(molecule=m2)
+        s3.save()
+        FragmentationSpectrum.objects.create(precursor_mz='123.456', spec_num=0, dataset=d1, standard=s1)
+        FragmentationSpectrum.objects.create(precursor_mz='123.45', spec_num=0, dataset=d1, standard=s2)
+        FragmentationSpectrum.objects.create(precursor_mz='123.4', spec_num=0, dataset=d1, standard=s3)
+        cls.m_onespectrum = m2
+        cls.m_twospectra = m1
+
+    def test_counts(self):
+        one_countset = self.m_onespectrum.moleculespectracount_set
+        two_countset = self.m_twospectra.moleculespectracount_set
+        self.assertEqual(one_countset.count(), 1)
+        self.assertEqual(two_countset.count(), 1)
+        one_count = one_countset.values_list()[0][1]
+        two_count = two_countset.values_list()[0][1]
+        self.assertEqual(one_count, 1)
+        self.assertEqual(two_count, 2)
