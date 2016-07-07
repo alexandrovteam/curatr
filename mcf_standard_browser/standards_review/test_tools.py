@@ -1,7 +1,9 @@
+import logging
+
 from django.test import TestCase
 
-from models import Molecule, Standard
-from tools import clear_molecules_without_standard
+from models import Molecule, Standard, Dataset, ProcessingError
+from tools import clear_molecules_without_standard, DatabaseLogHandler
 
 
 class MoleculeCleanTest(TestCase):
@@ -15,3 +17,17 @@ class MoleculeCleanTest(TestCase):
         s1.save()
         clear_molecules_without_standard()
         self.assertEqual(Molecule.objects.all().count(), 1)
+
+
+class DatabaseLogHandlerTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.d1 = Dataset(name='foo')
+        cls.d1.save()
+
+    def test_writes_to_database(self):
+        msg = "Foo message"
+        record = logging.makeLogRecord({"msg": msg})
+        h1 = DatabaseLogHandler(dataset=self.d1)
+        h1.emit(record)
+        self.assertTrue(ProcessingError.objects.filter(message=msg, dataset=self.d1).exists())
