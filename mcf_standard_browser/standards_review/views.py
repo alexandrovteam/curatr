@@ -174,7 +174,6 @@ def standard_edit(request, pk):
             return redirect('standard-list')
     else:
         form = StandardForm(instance=standard)
-    logging.debug(form.keys())
     return render(request, 'mcf_standards_browse/mcf_standard_edit.html', {'form': form,})
 
 
