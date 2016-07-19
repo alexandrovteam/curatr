@@ -151,7 +151,6 @@ Temporary Items
 mcf_standard_browser/db.sqlite3
 /mcf_standard_browser/mcf_standard_browser/settings.py
 /mcf_standard_browser/static
-!/mcf_standard_browser/static/favicon
 /djcelery
 /mcf_standard_browser/media
 !/mcf_standard_browser/media/Standard_Library_MCF_Inhouse_metabolites*
