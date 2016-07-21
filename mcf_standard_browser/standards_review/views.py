@@ -72,7 +72,7 @@ class MoleculeListView(FeedDataView):
     def convert_queryset_to_values_list(self, queryset):
         initial_values_list = super(MoleculeListView, self).convert_queryset_to_values_list(queryset)
         for row, molcount in zip(initial_values_list, queryset):
-            for adduct in Adduct.objects.all():
+            for adduct in Adduct.objects.all().order_by('charge'):
                 row.append(np.round(molcount.molecule.adduct_mzs[str(adduct)], decimals=5))
         return initial_values_list
 
