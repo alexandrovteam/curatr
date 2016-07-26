@@ -27,6 +27,7 @@ class DatabaseLogHandlerTest(TestCase):
 
     def test_writes_to_database(self):
         msg = "Foo message"
+        self.assertFalse(ProcessingError.objects.filter(message=msg, dataset=self.d1).exists())
         record = logging.makeLogRecord({"msg": msg})
         h1 = DatabaseLogHandler(dataset=self.d1)
         h1.emit(record)

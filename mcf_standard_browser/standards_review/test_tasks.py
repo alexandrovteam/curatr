@@ -6,7 +6,7 @@ from models import Molecule, Standard, Dataset, Adduct
 from tasks import add_batch_standard, handle_uploaded_files
 
 
-class DataImportTest(TestCase):
+class DataImportTest(TestCase):  # TODO: add test cases for overwriting existing standards
     @classmethod
     def setUpClass(cls):
         super(DataImportTest, cls).setUpClass()
@@ -14,8 +14,9 @@ class DataImportTest(TestCase):
 
     def test_batch_add(self):
         metadata = {}
-        add_batch_standard(metadata, open(self.csv_filepath, 'r'))
-        self.assertGreater(Standard.objects.all().count(), 0)
+        errors = add_batch_standard(metadata, open(self.csv_filepath, 'r'))
+        self.assertEqual(len(errors), 0)
+        self.assertEqual(Standard.objects.all().count(), 861)
 
     def test_batch_double_add(self):
         # should not produce duplicate identical entries
