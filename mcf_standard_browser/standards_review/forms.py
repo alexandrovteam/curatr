@@ -15,7 +15,8 @@ def mzml_filename_validator(fn):
 class MoleculeForm(forms.ModelForm):
     class Meta:
         model = Molecule
-        fields = ('name', 'sum_formula', 'lipidmaps_id', 'pubchem_id', 'cas_id', 'chebi_id', 'hmdb_id', 'inchi_code', 'solubility')
+        fields = ('name', 'sum_formula', 'lipidmaps_id', 'pubchem_id', 'cas_id', 'chebi_id', 'hmdb_id', 'inchi_code',
+                  'solubility', 'tags')
 
 
 class StandardForm(forms.ModelForm):

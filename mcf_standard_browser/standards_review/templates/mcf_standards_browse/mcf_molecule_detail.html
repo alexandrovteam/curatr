@@ -30,6 +30,12 @@
             <p>HMDB: {{molecule.hmdb_id}} </p>
         </div>
         <div class="main-content">
+            <h2>Tags</h2>
+            {% for tag in molecule.tags.all %}
+            <p>{{ tag }}</p>
+            {% endfor %}
+        </div>
+        <div class="main-content">
             {% for standard, spectra in standards %}
             <p>Standard ID: <a href="{% url 'standard-detail' standard.MCFID %}"> {{ standard }} </a></p>
                 {% for spectrum in spectra %}
