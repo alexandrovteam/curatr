@@ -358,7 +358,10 @@ def dataset_delete(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
     path = dataset.path
     dataset.delete()
-    os.remove(path)
+    try:
+        os.remove(path)
+    except OSError:
+        logging.error("Failed to remove {} from filesystem. The file probably doesn't exist".format(path))
     return redirect('/dataset')
 
 
