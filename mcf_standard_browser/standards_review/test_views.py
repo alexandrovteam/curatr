@@ -1,6 +1,7 @@
 import datetime
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import Client
 from django.test import TestCase
 from os.path import join
@@ -8,6 +9,8 @@ from os.path import join
 from models import Molecule, FragmentationSpectrum, Dataset
 from models import Standard
 from tasks import add_batch_standard
+
+test_credentials = dict(username='testuser', password='secret')
 
 
 class StandardListTest(TestCase):
@@ -96,3 +99,33 @@ class MoleculeListTest(TestCase):
         molecule_table, molecules_with_spectra = self.get_table_and_count()
         self.assertEqual(len(molecule_table.rows), 1)
         self.assertEqual(molecules_with_spectra, 1)
+
+
+class DatasetDetailTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        u = User.objects.create(username=test_credentials['username'])
+        u.set_password(test_credentials['password'])
+        u.save()
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_shows_details_if_get(self):
+        d1 = Dataset.objects.create()
+        pk = d1.pk
+        self.assertEqual(self.client.get('/dataset/{}/'.format(d1.pk)).context['dataset'], d1)
+        self.assertEqual(Dataset.objects.get(pk=pk), d1)  # did not delete
+
+    def test_deletes_if_post(self):
+        d1 = Dataset.objects.create()
+        pk = d1.pk
+        # not logged in
+        resp = self.client.post('/dataset/{}/'.format(pk))
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.get('location'), '/accounts/login/?next=/dataset/{}/'.format(pk))
+        self.assertEqual(Dataset.objects.get(pk=pk), d1)
+        # logged in
+        self.client.login(**test_credentials)
+        self.client.post('/dataset/{}/'.format(pk))
+        self.assertRaises(Dataset.DoesNotExist, Dataset.objects.get, pk=pk)
