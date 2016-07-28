@@ -28,6 +28,8 @@
             <br>
             An example file is <a href="{% static "media/example_batch_upload.tsv" %}">here</a>
             This file <b>must</b> contain the fields: "id", "name";"formula", "inchi", "solubility", "vendor","vendor_id", "hmdb_id" , "chebi_id", "lipidmaps_id", "cas_id", "pubchem_id" <b>but</b> the values can be blank.
+            <br>
+            <strong>WARNING: This will overwrite any existing standards with identical IDs!</strong>
         {% endif %}
      </div>
 
