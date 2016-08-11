@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^molecule/cleandb/$', views.molecule_cleandb, name='molecule-cleandb'),
     url(r'^molecule/(?P<pk>.+)/$', views.molecule_detail, name='molecule-detail'),
     url(r'^molecule/$', views.molecule_list, name='molecule-list'),
+    url(r'^moleculetag/add/$', views.moleculetag_add, name='moleculetag-add'),
     url(r'^MS2/export/$', views.fragmentSpectrum_export, name='fragmentSpectrum-export'),
     url(r'^MS2/$', views.fragmentSpectrum_list, name='fragmentSpectrum-list'),
     url(r'^MS2/spec(?P<pk>.+)/$', views.fragmentSpectrum_detail, name='fragmentSpectrum-detail'),

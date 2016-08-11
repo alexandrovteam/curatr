@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 
 __author__ = 'palmer'
 from django import forms
-from .models import Standard, Adduct, FragmentationSpectrum, Molecule
+from .models import Standard, Adduct, FragmentationSpectrum, Molecule, MoleculeTag
 import logging
 from django.utils.safestring import mark_safe
 
@@ -77,3 +77,8 @@ class ExportLibrary(forms.Form):
     class_to_export = forms.ChoiceField(choices=((0, 'all'), (1, 'positive mode'), (2, 'negative mode')), widget=forms.Select)
     #spectra_to_export = forms.ChoiceField(choices=((0, 'Rated Correct'), (1, 'All Rated'), (2, 'ALL MSMS'),), widget=forms.Select)
 
+
+class MoleculeTagForm(forms.Form):
+    class Meta:
+        model = MoleculeTag
+        fields = ('name',)
