@@ -284,7 +284,7 @@ class ProcessingError(models.Model):
 
 
 class MoleculeTag(models.Model):
-    name = models.TextField(primary_key=True)
+    name = models.TextField()
 
     def __unicode__(self):
         return self.name
