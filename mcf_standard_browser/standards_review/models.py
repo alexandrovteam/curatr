@@ -87,7 +87,7 @@ class Molecule(models.Model):
     lipidmaps_id = models.TextField(null=True, blank=True)
     cas_id = models.TextField(null=True, blank=True)
     pubchem_id = models.TextField(null=True, blank=True)
-    tags = models.ManyToManyField('MoleculeTag')
+    tags = models.ManyToManyField('MoleculeTag', blank=True)
 
     def get_adduct_mzs(self):
         return json.loads(self._adduct_mzs)

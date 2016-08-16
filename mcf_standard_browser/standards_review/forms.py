@@ -17,6 +17,7 @@ class MoleculeForm(forms.ModelForm):
         model = Molecule
         fields = ('name', 'sum_formula', 'lipidmaps_id', 'pubchem_id', 'cas_id', 'chebi_id', 'hmdb_id', 'inchi_code',
                   'solubility', 'tags')
+        widgets = {'tags': forms.widgets.CheckboxSelectMultiple}
 
 
 class StandardForm(forms.ModelForm):
