@@ -13,11 +13,12 @@ from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.template import loader, Context
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic import CreateView
 from django.views.generic import TemplateView, ListView
 from table.views import FeedDataView
 import tasks
 import tools
-from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount
+from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
     StandardBatchForm, ExportLibrary, MoleculeTagForm
@@ -191,17 +192,12 @@ def molecule_add(request):
     return render(request, 'mcf_standards_browse/mcf_molecule_add.html', {'form': form, 'form_type': 'single'})
 
 
-@login_required()
-def moleculetag_add(request):
-    if request.method == "POST":
-        form = MoleculeTagForm(request.POST)
-        if form.is_valid():
-            molecule = form.save()
-            molecule.save()
-            return redirect('')
-    else:
-        form = MoleculeTagForm()
-    return render(request, 'mcf_standards_browse/mcf_moleculetag_add.html', {'form': form, 'form_type': 'single'})
+class MoleculetagAdd(CreateView):
+    template_name = 'mcf_standards_browse/mcf_moleculetag_add.html'
+    model = MoleculeTag
+    form = MoleculeTagForm
+    fields = ['name']
+    success_url = '/'
 
 
 @login_required()
