@@ -98,7 +98,12 @@ class Molecule(models.Model):
             adduct_dict[str(adduct)] = self.get_mz(adduct)
         self._adduct_mzs = json.dumps(adduct_dict)
 
+    def get_adduct_mzs_by_pk(self):
+        by_str = self.get_adduct_mzs()
+        return {add.pk: by_str[str(add)] for add in Adduct.objects.all()}
+
     adduct_mzs = property(get_adduct_mzs, set_adduct_mzs)
+    adduct_mzs_by_pk = property(get_adduct_mzs_by_pk)
 
     def get_mass(self):
         logging.info(self.sum_formula)

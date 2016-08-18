@@ -16,8 +16,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import CreateView
 from django.views.generic import TemplateView, ListView
 from table.views import FeedDataView
+from django_tables2 import RequestConfig
 import tasks
 import tools
+from .tables2 import MoleculeTable2
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
@@ -50,7 +52,9 @@ def standard_list(request):
 
 
 def molecule_list(request):
-    table = MoleculeTable()
+    table = MoleculeTable2(Molecule.objects.filter(standard__isnull=False), attrs={'id': 'molecule_list',
+                                                                                   'class': 'table table-striped'})
+    RequestConfig(request).configure(table)
     molecules_with_spectra = MoleculeSpectraCount.objects.filter(spectra_count__gt=0).count()
     return render(request, 'mcf_standards_browse/mcf_molecule_list.html',
                   {'molecule_list': table, 'molecules_with_spectra': molecules_with_spectra})
@@ -64,17 +68,6 @@ class StandardListView(FeedDataView):
         for row, standard in zip(initial_values_list, queryset):
             for adduct in Adduct.objects.all():
                 row.append(np.round(standard.molecule.adduct_mzs[str(adduct)], decimals=5))
-        return initial_values_list
-
-
-class MoleculeListView(FeedDataView):
-    token = MoleculeTable.token
-
-    def convert_queryset_to_values_list(self, queryset):
-        initial_values_list = super(MoleculeListView, self).convert_queryset_to_values_list(queryset)
-        for row, molcount in zip(initial_values_list, queryset):
-            for adduct in Adduct.objects.all().order_by('charge'):
-                row.append(np.round(molcount.molecule.adduct_mzs[str(adduct)], decimals=5))
         return initial_values_list
 
 

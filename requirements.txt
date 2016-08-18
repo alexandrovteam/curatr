@@ -4,6 +4,7 @@ django-celery
 django-datatable>=0.2.1
 django-highcharts
 django-static-jquery
+django-tables2
 numpy
 pandas
 pymspec
