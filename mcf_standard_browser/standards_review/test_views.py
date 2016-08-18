@@ -129,3 +129,25 @@ class DatasetDetailTest(TestCase):
         self.client.login(**test_credentials)
         self.client.post('/dataset/{}/'.format(pk))
         self.assertRaises(Dataset.DoesNotExist, Dataset.objects.get, pk=pk)
+
+
+class MoleculeEditTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.mol = Molecule.objects.create(name='foo', sum_formula='FOO', inchi_code='code')
+        u = User.objects.create(username=test_credentials['username'])
+        u.set_password(test_credentials['password'])
+        u.save()
+
+    def setUp(self):
+        self.client = Client()
+        self.client.login(**test_credentials)
+
+    def test_can_edit(self):
+        new_formula = 'RaB'
+        self.assertEqual(Molecule.objects.count(), 1)
+        self.client.post('/molecule/edit/{}/'.format(self.mol.pk),
+                         data={'sum_formula': new_formula, 'name': 'foo', 'inchi_code': 'code'})
+        self.assertEqual(Molecule.objects.count(), 1)
+        edited_mol = Molecule.objects.get(pk=self.mol.pk)
+        self.assertEqual(edited_mol.sum_formula, new_formula)

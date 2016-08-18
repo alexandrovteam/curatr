@@ -197,7 +197,7 @@ def molecule_edit(request, pk):
     molecule = get_object_or_404(Molecule, pk=pk)
     standards = Standard.objects.all().filter(molecule=molecule)
     if request.method == "POST":
-        form = MoleculeForm(request.POST)
+        form = MoleculeForm(request.POST, instance=molecule)
         if form.is_valid():
             standard = form.save()
             standard.save()
