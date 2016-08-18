@@ -1,5 +1,6 @@
 import logging
 
+import django_tables2 as tables
 import numpy as np
 from django.core.urlresolvers import reverse_lazy
 from django.db.utils import OperationalError
@@ -8,7 +9,7 @@ from table import Table
 from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
 
-from models import Standard, Adduct, MoleculeSpectraCount, FragmentationSpectrum, Dataset
+from models import Standard, Adduct, FragmentationSpectrum, Dataset
 
 
 class AdductMzColumn(Column):
@@ -41,20 +42,23 @@ class ProcessingErrorColumn(Column):
             return safestring.mark_safe('<div class="big-red"><strong> ! </strong></div>')
 
 
-class MoleculeTable(Table):
-    name = LinkColumn(field='molecule.name', header='name',
-                      links=[Link(text=Accessor('molecule.name'), viewname='molecule-detail',
-                                  args=(Accessor('molecule.pk'),))])
-    formula = Column(field='molecule.sum_formula', header='Formula')
-    exact_mass = Column(field='molecule.exact_mass', header='Exact Mass')
-    pubchem_id = Column(field='molecule.pubchem_id', header='Pubchem ID')
-    spectra_count = Column(field='spectra_count', header="Spectra Count")
+class MoleculeTable(tables.Table):
+    name = tables.LinkColumn(viewname='molecule-detail', args=(tables.A('id'),), verbose_name='Name')
+    formula = tables.Column(accessor='sum_formula', verbose_name='Sum Formula')
+    exact_mass = tables.Column(verbose_name='Exact Mass')
+    pubchem_id = tables.Column(verbose_name='Pubchem ID')
+    spectra_count = tables.Column(accessor='spectra_count',
+                                  order_by='-moleculespectracount.spectra_count')
+    tags = tables.Column(order_by='-tags', verbose_name='Tags')
+
+    @staticmethod
+    def render_tags(value):
+        if value.count() > 0:
+            return ', '.join(str(v) for v in value.all())
+        return '-'
 
     class Meta:
-        model = MoleculeSpectraCount
-        ajax = True
-        ajax_source = reverse_lazy('molecule_table')
-        sort = [(0, 'asc')]
+        order_by = ('spectra_count', 'name')
 
 
 class StandardTable(Table):
@@ -101,12 +105,13 @@ class DatasetListTable(Table):
         ajax = True
         sort = [(0, 'asc')]
 
+
 try:
     for adduct in Adduct.objects.all().order_by("charge"):
         logging.debug(adduct)
         # dynamically add one column per adduct
-        col = AdductMzColumn(adduct=adduct, field='molecule.adduct_mz')
-        MoleculeTable.base_columns.append(col)
-        setattr(MoleculeTable, 'adduct{}'.format(adduct.id), col)
+        col = tables.Column(accessor='adduct_mzs_by_pk.{}'.format(adduct.pk), empty_values=(), verbose_name=str(
+            adduct))
+        MoleculeTable.base_columns['adduct{}'.format(adduct.id)] = col
 except OperationalError:
     pass

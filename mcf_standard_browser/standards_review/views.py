@@ -19,7 +19,6 @@ from table.views import FeedDataView
 from django_tables2 import RequestConfig
 import tasks
 import tools
-from .tables2 import MoleculeTable2
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
@@ -52,7 +51,7 @@ def standard_list(request):
 
 
 def molecule_list(request):
-    table = MoleculeTable2(Molecule.objects.filter(standard__isnull=False), attrs={'id': 'molecule_list',
+    table = MoleculeTable(Molecule.objects.filter(standard__isnull=False), attrs={'id': 'molecule_list',
                                                                                    'class': 'table table-striped'})
     RequestConfig(request).configure(table)
     molecules_with_spectra = MoleculeSpectraCount.objects.filter(spectra_count__gt=0).count()
