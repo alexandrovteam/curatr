@@ -151,3 +151,29 @@ class MoleculeEditTest(TestCase):
         self.assertEqual(Molecule.objects.count(), 1)
         edited_mol = Molecule.objects.get(pk=self.mol.pk)
         self.assertEqual(edited_mol.sum_formula, new_formula)
+
+
+class StandardEditTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.mol = Molecule.objects.create(name='foo', sum_formula='FOO', inchi_code='code')
+        cls.std_dict = dict(molecule=cls.mol, MCFID=1)
+        cls.std = Standard.objects.create(**cls.std_dict)
+        u = User.objects.create(username=test_credentials['username'])
+        u.set_password(test_credentials['password'])
+        u.save()
+
+    def setUp(self):
+        self.client = Client()
+        self.client.login(**test_credentials)
+
+    def test_can_edit(self):
+        new_mcfid = 2
+        self.assertEqual(Standard.objects.count(), 1)
+        updated_dict = self.std_dict
+        updated_dict['MCFID'] = 2
+        updated_dict['molecule'] = self.mol.pk
+        self.client.post('/inventory/edit/MCF{}/'.format(self.std.MCFID), data=updated_dict)
+        self.assertEqual(Standard.objects.count(), 1)
+        edited_std = Standard.objects.get(pk=self.std.pk)
+        self.assertEqual(edited_std.MCFID, new_mcfid)
