@@ -4,6 +4,7 @@ import zipfile
 from collections import Counter
 from uuid import uuid4
 
+import json
 import numpy as np
 import os
 from django.conf import settings
@@ -258,6 +259,9 @@ class SpectraListView(FeedDataView):
 
 def fragmentSpectrum_detail(request, pk):
     spectrum = get_object_or_404(FragmentationSpectrum, pk=pk)
+    splash_payload = json.dumps({
+        "ions": [{"mass": mz, "intensity": int_} for mz, int_ in zip(spectrum.centroid_mzs, spectrum.centroid_ints)],
+        "type": "MS"})
     xdata = np.concatenate((spectrum.centroid_mzs,
                             spectrum.centroid_mzs[0:-1] / 2. + spectrum.centroid_mzs[1:] / 2.,
                             spectrum.centroid_mzs + 0.00001,
@@ -308,6 +312,7 @@ def fragmentSpectrum_detail(request, pk):
                  "data": [[ii, jj] for ii, jj in zip(np.round(chartdata[0]['x'], 5), chartdata[0]['y'])]},
             ],
         },
+        "splash_payload": splash_payload,
     }
     return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_detail.html', data)
 

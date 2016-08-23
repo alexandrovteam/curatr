@@ -20,6 +20,7 @@
             <p>Ion: <a href="{% url 'standard-detail' specdata.spectrum.standard.MCFID %}">{{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct }}</a></p>
             <p>Raw data: <a href="{% url 'dataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} </a></p>
             <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
+            <p id="splash">Splash: calculating...</p>
         </div>
         <br>
         <div class = "mol">
@@ -59,6 +60,18 @@
             series: series
         });
     });
+
+    function setSplash(splash, status, jqxhr) {
+        console.log(splash);
+        $('#splash').text("Splash: " + splash);
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "http://splash.fiehnlab.ucdavis.edu/splash/it",
+        data: JSON.stringify({{ splash_payload | safe}}),
+        contentType: "application/json"
+    }).done(setSplash).fail(function (jqxhr, status, error) {console.log("Error: " + error + ", Status: " + status)});
 </script>
 {% endblock %}
 
