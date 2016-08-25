@@ -9,6 +9,20 @@
     <div class="main-content">
         <div class="row">
             <div class="col-sm-12">
+                <form method="get" action="{{ request.path }}">
+                    <input type="search" name="search" placeholder="Search..."
+                           value="{{ request.GET.search }}">
+                    {% for k, v in request.GET.items %}
+                        {% if not k == "search" %}
+                            <input type="hidden" name="{{ k }}" value="{{ v }}">
+                        {% endif %}
+                    {% endfor %}
+                    <input type="submit">
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
                 {% render_table molecule_list %}
             </div>
         </div>
