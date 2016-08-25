@@ -111,7 +111,7 @@ try:
         logging.debug(adduct)
         # dynamically add one column per adduct
         col = tables.Column(accessor='adduct_mzs_by_pk.{}'.format(adduct.pk), empty_values=(), verbose_name=str(
-            adduct))
+            adduct), orderable=False)
         MoleculeTable.base_columns['adduct{}'.format(adduct.id)] = col
 except OperationalError:
     pass
