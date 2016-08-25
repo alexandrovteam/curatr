@@ -56,7 +56,7 @@ def molecule_list(request):
         'name', 'sum_formula', 'exact_mass', 'pubchem_id', 'moleculespectracount__spectra_count', 'tags__name',
         '_adduct_mzs']
     search_string = request.GET.get('search', None)
-    qs = Molecule.objects.filter(standard__isnull=False)
+    qs = Molecule.objects.all()
     if search_string:
         queries = [Q(**{field + '__icontains': search_string}) for field in icontains_fields]
         search_query = queries.pop()
