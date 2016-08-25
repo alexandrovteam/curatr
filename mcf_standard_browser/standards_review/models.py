@@ -154,7 +154,7 @@ class Molecule(models.Model):
 
 
 class Standard(models.Model):
-    MCFID = models.AutoField(primary_key=True)
+    MCFID = models.IntegerField(null=True, blank=True)
     molecule = models.ForeignKey(Molecule)
     vendor = models.TextField(null=True, blank=True)
     vendor_cat = models.TextField(null=True, blank=True)

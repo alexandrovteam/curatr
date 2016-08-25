@@ -169,7 +169,7 @@ def standard_add(request):
 
 @login_required()
 def standard_edit(request, pk):
-    standard = get_object_or_404(Standard, MCFID=pk)
+    standard = get_object_or_404(Standard, pk=pk)
     if request.method == "POST":
         form = StandardForm(request.POST, instance=standard)
         if form.is_valid():
