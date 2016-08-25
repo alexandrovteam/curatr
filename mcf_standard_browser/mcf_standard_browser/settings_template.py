@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'highcharts',
     'django_static_jquery',
     'djcelery',
-    'table'
+    'table',
+    'django_tables2'
 ]
 
 MIDDLEWARE_CLASSES = [
