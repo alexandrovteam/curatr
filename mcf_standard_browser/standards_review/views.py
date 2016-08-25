@@ -52,8 +52,18 @@ def standard_list(request):
 
 
 def molecule_list(request):
-    table = MoleculeTable(Molecule.objects.filter(standard__isnull=False), attrs={'id': 'molecule_list',
-                                                                                   'class': 'table table-striped'})
+    icontains_fields = [
+        'name', 'sum_formula', 'exact_mass', 'pubchem_id', 'moleculespectracount__spectra_count', 'tags__name',
+        '_adduct_mzs']
+    search_string = request.GET.get('search', None)
+    qs = Molecule.objects.filter(standard__isnull=False)
+    if search_string:
+        queries = [Q(**{field + '__icontains': search_string}) for field in icontains_fields]
+        search_query = queries.pop()
+        for q in queries:
+            search_query |= q
+        qs = qs.filter(search_query)
+    table = MoleculeTable(qs, attrs={'id': 'molecule_list', 'class': 'table table-striped'})
     RequestConfig(request).configure(table)
     molecules_with_spectra = MoleculeSpectraCount.objects.filter(spectra_count__gt=0).count()
     return render(request, 'mcf_standards_browse/mcf_molecule_list.html',
