@@ -23,7 +23,9 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
-                {% render_table molecule_list %}
+                <div style="overflow-x: auto">
+                    {% render_table molecule_list %}
+                </div>
             </div>
         </div>
         {{ molecules_with_spectra }} molecule(s) with at least one fragmentation spectrum
