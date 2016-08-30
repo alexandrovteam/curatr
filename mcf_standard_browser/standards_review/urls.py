@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'^xic/(?P<dataset_pk>.+)/MCF(?P<standard_pk>.+)/M(?P<adduct_pk>.+)$', views.xic_detail,
         name='xic-detail'),
     url(r'^accounts/login/$', auth_views.login, name='login'),
-    url(r'^accounts/logout/$', auth_views.logout, {'next_page': '/'}),
+    url(r'^accounts/logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^errors/batch_molecule_upload/', views.error_page, name="batch-upload-error"),
     url(r'^about/curatr/', views.about_curatr, name="about-curatr"),
     url(r'^about/', views.about, name="about"),
