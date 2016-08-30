@@ -614,12 +614,15 @@ def library_stats(request):
     reviewed = spectra.filter(reviewed=1)
     accepted = reviewed.filter(standard_id__isnull=False)
     rejected = reviewed.filter(standard_id__isnull=True)
+    tag_counts = [t.molecule_set.count() for t in MoleculeTag.objects.all()]
     total_accepted = accepted.count()
     total_rejected = rejected.count()
     total_spectra = spectra.count()
     total_reviewed = reviewed.count()
     total_annotated = annotated_molecules.count()
     total_molecules = molecules.count()
+    total_taggings = sum(tag_counts)
+    total_tagged = Molecule.objects.filter(tags__isnull=False).count()
 
     # maps number of annotations to how many molecules exists with that amount of annotations, excluding 0
     annotation_count_histo = Counter(
@@ -634,12 +637,19 @@ def library_stats(request):
             'data': annotation_count_histo.values(),
             'labels': annotation_count_histo.keys()
         },
+        "chart3": {
+            'data': tag_counts,
+            'labels': [str(t) for t in MoleculeTag.objects.all()],
+        },
         "total_spectra": total_spectra,
         "total_molecules": total_molecules,
         "total_annotated": total_annotated,
         "total_annotations": total_reviewed,
+        "total_taggings": total_taggings,
+        "total_tagged": total_tagged,
         "percent_spectra_curated": _percent(total_reviewed, total_spectra),
-        "percent_molecules_annotated": _percent(total_annotated, total_molecules)
+        "percent_molecules_annotated": _percent(total_annotated, total_molecules),
+        "percent_molecules_tagged": _percent(total_tagged, total_molecules),
     }
     return render(request, 'mcf_standards_browse/mcf_library_stats.html', data)
 

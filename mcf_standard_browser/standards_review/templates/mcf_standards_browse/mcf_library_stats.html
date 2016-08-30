@@ -90,6 +90,43 @@
                 </div>
                 <div class="col-sm-2"></div>
             </div>
+
+            <div style="margin-top: 100px;"></div>
+            <div class="row">
+                <h2>Tags</h2>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-sm-4">
+                    <canvas id="chart3" width="100%" height="100%"></canvas>
+                </div>
+                <div class="col-sm-2"></div>
+                <div class="col-sm-2">
+                    <div class="margin1"></div>
+                    <div class="big-number">
+                        <p>{{ total_taggings }}</p>
+                    </div>
+                    <div class="number-description">
+                        <p>taggings</p>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="margin1"></div>
+                    <div class="big-number">
+                        <p>{{ total_tagged }}</p>
+                    </div>
+                    <div class="number-description">
+                        <p>tagged molecules</p>
+                    </div>
+                    <div class="big-number">
+                        <p>{{ percent_molecules_tagged }}%</p>
+                    </div>
+                    <div class="number-description">
+                        <p>tagged molecules (percent)</p>
+                    </div>
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -101,6 +138,7 @@
             $('document').ready(function () {
                 const spectra_pie_chart = document.getElementById("chart1");
                 const molecules_bar_chart = document.getElementById("chart2");
+                const tags_bar_chart = document.getElementById("chart3");
                 const data1 = {
                     labels: {{ chart1.labels }},
                     datasets: [{
@@ -127,7 +165,14 @@
                         data: {{ chart2.data }}
                     }]
                 };
-                const common_options = {
+                const data3 = {
+                    labels: {{ chart3.labels }},
+                    datasets: [{
+                        label: 'Number of molecules per tag',
+                        data: {{ chart3.data }}
+                    }]
+                };
+                const global_options = {
                     animation: {
                         animateScale: true
                     },
@@ -135,15 +180,30 @@
                         position: 'bottom'
                     }
                 };
+                const bar_extra_options = {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                };
+                const bar_options = $.extend(bar_extra_options, global_options);
                 new Chart(spectra_pie_chart, {
                     type: 'doughnut',
                     data: data1,
-                    options: common_options
+                    options: global_options
                 });
                 new Chart(molecules_bar_chart, {
                     type: 'bar',
                     data: data2,
-                    options: common_options
+                    options: bar_options
+                });
+                new Chart(tags_bar_chart, {
+                    type: 'bar',
+                    data: data3,
+                    options: bar_options
                 });
             })
         </script>
