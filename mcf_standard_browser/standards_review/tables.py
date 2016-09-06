@@ -61,21 +61,18 @@ class MoleculeTable(tables.Table):
         order_by = ('spectra_count', 'name')
 
 
-class StandardTable(Table):
-    id = LinkColumn(field='MCFID', header='Inventory ID',
-                    links=[Link(text=Accessor('MCFID'), viewname='standard-detail', args=(Accessor('MCFID'),))])
-    molecule_name = Column(field='molecule.name', header='Name')
-    molecular_formula = Column(field='molecule.sum_formula', header='Formula')
-    mass = Column(field='molecule.exact_mass', header='Exact Mass')
-    vendor = Column(field='vendor', header='Vendor')
-    vendor_id = Column(field='vendor_cat', header='Vendor ID')
-    pubchem_id = Column(field='molecule.pubchem_id', header='Pubchem ID')
+class StandardTable(tables.Table):
+    id = tables.LinkColumn(accessor='MCFID', verbose_name='Inventory ID', args=[Accessor('MCFID')],
+                           viewname='standard-detail')
+    molecule_name = tables.Column(accessor='molecule.name', verbose_name='Name')
+    molecular_formula = tables.Column(accessor='molecule.sum_formula', verbose_name='Formula')
+    mass = tables.Column(accessor='molecule.exact_mass', verbose_name='Exact Mass')
+    vendor = tables.Column(accessor='vendor', verbose_name='Vendor')
+    vendor_id = tables.Column(accessor='vendor_cat', verbose_name='Vendor ID')
+    pubchem_id = tables.Column(accessor='molecule.pubchem_id', verbose_name='Pubchem ID')
 
     class Meta:
-        model = Standard
-        ajax = True
-        ajax_source = reverse_lazy('standard_table')
-        sort = [(0, 'asc')]
+        order_by = ('id',)
 
 
 class SpectraTable(Table):

@@ -1,19 +1,32 @@
 {% extends 'mcf_standards_browse/base.html' %}
 {% load static %}
-{% load table_tags %}
-
-<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-<script src="{% static 'js/jquery.min.js' %}"></script>
-<script src="{% static 'js/bootstrap.min.js' %}"></script>
-<script type='text/javascript' src='https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js'></script>
+{% load render_table from django_tables2 %}
 
 {% block content %}
-    <div class="main-content" style="margin-top: 10px">
+    <div class="main-content">
         <h1>Standard Inventory</h1>
-        <br><br><br>
-        {% render_table standard_list %}
-        <a href="{% url 'standard-add' %}" id="add_standard_button">
-            <span class="glyphicon glyphicon-plus"> Add </span>
-        </a>
+    </div>
+    <div class="main-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <form method="get" action="{{ request.path }}">
+                    <input type="search" name="search" placeholder="Search..."
+                           value="{{ request.GET.search }}">
+                    {% for k, v in request.GET.items %}
+                        {% if not k == "search" %}
+                            <input type="hidden" name="{{ k }}" value="{{ v }}">
+                        {% endif %}
+                    {% endfor %}
+                    <input type="submit">
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="overflow-x: auto">
+                    {% render_table standard_list %}
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

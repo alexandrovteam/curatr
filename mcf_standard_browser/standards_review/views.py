@@ -47,7 +47,18 @@ def library_home(request):
 
 
 def standard_list(request):
-    table = StandardTable()
+    icontains_fields = ['MCFID', 'molecule__name', 'molecule__sum_formula', 'molecule__exact_mass', 'vendor',
+                        'vendor_cat', 'molecule__pubchem_id']
+    search_string = request.GET.get('search', None)
+    qs = Standard.objects.all()
+    if search_string:
+        queries = [Q(**{field + '__icontains': search_string}) for field in icontains_fields]
+        search_query = queries.pop()
+        for q in queries:
+            search_query |= q
+        qs = qs.filter(search_query)
+    table = StandardTable(qs, attrs={'id': 'molecule_list', 'class': 'table table-striped'})
+    RequestConfig(request).configure(table)
     return render(request, "mcf_standards_browse/mcf_standard_list.html", {'standard_list': table})
 
 
@@ -68,17 +79,6 @@ def molecule_list(request):
     molecules_with_spectra = MoleculeSpectraCount.objects.filter(spectra_count__gt=0).count()
     return render(request, 'mcf_standards_browse/mcf_molecule_list.html',
                   {'molecule_list': table, 'molecules_with_spectra': molecules_with_spectra})
-
-
-class StandardListView(FeedDataView):
-    token = StandardTable.token
-
-    def convert_queryset_to_values_list(self, queryset):
-        initial_values_list = super(StandardListView, self).convert_queryset_to_values_list(queryset)
-        for row, standard in zip(initial_values_list, queryset):
-            for adduct in Adduct.objects.all():
-                row.append(np.round(standard.molecule.adduct_mzs[str(adduct)], decimals=5))
-        return initial_values_list
 
 
 class IndexView(TemplateView):

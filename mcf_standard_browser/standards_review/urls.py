@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 
 from . import views
-from .views import StandardListView, SpectraListView
+from .views import SpectraListView
 
 urlpatterns = [
     url(r'^$', views.home_page),
@@ -34,7 +34,6 @@ urlpatterns = [
     url(r'^about/curatr/', views.about_curatr, name="about-curatr"),
     url(r'^about/', views.about, name="about"),
     url(r'^table/', include('table.urls')),
-    url(r'^table_standard/data/$', StandardListView.as_view(), name='standard_table'),
     url(r'^table_spectra/data/$', SpectraListView.as_view(), name='spectra_table'),
     url(r'^library/$', views.library_home, name='library-home'),
     url(r'^curate/$', views.curate_home, name='curate-home'),
