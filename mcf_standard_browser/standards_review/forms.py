@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 
 __author__ = 'palmer'
 from django import forms
-from .models import Standard, Adduct, FragmentationSpectrum, Molecule, MoleculeTag
+from .models import Standard, Adduct, FragmentationSpectrum, Molecule, MoleculeTag, LcInfo, MsInfo
 import logging
 from django.utils.safestring import mark_safe
 
@@ -43,9 +43,10 @@ class UploadFileForm(forms.Form):
     mzml_file = forms.FileField(validators=[mzml_filename_validator])
     adducts = forms.ModelMultipleChoiceField(queryset=Adduct.objects.all())
     standards = forms.ModelMultipleChoiceField(queryset=Standard.objects.all().order_by('MCFID'))
-    instrument_information = forms.CharField(required=False)
     mass_accuracy_ppm = forms.FloatField(min_value=0.000001, label="MS1 mass accuracy (ppm)")
     quad_window_mz = forms.FloatField(min_value=0.000001, label='Precursor Window (m/z)')
+    lc_info = forms.ModelChoiceField(queryset=LcInfo.objects.all())
+    ms_info = forms.ModelChoiceField(queryset=MsInfo.objects.all())
 
 
 class FragSpecReview(forms.Form):

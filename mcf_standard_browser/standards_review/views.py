@@ -476,7 +476,8 @@ def dataset_upload(request):
                     "standards": post_dict['standards'],
                     "mass_accuracy_ppm": post_dict['mass_accuracy_ppm'][0],
                     "quad_window_mz": post_dict['quad_window_mz'][0],
-                    "instrument_information": post_dict['instrument_information']}
+                    "lc_info": post_dict['lc_info'][0],
+                    "ms_info": post_dict['ms_info'][0]}
             uploaded_file = request.FILES['mzml_file']
             base_name, extension = os.path.splitext(uploaded_file.name)
             d = Dataset(name=uploaded_file.name, processing_finished=False)

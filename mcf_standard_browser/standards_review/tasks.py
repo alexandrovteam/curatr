@@ -145,13 +145,15 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
             mz_lower[standard][adduct] = mz[standard][adduct] - delta_mz
     logger.debug('adding dataset')
     try:
-        instrument = metadata['instrument_information'][0]
+        lc_info = metadata['lc_info'][0]
+        ms_info = metadata['ms_info'][0]
     except LookupError:
         logger.debug('no instrument information supplied; using empty string instead')
-        instrument = ''
+        lc_info = ms_info = ''
 
     d.mass_accuracy_ppm = ppm
-    d.intrument = instrument
+    d.lc_info = lc_info
+    d.ms_info = ms_info
     d.save()
     for standard in standards:
         d.standards_present.add(standard)

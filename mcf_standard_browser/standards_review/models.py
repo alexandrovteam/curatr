@@ -166,6 +166,14 @@ class Standard(models.Model):
         return "{}: {}".format(self.MCFID, self.molecule.name)
 
 
+class LcInfo(models.Model):
+    content = models.TextField()
+
+
+class MsInfo(models.Model):
+    content = models.TextField()
+
+
 class Dataset(models.Model):
     processing_finished = models.BooleanField(default=False)
     name = models.TextField(default="")
@@ -174,7 +182,8 @@ class Dataset(models.Model):
     standards_present = models.ManyToManyField(Standard, blank=True)
     mass_accuracy_ppm = models.FloatField(default=10.0)
     quad_window_mz = models.FloatField(default=1.0)
-    intrument = models.TextField(default="")
+    lc_info = models.ForeignKey(to=LcInfo, null=True)
+    ms_info = models.ForeignKey(to=MsInfo, null=True)
 
     # (for xic search)
     def __unicode__(self):
