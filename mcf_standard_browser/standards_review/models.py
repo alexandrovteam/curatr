@@ -182,8 +182,8 @@ class Dataset(models.Model):
     standards_present = models.ManyToManyField(Standard, blank=True)
     mass_accuracy_ppm = models.FloatField(default=10.0)
     quad_window_mz = models.FloatField(default=1.0)
-    lc_info = models.ForeignKey(to=LcInfo, null=True)
-    ms_info = models.ForeignKey(to=MsInfo, null=True)
+    lc_info = models.ManyToManyField(to=LcInfo)
+    ms_info = models.ManyToManyField(to=MsInfo)
 
     # (for xic search)
     def __unicode__(self):

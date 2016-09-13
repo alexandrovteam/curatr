@@ -1,6 +1,7 @@
 {% extends 'mcf_standards_browse/base.html' %}
 
 {% block content %}
+<link rel="stylesheet" href="/static/css/awesomplete.css">
 <div class="main-content" style="margin-top: 10px">
     <div id = welcome>
         <h2>Upload Dataset</h2>
@@ -20,4 +21,38 @@
 </div>
 {% endblock %}
 
+{% block script %}
+<script src="/static/js/awesomplete.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var lc_info = document.getElementById("id_lc_info");
+        var ms_info = document.getElementById("id_ms_info");
+        lc_info.setAttribute('data-multiple', '');
+        ms_info.setAttribute('data-multiple', '');
+        {% autoescape off %}
+        new Awesomplete(lc_info, {
+            list: {{ autocomplete.lc_info }},
+            filter: function(text, input) {
+                return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+            },
 
+            replace: function(text) {
+                var before = this.input.value.match(/^.+,\s*|/)[0];
+                this.input.value = before + text + ", ";
+            }
+        });
+        new Awesomplete(ms_info, {
+            list: {{ autocomplete.ms_info }},
+            filter: function(text, input) {
+                return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+            },
+
+            replace: function(text) {
+                var before = this.input.value.match(/^.+,\s*|/)[0];
+                this.input.value = before + text + ", ";
+            }
+        });
+        {% endautoescape %}
+    });
+</script>
+{% endblock %}

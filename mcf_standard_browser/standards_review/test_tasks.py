@@ -4,7 +4,7 @@ from django.conf import settings
 from django.test import TestCase
 from os.path import join
 
-from models import Molecule, Standard, Dataset, Adduct
+from models import Molecule, Standard, Dataset, Adduct, LcInfo, MsInfo
 from tasks import add_batch_standard, handle_uploaded_files
 
 
@@ -40,11 +40,20 @@ class DatasetUploadTest(TestCase):
         cls.mzml_filepath = join(settings.MEDIA_ROOT, "sample.mzML")
         cls.d1 = Dataset(name='foo')
         cls.d1.save()
+        cls.lc1 = LcInfo.objects.create(content='LC1')
 
     def test_dataset_upload(self):
         metadata = {'mass_accuracy_ppm': 0.000001,
                     'quad_window_mz': 0.000001,
                     'standards': [x[0] for x in Standard.objects.filter(molecule__name='SUCROSE').values_list("pk")],
-                    'adducts': [x[0] for x in Adduct.objects.all().values_list("pk")]}
+                    'adducts': [x[0] for x in Adduct.objects.all().values_list("pk")],
+                    'lc_info': "LC1",
+                    'ms_info': "MS1, MS1"}
         handle_uploaded_files(metadata, self.mzml_filepath, self.d1)
         self.assertGreater(self.d1.fragmentationspectrum_set.count(), 0)
+        self.assertEqual(LcInfo.objects.count(), 1)
+        self.assertEqual(MsInfo.objects.count(), 1)
+        self.assertEqual(self.d1.lc_info.count(), 1)
+        self.assertEqual(self.d1.ms_info.count(), 1)
+        self.assertEqual(self.lc1, self.d1.lc_info.get())
+        self.assertEqual(self.d1.ms_info.get().content, 'MS1')
