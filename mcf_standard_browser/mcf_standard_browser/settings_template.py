@@ -163,4 +163,5 @@ INSTITUTE_NAME= '[EMBL - Metabolmoics Core Facility]'
 
 SETTINGS_EXPORT = [
     'INSTITUTE_NAME',
+    'MEDIA_URL'
 ]
