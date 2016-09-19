@@ -10,7 +10,7 @@
                 <p>{{standard.molecule.name}}</p>
                 <h2>Chemical Information</h2>
                 <p>Formula: {{standard.molecule.sum_formula}}</p>
-                <p>MCFID: {{standard.MCFID}} </p>
+                <p>Inventory ID: {{standard.MCFID}} </p>
                 <p>Exact mass: {{standard.molecule.exact_mass}} </p>
                 <p>Solubility: {{standard.molecule.solubility}} </p>
                 <p>Inchi: {{standard.molecule.inchi_code}} </p>
@@ -34,7 +34,7 @@
 
         {% if user.is_authenticated %}
             <div class="main-content">
-                <a href="{% url 'standard-edit' pk=standard.MCFID %}" class="btn btn-default">Edit Standard</a>
+                <a href="{% url 'standard-edit' mcfid=standard.MCFID %}" class="btn btn-default">Edit Standard</a>
             </div>
         </div>
         {% endif %}

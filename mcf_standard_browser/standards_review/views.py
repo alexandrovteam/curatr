@@ -101,8 +101,8 @@ class Standard_list_ez(ListView):
     context_object_name = 'standards'
 
 
-def standard_detail(request, pk):
-    standard = get_object_or_404(Standard, MCFID=pk)
+def standard_detail(request, mcfid):
+    standard = get_object_or_404(Standard, MCFID=mcfid)
     frag_specs = FragmentationSpectrum.objects.all().filter(standard=standard)
     chart_type = 'line'
     chart_height = 300
@@ -169,8 +169,8 @@ def standard_add(request):
 
 
 @login_required()
-def standard_edit(request, pk):
-    standard = get_object_or_404(Standard, pk=pk)
+def standard_edit(request, mcfid):
+    standard = get_object_or_404(Standard, MCFID=mcfid)
     if request.method == "POST":
         form = StandardForm(request.POST, instance=standard)
         if form.is_valid():
@@ -383,9 +383,9 @@ def dataset_delete(request, pk):
 
 
 @ensure_csrf_cookie
-def xic_detail(request, dataset_pk, standard_pk, adduct_pk):
+def xic_detail(request, dataset_pk, mcfid, adduct_pk):
     dataset = get_object_or_404(Dataset, pk=dataset_pk)
-    standard = get_object_or_404(Standard, pk=standard_pk)
+    standard = get_object_or_404(Standard, MCFID=mcfid)
     adduct = get_object_or_404(Adduct, pk=adduct_pk)
     mz = standard.molecule.get_mz(adduct)
     delta_mz = mz * dataset.mass_accuracy_ppm * 1e-6
@@ -569,7 +569,7 @@ def fragmentSpectrum_export(request):
                 filename_list = []
                 for ii, cc in enumerate(c['spec_data']):
                     if cc[0].standard:
-                        export_filename = "MCFID{}".format(cc[0].standard.MCFID)
+                        export_filename = "InventoryID{}".format(cc[0].standard.MCFID)
                     else:
                         export_filename = 'unknown_standard'
                     ii = 0

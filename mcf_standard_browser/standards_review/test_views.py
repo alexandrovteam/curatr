@@ -173,7 +173,7 @@ class StandardEditTest(TestCase):
         updated_dict = self.std_dict
         updated_dict['vendor'] = new_vendor
         updated_dict['molecule'] = self.mol.pk
-        self.client.post('/inventory/edit/MCF{}/'.format(self.std.pk), data=updated_dict)
+        self.client.post('/inventory/edit/inventory{}/'.format(self.std.pk), data=updated_dict)
         self.assertEqual(Standard.objects.count(), 1)
         edited_std = Standard.objects.get(pk=self.std.pk)
         self.assertEqual(edited_std.vendor, new_vendor)

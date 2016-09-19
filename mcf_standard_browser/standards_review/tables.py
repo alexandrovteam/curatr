@@ -76,7 +76,7 @@ class StandardTable(tables.Table):
 
 
 class SpectraTable(Table):
-    mcfid = Column(field='standard.MCFID', header='MCF ID')
+    mcfid = Column(field='standard.MCFID', header='Inventory ID')
     molecule = Column(field='standard.molecule.name', header='Molecule')
     precursor_mz = Column(field='precursor_mz', header='Precursor m/z')
     adduct = AdductColumn(field='adduct.delta_formula', header='Adduct')

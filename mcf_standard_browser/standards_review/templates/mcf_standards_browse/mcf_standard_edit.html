@@ -22,12 +22,14 @@
 
 {% block script %}
     <script type="text/javascript">
-    document.getElementById("click_button").onclick = function() {
-        var e = document.getElementById("id_molecule");
-        var mcfid = e.options[e.selectedIndex].value;
-        var base_url='/molecule/edit/';
-        window.open(base_url.concat(mcfid),'_top');
-        return false;
-    };
-</script>
+        $(document).ready(function () {
+            document.getElementById("click_button").onclick = function() {
+                var e = document.getElementById("id_molecule");
+                var mcfid = e.options[e.selectedIndex].value;
+                var base_url = '/molecule/edit/';
+                window.open(base_url.concat(mcfid), '_top');
+                return false;
+            };
+        });
+    </script>
 {% endblock %}

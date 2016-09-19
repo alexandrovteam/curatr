@@ -14,7 +14,8 @@
         <div class="main-content">
 
             {% for standard in standards %}
-                <a href="{% url 'standard-edit' pk=standard.MCFID %}" class="btn btn-default">Edit Standard: {{ standard }}</a>
+                <a href="{% url 'standard-edit' mcfid=standard.MCFID %}" class="btn btn-default">Edit Standard:
+                    {{ standard }}</a>
             {% endfor %}
         </div>
 </div>
