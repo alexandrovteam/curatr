@@ -1,11 +1,6 @@
-{% extends 'mcf_standards_browse/base.html' %}
+{% extends 'mcf_standards_browse/base_highcharts.html' %}
 {% load staticfiles %}
 {% load xic_extras %}
-{% block head %}
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="{% static 'highcharts/js/highcharts.js' %}"></script>
-    <script src="{% static 'highcharts/js/modules/exporting.js'%}"></script>
-{% endblock %}
 
 {% block content %}
     <div class="page-header-extras">

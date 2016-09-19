@@ -1,8 +1,11 @@
 {% extends 'mcf_standards_browse/base.html' %}
+{% load staticfiles %}
 
 {% block content %}
-<link rel="stylesheet" href="/static/css/awesomplete.css">
-<div class="main-content" style="margin-top: 10px">
+    <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}">
+    <script src="{% static 'js/awesomplete.min.js' %}"></script>
+
+    <div class="main-content" style="margin-top: 10px">
     <div id = welcome>
         <h2>Upload Dataset</h2>
         <p>Process of submitting data:
@@ -22,7 +25,6 @@
 {% endblock %}
 
 {% block script %}
-<script src="/static/js/awesomplete.min.js"></script>
 <script>
     $(document).ready(function () {
         var lc_info = document.getElementById("id_lc_info");
