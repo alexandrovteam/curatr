@@ -62,7 +62,7 @@ class MoleculeTable(tables.Table):
 
 
 class StandardTable(tables.Table):
-    id = tables.LinkColumn(accessor='MCFID', verbose_name='Inventory ID', args=[Accessor('MCFID')],
+    id = tables.LinkColumn(accessor='MCFID', verbose_name='Inventory ID', args=[tables.A('MCFID')],
                            viewname='standard-detail')
     molecule_name = tables.Column(accessor='molecule.name', verbose_name='Name')
     molecular_formula = tables.Column(accessor='molecule.sum_formula', verbose_name='Formula')
