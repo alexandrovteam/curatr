@@ -48,7 +48,7 @@ def library_home(request):
 
 
 def standard_list(request):
-    icontains_fields = ['MCFID', 'molecule__name', 'molecule__sum_formula', 'molecule__exact_mass', 'vendor',
+    icontains_fields = ['inventory_id', 'molecule__name', 'molecule__sum_formula', 'molecule__exact_mass', 'vendor',
                         'vendor_cat', 'molecule__pubchem_id']
     search_string = request.GET.get('search', None)
     qs = Standard.objects.all()
@@ -102,7 +102,7 @@ class Standard_list_ez(ListView):
 
 
 def standard_detail(request, mcfid):
-    standard = get_object_or_404(Standard, MCFID=mcfid)
+    standard = get_object_or_404(Standard, inventory_id=mcfid)
     frag_specs = FragmentationSpectrum.objects.all().filter(standard=standard)
     chart_type = 'line'
     chart_height = 300
@@ -170,7 +170,7 @@ def standard_add(request):
 
 @login_required()
 def standard_edit(request, mcfid):
-    standard = get_object_or_404(Standard, MCFID=mcfid)
+    standard = get_object_or_404(Standard, inventory_id=mcfid)
     if request.method == "POST":
         form = StandardForm(request.POST, instance=standard)
         if form.is_valid():
@@ -345,7 +345,7 @@ def dataset_detail(request, pk):
 def dataset_detail_show(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
     adducts = dataset.adducts_present.all()
-    standards = dataset.standards_present.all().order_by('MCFID')
+    standards = dataset.standards_present.all().order_by('inventory_id')
     table_list = []
     for standard in standards:
         for adduct in adducts:
@@ -385,7 +385,7 @@ def dataset_delete(request, pk):
 @ensure_csrf_cookie
 def xic_detail(request, dataset_pk, mcfid, adduct_pk):
     dataset = get_object_or_404(Dataset, pk=dataset_pk)
-    standard = get_object_or_404(Standard, MCFID=mcfid)
+    standard = get_object_or_404(Standard, inventory_id=mcfid)
     adduct = get_object_or_404(Adduct, pk=adduct_pk)
     mz = standard.molecule.get_mz(adduct)
     delta_mz = mz * dataset.mass_accuracy_ppm * 1e-6
@@ -569,7 +569,7 @@ def fragmentSpectrum_export(request):
                 filename_list = []
                 for ii, cc in enumerate(c['spec_data']):
                     if cc[0].standard:
-                        export_filename = "InventoryID{}".format(cc[0].standard.MCFID)
+                        export_filename = "InventoryID{}".format(cc[0].standard.inventory_id)
                     else:
                         export_filename = 'unknown_standard'
                     ii = 0

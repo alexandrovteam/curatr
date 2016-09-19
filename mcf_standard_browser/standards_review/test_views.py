@@ -27,7 +27,7 @@ class StandardListTest(TestCase):
         m1 = Molecule(name='test', sum_formula="C1H2O3")
         m1.save()
         s1 = Standard(
-            MCFID=0,
+            inventory_id=0,
             molecule=m1,
             vendor="sigma",
             vendor_cat="sig0001",
@@ -157,7 +157,7 @@ class StandardEditTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.mol = Molecule.objects.create(name='foo', sum_formula='FOO', inchi_code='code')
-        cls.std_dict = dict(molecule=cls.mol, vendor='foo')
+        cls.std_dict = dict(molecule=cls.mol, vendor='foo', inventory_id=1)
         cls.std = Standard.objects.create(**cls.std_dict)
         u = User.objects.create(username=test_credentials['username'])
         u.set_password(test_credentials['password'])
@@ -173,7 +173,7 @@ class StandardEditTest(TestCase):
         updated_dict = self.std_dict
         updated_dict['vendor'] = new_vendor
         updated_dict['molecule'] = self.mol.pk
-        self.client.post('/inventory/edit/inventory{}/'.format(self.std.pk), data=updated_dict)
+        self.client.post('/inventory/edit/inventory{}/'.format(self.std.inventory_id), data=updated_dict)
         self.assertEqual(Standard.objects.count(), 1)
         edited_std = Standard.objects.get(pk=self.std.pk)
         self.assertEqual(edited_std.vendor, new_vendor)

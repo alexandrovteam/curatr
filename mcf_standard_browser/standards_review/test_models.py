@@ -27,7 +27,7 @@ class StandardModelTest(TestCase):
         m1 = Molecule(name='test', sum_formula="C1H2O3")
         m1.save()
         s1 = Standard(
-            MCFID=0,
+            inventory_id=0,
             molecule=m1,
             vendor="sigma",
             vendor_cat="sig0001",
@@ -89,9 +89,9 @@ class DatasetModelTest(TestCase):
         m1.save()
         m2 = Molecule(name='TestMolecule1', sum_formula="C2H2O3")
         m2.save()
-        s1 = Standard(molecule=m1, MCFID="0")
+        s1 = Standard(molecule=m1, inventory_id="0")
         s1.save()
-        s2 = Standard(molecule=m2, MCFID="1")
+        s2 = Standard(molecule=m2, inventory_id="1")
         s2.save()
         # create adduct
         a1 = Adduct(nM=1, delta_formula='+H+K', charge=-2)
@@ -110,7 +110,7 @@ class XicModelTest(TestCase):
     def test_add_xic(self):
         m1 = Molecule(name='TestMolecule1', sum_formula="C1H2O3")
         m1.save()
-        s1 = Standard(molecule=m1, MCFID="0")
+        s1 = Standard(molecule=m1, inventory_id="0")
         s1.save()
         a1 = Adduct(nM=1, delta_formula='+H+K', charge=-2)
         a1.save()
@@ -133,7 +133,7 @@ class XicModelTest(TestCase):
         a1.save()
         m1 = Molecule(name='TestMolecule1', sum_formula="C1H2O3")
         m1.save()
-        s1 = Standard(molecule=m1, MCFID="0")
+        s1 = Standard(molecule=m1, inventory_id="0")
         s1.save()
         # create some xics
         x1 = Xic(mz=60.993, dataset=d1)

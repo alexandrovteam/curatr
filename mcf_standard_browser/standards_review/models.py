@@ -154,7 +154,7 @@ class Molecule(models.Model):
 
 
 class Standard(models.Model):
-    MCFID = models.IntegerField(null=True, blank=True)
+    inventory_id = models.IntegerField(null=True, blank=True, db_column='MCFID')
     molecule = models.ForeignKey(Molecule)
     vendor = models.TextField(null=True, blank=True)
     vendor_cat = models.TextField(null=True, blank=True)
@@ -163,7 +163,7 @@ class Standard(models.Model):
     purchase_date = models.DateField(null=True, blank=True)
 
     def __unicode__(self):
-        return "{}: {}".format(self.MCFID, self.molecule.name)
+        return "{}: {}".format(self.inventory_id, self.molecule.name)
 
 
 class LcInfo(models.Model):

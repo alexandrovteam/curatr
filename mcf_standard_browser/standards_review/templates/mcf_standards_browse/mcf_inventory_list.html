@@ -22,8 +22,8 @@
                 <tbody>
                 {% for standard, adduct_mzs in standards %}
                     <tr>
-                        <td><a href="{% url 'standard-detail' mcfid=standard.MCFID %}" id="Inventory ID">
-                            {{ standard.MCFID|add:"0"|stringformat:"04d" }} </a> </td>
+                        <td><a href="{% url 'standard-detail' mcfid=standard.inventory_id %}" id="Inventory ID">
+                            {{ standard.inventory_id|add:"0"|stringformat:"04d" }} </a> </td>
                         <td>{{ standard.molecule}} </td>
                         <td>{{ standard.molecule.sum_formula }} </td>
                         <td>{{ standard.molecule.exact_mass }} </td>

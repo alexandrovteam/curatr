@@ -29,7 +29,7 @@
                 <td>{{ item.0 }} {% autoescape off %}{{ item.1.html_str }}{% endautoescape%} </td>
                 <td>{{ item.2 }}</td>
                 <td>{{ item.3 }}</td>
-                <td><a href="{% url 'xic-detail' dataset_pk=dataset.pk mcfid=item.0.MCFID adduct_pk=item.1.pk%}">
+                <td><a href="{% url 'xic-detail' dataset_pk=dataset.pk mcfid=item.0.inventory_id adduct_pk=item.1.pk%}">
                     View</a></td>
             </tr>
         {% endfor %}

@@ -62,7 +62,7 @@ class MoleculeTable(tables.Table):
 
 
 class StandardTable(tables.Table):
-    id = tables.LinkColumn(accessor='MCFID', verbose_name='Inventory ID', args=[tables.A('MCFID')],
+    id = tables.LinkColumn(accessor='inventory_id', verbose_name='Inventory ID', args=[tables.A('inventory_id')],
                            viewname='standard-detail')
     molecule_name = tables.Column(accessor='molecule.name', verbose_name='Name')
     molecular_formula = tables.Column(accessor='molecule.sum_formula', verbose_name='Formula')
@@ -76,7 +76,7 @@ class StandardTable(tables.Table):
 
 
 class SpectraTable(Table):
-    mcfid = Column(field='standard.MCFID', header='Inventory ID')
+    inventory_id = Column(field='standard.inventory_id', header='Inventory ID')
     molecule = Column(field='standard.molecule.name', header='Molecule')
     precursor_mz = Column(field='precursor_mz', header='Precursor m/z')
     adduct = AdductColumn(field='adduct.delta_formula', header='Adduct')

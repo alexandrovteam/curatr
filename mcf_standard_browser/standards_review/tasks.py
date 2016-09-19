@@ -93,7 +93,7 @@ def add_batch_standard(metadata, csv_file):
                 molecule.save()
                 logging.info("Successfully saved " + molecule.name)
 
-            s = Standard.objects.all().filter(MCFID=entry['id'])
+            s = Standard.objects.all().filter(inventory_id=entry['id'])
             if s.exists():  # standard already added, overwrite
                 s = s[0]
             else:
@@ -106,9 +106,9 @@ def add_batch_standard(metadata, csv_file):
                 s.purchase_date = dateutil.parser.parse(entry["purchase_date"], fuzzy=True)
             s.save()
             if entry["id"] == []:
-                s.MCFID = s.pk
+                s.inventory_id = s.pk
             else:
-                s.MCFID = entry['id']
+                s.inventory_id = entry['id']
             s.save()
         except:
             error_list.append([entry['name'], sys.exc_info()[1]])

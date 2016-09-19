@@ -3,7 +3,7 @@
   {% with mz_ii_pairs.0 as first_pair%}
   {% with mz_ii_pairs|last as last_pair%}
   {
-      "spectrumId": "{{spectrum.standard.MCFID}}",
+      "spectrumId": "{{spectrum.standard.inventory_id}}",
       "mzStart": {{first_pair.0}},
       "mzStop": {{last_pair.0}},
       "peaks": [{% for mz_ii in mz_ii_pairs%}

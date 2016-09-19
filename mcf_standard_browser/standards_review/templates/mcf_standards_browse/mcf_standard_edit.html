@@ -25,9 +25,9 @@
         $(document).ready(function () {
             document.getElementById("click_button").onclick = function() {
                 var e = document.getElementById("id_molecule");
-                var mcfid = e.options[e.selectedIndex].value;
+                var inventory_id = e.options[e.selectedIndex].value;
                 var base_url = '/molecule/edit/';
-                window.open(base_url.concat(mcfid), '_top');
+                window.open(base_url.concat(inventory_id), '_top');
                 return false;
             };
         });

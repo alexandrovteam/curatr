@@ -23,7 +23,7 @@ class MoleculeForm(forms.ModelForm):
 class StandardForm(forms.ModelForm):
     class Meta:
         model = Standard
-        fields = ('MCFID','molecule','vendor','vendor_cat','lot_num' ,'location' ,'purchase_date')
+        fields = ('inventory_id','molecule','vendor','vendor_cat','lot_num' ,'location' ,'purchase_date')
         help_texts = {
             'molecule': mark_safe('Molecule not in the list? <a href="/molecule/add/"> add it </a>')
             }
@@ -42,7 +42,7 @@ class StandardBatchForm(forms.Form):
 class UploadFileForm(forms.Form):
     mzml_file = forms.FileField(validators=[mzml_filename_validator])
     adducts = forms.ModelMultipleChoiceField(queryset=Adduct.objects.all())
-    standards = forms.ModelMultipleChoiceField(queryset=Standard.objects.all().order_by('MCFID'))
+    standards = forms.ModelMultipleChoiceField(queryset=Standard.objects.all().order_by('inventory_id'))
     mass_accuracy_ppm = forms.FloatField(min_value=0.000001, label="MS1 mass accuracy (ppm)")
     quad_window_mz = forms.FloatField(min_value=0.000001, label='Precursor Window (m/z)')
     lc_info = forms.CharField(label="LC Info")
