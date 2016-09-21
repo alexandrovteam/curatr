@@ -29,6 +29,13 @@ class StandardForm(forms.ModelForm):
             }
 
 
+class StandardAddForm(forms.ModelForm):
+    class Meta:
+        model = Standard
+        fields = ('molecule', 'vendor', 'vendor_cat', 'lot_num', 'location', 'purchase_date')
+        help_texts = {'molecule': mark_safe('Molecule not in the list? <a href="/molecule/add/"> add it </a>')}
+
+
 class AdductForm(forms.ModelForm):
     class Meta:
         model = Adduct

@@ -36,8 +36,28 @@ class StandardModelTest(TestCase):
             purchase_date=datetime.datetime.now(),
         )
         s1.save()
+        self.assertEqual(s1.inventory_id, 0)
         self.assertEqual(Standard.objects.all().count(), 1)
         self.assertAlmostEqual(s1.molecule.exact_mass, 62.00039, places=4)
+
+    def test_add_standard_generates_inventory_id(self):
+        m1 = Molecule(name='test', sum_formula="C1H2O3")
+        m1.save()
+        s1 = Standard.objects.create(
+            molecule=m1,
+            vendor="sigma",
+            vendor_cat="sig0001",
+            lot_num="#123456",
+            location="fridge",
+            purchase_date=datetime.datetime.now(),
+        )
+        self.assertEqual(Standard.objects.all().count(), 1)
+        self.assertEqual(s1.inventory_id, 1)
+        s2 = Standard.objects.create(molecule=m1)
+        self.assertEqual(Standard.objects.all().count(), 2)
+        self.assertEqual(s2.inventory_id, 2)
+        self.assertAlmostEqual(s1.molecule.exact_mass, 62.00039, places=4)
+        self.assertAlmostEqual(s2.molecule.exact_mass, 62.00039, places=4)
 
     def test_get_mz(self):
         m1 = Molecule(name='test', sum_formula="C1H2O3")

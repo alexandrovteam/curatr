@@ -24,7 +24,7 @@ from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecu
     LcInfo, MsInfo
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
-    StandardBatchForm, ExportLibrary, MoleculeTagForm
+    StandardBatchForm, ExportLibrary, MoleculeTagForm, StandardAddForm
 
 
 # Create your views here.
@@ -158,13 +158,13 @@ def molecule_detail(request, pk):
 @login_required()
 def standard_add(request):
     if request.method == "POST":
-        form = StandardForm(request.POST)
+        form = StandardAddForm(request.POST)
         if form.is_valid():
             standard = form.save()
             standard.save()
             return redirect('standard-list')
     else:
-        form = StandardForm()
+        form = StandardAddForm()
     return render(request, 'mcf_standards_browse/mcf_standard_add.html', {'form': form, 'form_type': 'single'})
 
 

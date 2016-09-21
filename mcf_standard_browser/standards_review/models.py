@@ -3,6 +3,8 @@ import base64
 import datetime
 import json
 import logging
+
+from django.db.models import Max
 from django.utils import safestring
 import numpy as np
 import re
@@ -154,13 +156,22 @@ class Molecule(models.Model):
 
 
 class Standard(models.Model):
-    inventory_id = models.IntegerField(null=True, blank=True, db_column='MCFID')
+    inventory_id = models.IntegerField(db_column='MCFID', unique=True)
     molecule = models.ForeignKey(Molecule)
     vendor = models.TextField(null=True, blank=True)
     vendor_cat = models.TextField(null=True, blank=True)
     lot_num = models.TextField(null=True, blank=True)
     location = models.TextField(null=True, blank=True)
     purchase_date = models.DateField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.inventory_id is None:
+            standards = Standard.objects.all()
+            max_ = standards.aggregate(Max('inventory_id'))['inventory_id__max']
+            if max_ is None:  # if there are no standards
+                max_ = 0
+            self.inventory_id = max_ + 1
+        super(Standard, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return "{}: {}".format(self.inventory_id, self.molecule.name)
