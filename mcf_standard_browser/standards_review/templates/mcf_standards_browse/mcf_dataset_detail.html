@@ -55,11 +55,19 @@
             <div class="row">
                 <div class="col-md-4">
                     <h3>LC Info:</h3>
-                    <p>{{ dataset.lc_info}}</p>
+                    <p>
+                    {% for info in dataset.lc_info.all %}
+                    {{ info }}
+                    {% endfor %}
+                    </p>
                 </div>
                 <div class="col-md-4">
                     <h3>MS Info:</h3>
-                    <p>{{ dataset.ms_info}}</p>
+                    <p>
+                    {% for info in dataset.ms_info.all %}
+                    {{ info }}
+                    {% endfor %}
+                    </p>
                 </div>
             </div>
         </div>
