@@ -8,7 +8,7 @@ import pymzml
 from celery import shared_task
 
 from tools import DatabaseLogHandler
-from models import Adduct, Dataset, FragmentationSpectrum, Xic, LcInfo, MsInfo
+from models import Adduct, Dataset, FragmentationSpectrum, Xic, LcInfo, MsInfo, InstrumentInfo
 from models import Molecule, Standard
 
 
@@ -147,28 +147,26 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
     try:
         lc_info = metadata['lc_info']
         ms_info = metadata['ms_info']
+        instrument_info = metadata['instrument_info']
     except LookupError:
         logger.debug('no instrument information supplied; using empty string instead')
-        lc_info = ms_info = ''
+        lc_info = ms_info = instrument_info = ''
 
     lc_info_stripped = set()
     ms_info_stripped = set()
-    for lc in lc_info.split(', '):
-        if lc:
-            lc_stripped = lc.replace(',', '').strip()
-            lc_info_stripped.add(lc_stripped)
-    for ms in ms_info.split(', '):
-        if ms:
-            ms_stripped = ms.replace(',', '').strip()
-            ms_info_stripped.add(ms_stripped)
-    for lc in lc_info_stripped:
-        lc_obj = LcInfo.objects.get_or_create(content=lc)[0]
-        if lc_obj not in d.lc_info.all():
-            d.lc_info.add(lc_obj)
-    for ms in ms_info_stripped:
-        ms_obj = MsInfo.objects.get_or_create(content=ms)[0]
-        if ms_obj not in d.ms_info.all():
-            d.ms_info.add(ms_obj)
+    instr_info_stripped = set()
+    tag_sets = (lc_info_stripped, ms_info_stripped, instr_info_stripped)
+    for tag_str, tag_set in zip([lc_info, ms_info, instrument_info], tag_sets):
+        for tag in tag_str.split(', '):
+            if tag:
+                tag_stripped = tag.replace(',', '').strip()
+                tag_set.add(tag_stripped)
+    for tag_set, TagClass, attrname in zip(tag_sets, [LcInfo, MsInfo, InstrumentInfo],
+                                           ['lc_info', 'ms_info', 'instrument_info']):
+        for tag in tag_set:
+            tag_obj = TagClass.objects.get_or_create(content=tag)[0]
+            if tag_obj not in getattr(d, attrname).all():
+                getattr(d, attrname).add(tag_obj)
 
     d.mass_accuracy_ppm = ppm
     d.save()

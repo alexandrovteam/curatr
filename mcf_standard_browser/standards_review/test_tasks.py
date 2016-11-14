@@ -4,7 +4,7 @@ from django.conf import settings
 from django.test import TestCase
 from os.path import join
 
-from models import Molecule, Standard, Dataset, Adduct, LcInfo, MsInfo
+from models import Molecule, Standard, Dataset, Adduct, LcInfo, MsInfo, InstrumentInfo
 from tasks import add_batch_standard, handle_uploaded_files
 
 
@@ -48,12 +48,16 @@ class DatasetUploadTest(TestCase):
                     'standards': [x[0] for x in Standard.objects.filter(molecule__name='SUCROSE').values_list("pk")],
                     'adducts': [x[0] for x in Adduct.objects.all().values_list("pk")],
                     'lc_info': "LC1",
-                    'ms_info': "MS1, MS1"}
+                    'ms_info': "MS1, MS1",
+                    'instrument_info': "foo_instr, abc, foo_instr"}
         handle_uploaded_files(metadata, self.mzml_filepath, self.d1)
         self.assertGreater(self.d1.fragmentationspectrum_set.count(), 0)
         self.assertEqual(LcInfo.objects.count(), 1)
         self.assertEqual(MsInfo.objects.count(), 1)
+        self.assertEqual(InstrumentInfo.objects.count(), 2)
         self.assertEqual(self.d1.lc_info.count(), 1)
         self.assertEqual(self.d1.ms_info.count(), 1)
         self.assertEqual(self.lc1, self.d1.lc_info.get())
         self.assertEqual(self.d1.ms_info.get().content, 'MS1')
+        instr_infos = [i.content for i in self.d1.instrument_info.all()]
+        self.assertItemsEqual(instr_infos, ('foo_instr', 'abc'))

@@ -185,6 +185,10 @@ class MsInfo(models.Model):
     content = models.TextField()
 
 
+class InstrumentInfo(models.Model):
+    content = models.TextField()
+
+
 class Dataset(models.Model):
     processing_finished = models.BooleanField(default=False)
     name = models.TextField(default="")
@@ -195,6 +199,7 @@ class Dataset(models.Model):
     quad_window_mz = models.FloatField(default=1.0)
     lc_info = models.ManyToManyField(to=LcInfo)
     ms_info = models.ManyToManyField(to=MsInfo)
+    instrument_info = models.ManyToManyField(to=InstrumentInfo)
 
     # (for xic search)
     def __unicode__(self):

@@ -21,7 +21,7 @@ from django_tables2 import RequestConfig
 import tasks
 import tools
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag, \
-    LcInfo, MsInfo
+    LcInfo, MsInfo, InstrumentInfo
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
     StandardBatchForm, ExportLibrary, MoleculeTagForm, StandardAddForm
@@ -478,7 +478,8 @@ def dataset_upload(request):
                     "mass_accuracy_ppm": post_dict['mass_accuracy_ppm'][0],
                     "quad_window_mz": post_dict['quad_window_mz'][0],
                     "lc_info": post_dict['lc_info'][0],
-                    "ms_info": post_dict['ms_info'][0]}
+                    "ms_info": post_dict['ms_info'][0],
+                    "instrument_info": post_dict['instrument_info'][0]}
             uploaded_file = request.FILES['mzml_file']
             base_name, extension = os.path.splitext(uploaded_file.name)
             d = Dataset(name=uploaded_file.name, processing_finished=False)
@@ -499,6 +500,7 @@ def dataset_upload(request):
     autocomplete = {
         'lc_info': [str(info.content) for info in LcInfo.objects.all()],
         'ms_info': [str(info.content) for info in MsInfo.objects.all()],
+        'instrument_info': [str(info.content) for info in InstrumentInfo.objects.all()],
     }
     return render(request, 'mcf_standards_browse/dataset_upload.html', {'form': form, 'autocomplete': autocomplete})
 

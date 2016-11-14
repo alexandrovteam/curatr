@@ -69,6 +69,14 @@
                     {% endfor %}
                     </p>
                 </div>
+                <div class="col-md-4">
+                    <h3>Instrument Info:</h3>
+                    <p>
+                    {% for info in dataset.instrument_info.all %}
+                    {{ info }}
+                    {% endfor %}
+                    </p>
+                </div>
             </div>
         </div>
         <div class="col-md-6">
