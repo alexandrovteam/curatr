@@ -1,0 +1,27 @@
+{% for k, v in mb_record.general_info %}
+{{ k }}: {{ v }}
+{% endfor %} {% for k, v in mb_record.compound_info %}
+CH${{ k }}: {{ v }}
+{% endfor %} {% for k, v in mb_record.compound_links %}
+CH$LINK: {{ k }} {{ v }}
+{% endfor %} {% for k, v in mb_record.biological_info %}
+SP${{ k }}: {{ v }}
+{% endfor %} {% for k, v in mb_record.biological_links %}
+SP$LINK: {{ k }} {{ v }}
+{% endfor %} {% for k, v in mb_record.analytical_info %}
+AC${{ k }}: {{ v }}
+{% endfor %} {% for k, v in mb_record.ms_info %}
+AC$MASS_SPECTROMETRY: {{ k }} {{ v }}
+{% endfor %} {% for k, v in mb_record.chromatography_info %}
+AC$CHROMATOGRAPHY: {{ k }} {{ v }}
+{% endfor %} {% for k, v in mb_record.focused_ion %}
+MS$FOCUSED_ION: {{ k }} {{ v }}
+{% endfor %} {% for k, v in mb_record.data_processing %}
+MS$DATA_PROCESSING: {{ k }} {{ v }}
+{% endfor %} {% for k, v in mb_record.peak_info %}
+PK${{ k }}: {{ v }}
+{% endfor %}
+PK$PEAK: m/z int. rel.int.
+{% for mz, int, relint in mb_record.peak_list %}
+  {{ mz }} {{ int }} {{ relint }}
+{% endfor %}
