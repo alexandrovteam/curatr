@@ -33,8 +33,8 @@ MS$FOCUSED_ION: PRECURSOR_TYPE {{ spectrum.adduct }}
 PK$SPLASH: {{ spectrum.splash }}
 PK$NUM_PEAK: 13
 PK$PEAK: m/z int. rel.int.
-{% for mz_ii in spec_data.1%}
-        {{mz_ii.0}}, {{mz_ii.1}} {{mz_ii.2}}{% endfor %}
+{% for mz_ii in spec_data.1%}    {{mz_ii.0}}, {{mz_ii.1}} {{mz_ii.2}}
+{% endfor %}
 //
 {% endwith %}
 {% endwith %}

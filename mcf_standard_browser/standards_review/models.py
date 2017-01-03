@@ -157,10 +157,8 @@ class Molecule(models.Model):
     @property
     def smiles(self):
         import pybel
-        logging.debug(pybel.__version__)
-        #import pubchempy
-        #c = pubchempy.Compound.from_cid(self.pubchem_id)
-        #return c.canonical_smiles
+        return pybel.readstring('inchi', self.inchi_code).writestring('smi')
+
 
 class Standard(models.Model):
     inventory_id = models.IntegerField(db_column='MCFID', unique=True)
