@@ -154,6 +154,13 @@ class Molecule(models.Model):
     def spectra_count(self):
         return FragmentationSpectrum.objects.all().filter(standard__molecule=self).count()
 
+    @property
+    def smiles(self):
+        import pybel
+        logging.debug(pybel.__version__)
+        #import pubchempy
+        #c = pubchempy.Compound.from_cid(self.pubchem_id)
+        #return c.canonical_smiles
 
 class Standard(models.Model):
     inventory_id = models.IntegerField(db_column='MCFID', unique=True)
@@ -298,6 +305,11 @@ class FragmentationSpectrum(models.Model):
             self.date_added = datetime.datetime.now()
         self.date_edited = datetime.datetime.now()
         super(FragmentationSpectrum, self).save(*args, **kwargs)
+
+    @property
+    def base_peak(self):
+        spec = self.get_centroids()
+        return spec[0][np.argmax(spec[1])]
 
 
 class MoleculeSpectraCount(models.Model):
