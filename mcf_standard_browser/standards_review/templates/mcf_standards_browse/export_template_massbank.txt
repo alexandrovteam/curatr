@@ -11,25 +11,25 @@ CH$FORMULA: {{ spectrum.standard.molecule.sum_formula }}
 CH$EXACT_MASS: {{ spectrum.standard.molecule.exact_mass}}
 CH$SMILES: {{ spectrum.standard.molecule.smiles }}
 CH$LINK: PUBCHEM CID: {{ spectrum.standard.molecule.pubchem_id }}
-AC$INSTRUMENT:
+AC$INSTRUMENT: {{ spectrum.dataset.instrument_info }}
 AC$INSTRUMENT_TYPE:
 AC$MASS_SPECTROMETRY: MS_TYPE MS2
-AC$MASS_SPECTROMETRY: ION_MODE
-AC$MASS_SPECTROMETRY: COLLISION_ENERGY
+AC$MASS_SPECTROMETRY: ION_MODE {{ info.ion_mode }}
+AC$MASS_SPECTROMETRY: COLLISION_ENERGY {{ spectrum.collision_energy }}
 AC$MASS_SPECTROMETRY: COLLISION_GAS
 {% with spec_data.1.0 as first_pair%}{% with spec_data.1|last as last_pair%}AC$MASS_SPECTROMETRY: SCANNING m/z {{ first_pair.0 }}-{{last_pair.0}}{% endwith %}{% endwith %}
 AC$CHROMATOGRAPHY: COLUMN_NAME Agilent C8 Cartridge Column 2.1X30mm 3.5 micron (guard); Agilent SB-Aq 2.1x50mm 1.8 micron (analytical)
 AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE
 AC$CHROMATOGRAPHY: FLOW_GRADIENT
 AC$CHROMATOGRAPHY: FLOW_RATE
-AC$CHROMATOGRAPHY: RETENTION_TIME {{ spec_data.spectrum.rt }}
+AC$CHROMATOGRAPHY: RETENTION_TIME {{ spectrum.rt }}
 AC$CHROMATOGRAPHY: SOLVENT A
 AC$CHROMATOGRAPHY: SOLVENT B
 MS$FOCUSED_ION: BASE_PEAK {{ spectrum.base_peak }}
 MS$FOCUSED_ION: PRECURSOR_M/Z {{ spectrum.precursor_mz }}
 MS$FOCUSED_ION: PRECURSOR_TYPE {{ spectrum.adduct }}
 PK$SPLASH: {{ spectrum.splash }}
-PK$NUM_PEAK: 13
+PK$NUM_PEAK: {{ num_peak }}
 PK$PEAK: m/z int. rel.int.
 {% for mz_ii in peak_list %}    {{mz_ii.0}} {{mz_ii.1}} {{mz_ii.2}}
 {% endfor %}
