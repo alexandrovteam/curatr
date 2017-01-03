@@ -1,6 +1,4 @@
 {% spaceless %}
-{% with spec_data.0 as spectrum %}
-{% with spec_data.3 as info %}
 ACCESSION: {{spectrum.standard}}
 RECORD_TITLE: {{ info.record_title }} (+)-Bicuculline; LC-ESI-QTOF; MS2; CE 10 ev; [M+H]+
 DATE: {{ info.date}}
@@ -33,10 +31,7 @@ MS$FOCUSED_ION: PRECURSOR_TYPE {{ spectrum.adduct }}
 PK$SPLASH: {{ spectrum.splash }}
 PK$NUM_PEAK: 13
 PK$PEAK: m/z int. rel.int.
-{% for mz_ii in spec_data.1%}    {{mz_ii.0}}, {{mz_ii.1}} {{mz_ii.2}}
+{% for mz_ii in peak_list %}    {{mz_ii.0}} {{mz_ii.1}} {{mz_ii.2}}
 {% endfor %}
 //
-{% endwith %}
-{% endwith %}
-
 {% endspaceless %}
