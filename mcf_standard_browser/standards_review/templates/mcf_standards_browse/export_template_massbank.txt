@@ -1,7 +1,7 @@
 {% spaceless %}
 ACCESSION: {{spectrum.standard}}
-DATE: {{ info.date }}
 RECORD_TITLE: {{ spectrum.standard.molecule.name }}; LC-{{ spectrum.dataset.ionization_method }}-{{ spectrum.dataset.ion_analyzer }}; MS2
+DATE: {% now "SHORT_DATETIME_FORMAT" %}
 AUTHORS: {{ info.institute }}
 LICENSE: CC BY-SA
 COMMENT: exported from curatr
