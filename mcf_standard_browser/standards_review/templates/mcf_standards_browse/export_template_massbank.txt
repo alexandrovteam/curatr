@@ -1,30 +1,30 @@
 {% spaceless %}
 ACCESSION: {{spectrum.standard}}
-RECORD_TITLE: {{ info.record_title }} (+)-Bicuculline; LC-ESI-QTOF; MS2; CE 10 ev; [M+H]+
-DATE: {{ info.date}}
+RECORD_TITLE: {{ spectrum.standard.molecule.name }}; LC-{{ info.ionization_method }}-{{ info.ion_analyzer }}; MS2
+DATE: {{ info.date }}
 AUTHORS: {{ info.institute }}
 LICENSE: CC BY-SA
 COMMENT: exported from curatr
-CH$NAME: {{ spectrum.standard.name }}
-CH$COMPOUND_CLASS:
+CH$NAME: {{ spectrum.standard.molecule.name }}
+CH$COMPOUND_CLASS: {% if spectrum.standard.molecule.natural_product %}Natural Product;{% else %}Non-Natural Product;{% endif %}
 CH$FORMULA: {{ spectrum.standard.molecule.sum_formula }}
 CH$EXACT_MASS: {{ spectrum.standard.molecule.exact_mass}}
 CH$SMILES: {{ spectrum.standard.molecule.smiles }}
 CH$LINK: PUBCHEM CID: {{ spectrum.standard.molecule.pubchem_id }}
 AC$INSTRUMENT: {{ spectrum.dataset.instrument_info }}
-AC$INSTRUMENT_TYPE:
+AC$INSTRUMENT_TYPE: LC-{{ info.ionization_method }}-{{ info.ion_analyzer }}
 AC$MASS_SPECTROMETRY: MS_TYPE MS2
 AC$MASS_SPECTROMETRY: ION_MODE {{ info.ion_mode }}
 AC$MASS_SPECTROMETRY: COLLISION_ENERGY {{ spectrum.collision_energy }}
-AC$MASS_SPECTROMETRY: COLLISION_GAS
+AC$MASS_SPECTROMETRY: COLLISION_GAS ??  {# This is not needed #}
 {% with spec_data.1.0 as first_pair%}{% with spec_data.1|last as last_pair%}AC$MASS_SPECTROMETRY: SCANNING m/z {{ first_pair.0 }}-{{last_pair.0}}{% endwith %}{% endwith %}
-AC$CHROMATOGRAPHY: COLUMN_NAME Agilent C8 Cartridge Column 2.1X30mm 3.5 micron (guard); Agilent SB-Aq 2.1x50mm 1.8 micron (analytical)
-AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE
-AC$CHROMATOGRAPHY: FLOW_GRADIENT
-AC$CHROMATOGRAPHY: FLOW_RATE
+AC$CHROMATOGRAPHY: COLUMN_NAME ??  {# This is not needed #}
+AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE ??  {# This is not needed #}
+AC$CHROMATOGRAPHY: FLOW_GRADIENT ??  {# This is not needed #}
+AC$CHROMATOGRAPHY: FLOW_RATE ??  {# This is not needed #}
 AC$CHROMATOGRAPHY: RETENTION_TIME {{ spectrum.rt }}
-AC$CHROMATOGRAPHY: SOLVENT A
-AC$CHROMATOGRAPHY: SOLVENT B
+AC$CHROMATOGRAPHY: SOLVENT A ??  {# This is not needed #}
+AC$CHROMATOGRAPHY: SOLVENT B ??  {# This is not needed #}
 MS$FOCUSED_ION: BASE_PEAK {{ spectrum.base_peak }}
 MS$FOCUSED_ION: PRECURSOR_M/Z {{ spectrum.precursor_mz }}
 MS$FOCUSED_ION: PRECURSOR_TYPE {{ spectrum.adduct }}

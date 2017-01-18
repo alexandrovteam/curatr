@@ -16,7 +16,7 @@ class MoleculeForm(forms.ModelForm):
     class Meta:
         model = Molecule
         fields = ('name', 'sum_formula', 'lipidmaps_id', 'pubchem_id', 'cas_id', 'chebi_id', 'hmdb_id', 'inchi_code',
-                  'solubility', 'tags')
+                  'solubility', 'tags', 'natural_product')
         widgets = {'tags': forms.widgets.CheckboxSelectMultiple}
 
 
