@@ -1,7 +1,7 @@
 {% spaceless %}
 ACCESSION: {{spectrum.standard}}
-RECORD_TITLE: {{ spectrum.standard.molecule.name }}; LC-{{ info.ionization_method }}-{{ info.ion_analyzer }}; MS2
 DATE: {{ info.date }}
+RECORD_TITLE: {{ spectrum.standard.molecule.name }}; LC-{{ spectrum.dataset.ionization_method }}-{{ spectrum.dataset.ion_analyzer }}; MS2
 AUTHORS: {{ info.institute }}
 LICENSE: CC BY-SA
 COMMENT: exported from curatr
@@ -12,7 +12,7 @@ CH$EXACT_MASS: {{ spectrum.standard.molecule.exact_mass}}
 CH$SMILES: {{ spectrum.standard.molecule.smiles }}
 CH$LINK: PUBCHEM CID: {{ spectrum.standard.molecule.pubchem_id }}
 AC$INSTRUMENT: {{ spectrum.dataset.instrument_info }}
-AC$INSTRUMENT_TYPE: LC-{{ info.ionization_method }}-{{ info.ion_analyzer }}
+AC$INSTRUMENT_TYPE: LC-{{ spectrum.dataset.ionization_method }}-{{ spectrum.dataset.ion_analyzer }}
 AC$MASS_SPECTROMETRY: MS_TYPE MS2
 AC$MASS_SPECTROMETRY: ION_MODE {{ info.ion_mode }}
 AC$MASS_SPECTROMETRY: COLLISION_ENERGY {{ spectrum.collision_energy }}
