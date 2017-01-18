@@ -16,15 +16,7 @@ AC$INSTRUMENT_TYPE: LC-{{ spectrum.dataset.ionization_method }}-{{ spectrum.data
 AC$MASS_SPECTROMETRY: MS_TYPE MS2
 AC$MASS_SPECTROMETRY: ION_MODE {{ info.ion_mode }}
 AC$MASS_SPECTROMETRY: COLLISION_ENERGY {{ spectrum.collision_energy }}
-AC$MASS_SPECTROMETRY: COLLISION_GAS ??  {# This is not needed #}
-{% with spec_data.1.0 as first_pair%}{% with spec_data.1|last as last_pair%}AC$MASS_SPECTROMETRY: SCANNING m/z {{ first_pair.0 }}-{{last_pair.0}}{% endwith %}{% endwith %}
-AC$CHROMATOGRAPHY: COLUMN_NAME ??  {# This is not needed #}
-AC$CHROMATOGRAPHY: COLUMN_TEMPERATURE ??  {# This is not needed #}
-AC$CHROMATOGRAPHY: FLOW_GRADIENT ??  {# This is not needed #}
-AC$CHROMATOGRAPHY: FLOW_RATE ??  {# This is not needed #}
 AC$CHROMATOGRAPHY: RETENTION_TIME {{ spectrum.rt }}
-AC$CHROMATOGRAPHY: SOLVENT A ??  {# This is not needed #}
-AC$CHROMATOGRAPHY: SOLVENT B ??  {# This is not needed #}
 MS$FOCUSED_ION: BASE_PEAK {{ spectrum.base_peak }}
 MS$FOCUSED_ION: PRECURSOR_M/Z {{ spectrum.precursor_mz }}
 MS$FOCUSED_ION: PRECURSOR_TYPE {{ spectrum.adduct }}
