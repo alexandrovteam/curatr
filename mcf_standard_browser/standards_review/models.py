@@ -3,6 +3,7 @@ import base64
 import datetime
 import json
 import logging
+from urllib2 import Request, urlopen
 
 from django.db.models import Max
 from django.utils import safestring
@@ -311,6 +312,16 @@ class FragmentationSpectrum(models.Model):
     def base_peak(self):
         spec = self.get_centroids()
         return spec[0][np.argmax(spec[1])]
+
+    @property
+    def splash(self):
+        splash_payload = json.dumps({
+            "ions": [{"mass": mz, "intensity": int_} for mz, int_ in zip(self.centroid_mzs, self.centroid_ints)],
+            "type": "MS"})
+        url = "http://splash.fiehnlab.ucdavis.edu/splash/it"
+        request = Request(url, data=splash_payload, headers={'Content-Type': "application/json"})
+        response = urlopen(request).read().decode()
+        return response
 
 
 class MoleculeSpectraCount(models.Model):
