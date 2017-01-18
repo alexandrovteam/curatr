@@ -206,6 +206,8 @@ class Dataset(models.Model):
     lc_info = models.ManyToManyField(to=LcInfo)
     ms_info = models.ManyToManyField(to=MsInfo)
     instrument_info = models.ManyToManyField(to=InstrumentInfo)
+    ionization_method = models.TextField(default="")
+    ion_analyzer = models.TextField(default="")
 
     # (for xic search)
     def __unicode__(self):

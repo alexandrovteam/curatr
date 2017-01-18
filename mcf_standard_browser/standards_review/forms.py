@@ -54,7 +54,9 @@ class UploadFileForm(forms.Form):
     quad_window_mz = forms.FloatField(min_value=0.000001, label='Precursor Window (m/z)')
     lc_info = forms.CharField(label="LC Info")
     ms_info = forms.CharField(label="MS Info")
-    instrument_info = forms.CharField(label="Instrument Info")
+    instrument_info = forms.CharField(label="Instrument Info (obsolete)")
+    ionization_method = forms.CharField(label="Ionization Method")
+    ion_analyzer = forms.CharField(label="Ion Analyzer")
 
 
 class FragSpecReview(forms.Form):

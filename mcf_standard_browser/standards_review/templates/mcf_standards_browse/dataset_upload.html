@@ -29,8 +29,12 @@
     $(document).ready(function () {
         var lc_info = document.getElementById("id_lc_info");
         var ms_info = document.getElementById("id_ms_info");
+        var ionization_method = document.getElementById("id_ionization_method");
+        var ion_analyzer = document.getElementById("id_ion_analyzer");
         lc_info.setAttribute('data-multiple', '');
         ms_info.setAttribute('data-multiple', '');
+        ionization_method.setAttribute('data-multiple', '');
+        ion_analyzer.setAttribute('data-multiple', '');
         {% autoescape off %}
         new Awesomplete(lc_info, {
             list: {{ autocomplete.lc_info }},
@@ -53,6 +57,14 @@
                 var before = this.input.value.match(/^.+,\s*|/)[0];
                 this.input.value = before + text + ", ";
             }
+        });
+        new Awesomplete(ionization_method, {
+            list: {{ autocomplete.ionization_method }},
+            minChars: 0
+        });
+        new Awesomplete(ion_analyzer, {
+            list: {{ autocomplete.ion_analyzer }},
+            minChars: 0
         });
         {% endautoescape %}
     });

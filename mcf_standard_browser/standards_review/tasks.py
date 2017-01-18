@@ -125,6 +125,8 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
     msrun = pymzml.run.Reader(mzml_filepath)
     ppm = float(metadata['mass_accuracy_ppm'])
     mz_tol_quad = float(metadata['quad_window_mz'])
+    ionization_method = metadata['ionization_method']
+    ion_analyzer = metadata['ion_analyzer']
     scan_time = []
     standards = Standard.objects.all().filter(pk__in=metadata['standards'])
     adducts = Adduct.objects.all().filter(pk__in=metadata['adducts'])
@@ -168,6 +170,8 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
             if tag_obj not in getattr(d, attrname).all():
                 getattr(d, attrname).add(tag_obj)
 
+    d.ionization_method = ionization_method
+    d.ion_analyzer = ion_analyzer
     d.mass_accuracy_ppm = ppm
     d.save()
     for standard in standards:
