@@ -159,7 +159,11 @@ class Molecule(models.Model):
     @property
     def smiles(self):
         import pybel
-        return pybel.readstring('inchi', self.inchi_code).writestring('smi')
+        try:
+            return pybel.readstring(b'inchi', self.inchi_code.encode('ascii')).write(b'smi').strip()
+        except IOError:
+            logging.error('Could not read InChI code: {}'.format(self.inchi_code))
+            return '??'
 
 
 class Standard(models.Model):
