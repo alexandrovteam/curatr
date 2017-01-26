@@ -2,14 +2,15 @@ import logging
 import sys
 
 import dateutil
-import os
 import pandas as pd
 import pymzml
 from celery import shared_task
+from celery.schedules import crontab
+from celery.task import periodic_task
 
-from tools import DatabaseLogHandler
-from models import Adduct, Dataset, FragmentationSpectrum, Xic, LcInfo, MsInfo, InstrumentInfo
+from models import Adduct, FragmentationSpectrum, Xic, LcInfo, MsInfo, InstrumentInfo
 from models import Molecule, Standard
+from tools import DatabaseLogHandler
 
 
 @shared_task
@@ -50,7 +51,7 @@ def add_batch_standard(metadata, csv_file):
     """
     error_list = []
     df = pd.read_csv(csv_file, sep="\t", dtype=unicode)
-    logging.info( 'I read the file')
+    logging.info('I read the file')
     df.columns = [x.replace(" ", "_").lower() for x in df.columns]
     logging.info("I replaced columns")
     df = df.fillna("")
@@ -252,3 +253,16 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
     logger.debug('done')
     logger.debug("added = True")
     return True
+
+
+@periodic_task(run_every=crontab(minute=0, hour=4))  # every day at 4am
+def scrape_pubchem_for_inchi():
+    from pubchempy import BadRequestError, Compound, NotFoundError
+    for m in Molecule.objects.filter(pubchem_id__isnull=False).order_by('pubchem_id'):
+        if m.pubchem_id:
+            try:
+                c = Compound.from_cid(m.pubchem_id)
+                m.inchi_code = c.inchi
+                m.save()
+            except (BadRequestError, NotFoundError):
+                logging.error('Invalid PubChem CID: {}'.format(m.pubchem_id))
