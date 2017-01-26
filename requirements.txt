@@ -7,7 +7,9 @@ django-static-jquery
 django-settings-export
 django-tables2
 numpy
+openbabel
 pandas
+pubchempy
 pymspec
 pymzml
 python-dateutil
