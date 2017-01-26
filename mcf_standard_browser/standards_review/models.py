@@ -191,13 +191,22 @@ class Standard(models.Model):
 class LcInfo(models.Model):
     content = models.TextField()
 
+    def __unicode__(self):
+        return self.content
+
 
 class MsInfo(models.Model):
     content = models.TextField()
 
+    def __unicode__(self):
+        return self.content
+
 
 class InstrumentInfo(models.Model):
     content = models.TextField()
+
+    def __unicode__(self):
+        return self.content
 
 
 class Dataset(models.Model):
