@@ -1,24 +1,24 @@
+import json
 import logging
+import os
 import time
 import zipfile
 from collections import Counter, defaultdict
 from tempfile import TemporaryFile
-from uuid import uuid4
 
-import json
 import numpy as np
-import os
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import Http404, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
-from django.template import loader, Context
+from django.template import loader
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import CreateView
 from django.views.generic import TemplateView, ListView
-from table.views import FeedDataView
 from django_tables2 import RequestConfig
+from table.views import FeedDataView
+
 import tasks
 import tools
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag, \
@@ -26,7 +26,6 @@ from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecu
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
 from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
     StandardBatchForm, ExportLibrary, MoleculeTagForm, StandardAddForm
-import datetime
 
 
 # Create your views here.
@@ -500,7 +499,8 @@ def dataset_upload(request):
             tasks.handle_uploaded_files.delay(data, mzml_filepath, d)
             return redirect('dataset-list')
     else:
-        form = UploadFileForm(initial={"mass_accuracy_ppm": 10.0, 'quad_window_mz': 1.0})
+        form = UploadFileForm(initial={"mass_accuracy_ppm": 10.0, 'quad_window_mz': 1.0, 'ion_analyzer': 'QFT',
+                                       'ionization_method': 'ESI'})
     autocomplete = {
         'lc_info': [str(info.content) for info in LcInfo.objects.all()],
         'ms_info': [str(info.content) for info in MsInfo.objects.all()],
@@ -509,7 +509,7 @@ def dataset_upload(request):
             list(set(Dataset.objects.values_list('ionization_method', flat=True).distinct()).union(
                 ['APCI', 'APPI', 'EI', 'ESI', 'FAB', 'MALDI']))),
         'ion_analyzer': json.dumps(list(set(Dataset.objects.values_list('ion_analyzer', flat=True).distinct()).union(
-            ['B', 'E', 'FT', 'IT', 'Q', 'TOF', 'EB', 'QQ', 'ITFT', 'QTOF'])))
+            tools.sum_of_2_perms(['B', 'E', 'FT', 'IT', 'Q', 'TOF']))))
     }
     return render(request, 'mcf_standards_browse/dataset_upload.html', {'form': form, 'autocomplete': autocomplete})
 
@@ -546,6 +546,7 @@ def fragmentSpectrum_export(request):
                 spectra = spectra.exclude(adduct__charge__gte=0)
             data_format_id = int(post_dict['data_format'][0])
             spec_pairs = [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints, 1000/(np.max(spectrum.centroid_ints))*spectrum.centroid_ints)] for spectrum in spectra]
+            c = {'spec_data': spec_pairs}
             if data_format_id == 0:  # mgf
                 content_type = "text/txt"
                 response = HttpResponse(content_type=content_type)
@@ -629,7 +630,7 @@ def fragmentSpectrum_export(request):
                 zf_n.seek(0)
                 response = FileResponse(zf_n, content_type="application/zip")
                 response['Content-Disposition'] = 'attachment; filename="mcf_spectra.zip"'
-                return response
+            return response
     else:
         form = ExportLibrary()
     return render(request, 'mcf_standards_browse/export_library.html', {'form': form})

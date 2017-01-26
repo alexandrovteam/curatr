@@ -1,3 +1,5 @@
+import itertools
+
 __author__ = 'palmer'
 import logging
 
@@ -51,3 +53,7 @@ class DatabaseLogHandler(logging.Handler):
     def emit(self, record):
         err = ProcessingError(dataset=self.dataset, message=record.getMessage())
         err.save()
+
+
+def sum_of_2_perms(vals):
+    return list(itertools.chain(iter(vals), map(''.join, itertools.product(vals, repeat=2))))
