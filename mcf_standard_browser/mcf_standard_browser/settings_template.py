@@ -159,7 +159,7 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 CELERYD_CONCURRENCY = 1
 
-INSTITUTE_NAME= '[EMBL - Metabolmoics Core Facility]'
+INSTITUTE_NAME= 'MY INSTITUTE'
 
 SETTINGS_EXPORT = [
     'INSTITUTE_NAME',
