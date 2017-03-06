@@ -9,6 +9,7 @@ It is written in python using the django web framework and is being developed by
 * Django 1.9
 * git 2.6
 * RabbitMQ 3.6
+* OpenBabel ```conda install -c clyde_fare openbabel=2.3.2'''
 
 ## Installation ##
 We recommend installing curatr and its python dependencies inside a virtual environment as follows:
@@ -54,6 +55,11 @@ Open `settings.py` and edit the following fields
 python manage.py migrate
 ```
 
+### Create an admin user ##
+```
+python manage.py createsuperuser
+'''
+
 ### Set up a message broker (example: RabbitMQ) ##
 1. [Install RabbitMQ] (https://www.rabbitmq.com/download.html)
 2. (Optional) Configure a user
@@ -78,5 +84,36 @@ python manage.py migrate
 
 Curatr should now be visible on  [localhost:8000](http://localhost:8000)
 
+### Getting Going ###
+We have provided an example molecular library and data in the [media](https://github.com/alexandrovteam/curatr/mcf_standard_browser/media) directory 
+1. Add standards to library
+    * Single
+        1. Add molecule
+            #todo
+        2. Add standard
+            #todo
+    * Batch
+        1. From the "Curate" menu select "Add Standard"
+        2. Click 'Add Batch'
+        3. Select a properly formatted .tsv file containing the standards to add
+            *this method will silently overwrite existing files allowing batch updating*
+        4. The task runs asynchronously so after a few seconds hit refresh
+2. Add adducts.
+    Curate -> Add Adduct
+    [nM+X]^(y)
+    * NM = n (number of metabolite molecules)
+    * Delta formula = X (e.g. "-H2O+H")
+    * Charge = y 
+3. Add data
+    #todo
+4. Curate data
+    #todo
+    
+### Advanced ###
+* Further users can be configured from http://localhost:8000/admin
+
+### Deployment ###
+It is a bad idea to run the django development server in a production environment. It's probably OK to run behind a corporate/university firewall but should not be exposed to the internet. 
+There are excellent detail guides available for various deployment platforms [e.g. from mozilla on deploying to Heroku ](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Deployment)
 ## Licence
 The source code in this repository is distributed under [the Apache 2.0 licence](http://www.apache.org/licenses/LICENSE-2.0).
