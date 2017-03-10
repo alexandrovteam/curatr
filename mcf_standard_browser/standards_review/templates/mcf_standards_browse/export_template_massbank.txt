@@ -1,29 +1,32 @@
 {% spaceless %}
-ACCESSION: {{spectrum.standard}}
-RECORD_TITLE: {{ spectrum.standard.molecule.name }}; LC-{{ spectrum.dataset.ionization_method }}-{{ spectrum.dataset.ion_analyzer }}; MS2
-DATE: {% now "SHORT_DATETIME_FORMAT" %}
-AUTHORS: {{ info.institute }}
-LICENSE: CC BY-SA
-COMMENT: exported from curatr
+ACCESSION: {{ settings.MASSBANK_INSTITUTE_CODE }}{{ spectrum.massbank_accession }}
+RECORD_TITLE: {{ spectrum.standard.molecule.name }}; {% if spectrum.dataset.lc_info.strip %} LC- {% endif %} {{ spectrum.dataset.ionization_method }}-{{ spectrum.dataset.ion_analyzer }}; MS2 {{ spectrum.collision_energy }}
+DATE: {{ spectrum.date_edited|date:"Y.m.d" }} (Uploaded {{ spectrum.date_added|date:"Y.m.d" }})
+AUTHORS: {{ settings.INSTITUTE_NAME }}
+LICENSE: {{ settings.EXPORT_LICENCE }}
+COPYRIGHT: (C) {% now 'Y'%} {{ settings.INSTITUTE_NAME }}
+COMMENT: export powered by curatr (https://github.com/alexandrovteam/curatr)
+COMMENT: {{ info.url }}
 CH$NAME: {{ spectrum.standard.molecule.name }}
-CH$COMPOUND_CLASS: {% if spectrum.standard.molecule.natural_product %}Natural Product;{% else %}Non-Natural Product;{% endif %}
+CH$COMPOUND_CLASS: N/A. Analytical Standard ({{ spectrum.standard.vendor }})
 CH$FORMULA: {{ spectrum.standard.molecule.sum_formula }}
 CH$EXACT_MASS: {{ spectrum.standard.molecule.exact_mass}}
 CH$SMILES: {{ spectrum.standard.molecule.smiles }}
-CH$LINK: PUBCHEM CID: {{ spectrum.standard.molecule.pubchem_id }}
-AC$INSTRUMENT: {{ spectrum.dataset.instrument_info }}
-AC$INSTRUMENT_TYPE: LC-{{ spectrum.dataset.ionization_method }}-{{ spectrum.dataset.ion_analyzer }}
+CH$IUPAC: {{ spectrum.standard.molecule.inchi_code }}
+CH$LINK: PUBCHEM CID:{{ spectrum.standard.molecule.pubchem_id }}
+AC$INSTRUMENT: {% if spectrum.dataset.instrument_info.strip %}{{ spectrum.dataset.instrument_info }}{% else %}Q Exactive Plus{% endif %}
+AC$INSTRUMENT_TYPE: {% if spectrum.dataset.lc_info.strip %}LC-{% endif %}{{ spectrum.dataset.ionization_method }}-{{ spectrum.dataset.ion_analyzer }}
 AC$MASS_SPECTROMETRY: MS_TYPE MS2
 AC$MASS_SPECTROMETRY: ION_MODE {{ info.ion_mode }}
+AC$MASS_SPECTROMETRY: FRAGMENTATION_MODE CID
 AC$MASS_SPECTROMETRY: COLLISION_ENERGY {{ spectrum.collision_energy }}
-AC$CHROMATOGRAPHY: RETENTION_TIME {{ spectrum.rt }}
-MS$FOCUSED_ION: BASE_PEAK {{ spectrum.base_peak }}
-MS$FOCUSED_ION: PRECURSOR_M/Z {{ spectrum.precursor_mz }}
-MS$FOCUSED_ION: PRECURSOR_TYPE {{ spectrum.adduct }}
+AC$CHROMATOGRAPHY: RETENTION_TIME {{ spectrum.rt|floatformat:1 }
+MS$FOCUSED_ION: BASE_PEAK {{ spectrum.base_peak|floatformat:4 }}
+MS$FOCUSED_ION: PRECURSOR_M/Z {{ spectrum.precursor_mz|floatformat:4}}
+MS$FOCUSED_ION: PRECURSOR_TYPE {{ spectrum.adduct.nice_str }}
 PK$SPLASH: {{ spectrum.splash }}
 PK$NUM_PEAK: {{ num_peak }}
 PK$PEAK: m/z int. rel.int.
-{% for mz_ii in peak_list %}    {{mz_ii.0}} {{mz_ii.1}} {{mz_ii.2}}
+{% for mz_ii in peak_list %}    {{mz_ii.0|floatformat:5}} {{mz_ii.1|floatformat:"0"}} {{mz_ii.2}}
 {% endfor %}
-//
-{% endspaceless %}
+//{% endspaceless %}

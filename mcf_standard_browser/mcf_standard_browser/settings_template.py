@@ -160,8 +160,12 @@ CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 CELERYD_CONCURRENCY = 1
 
 INSTITUTE_NAME= 'MY INSTITUTE'
+MASSBANK_INSTITUTE_CODE = 'DMY' # two or three letter code for massbank export
+EXPORT_LICENCE = "CC BY"
 
 SETTINGS_EXPORT = [
     'INSTITUTE_NAME',
-    'MEDIA_URL'
+    'MASSBANK_INSTITUTE_CODE',
+    'MEDIA_URL',
+    'EXPORT_LICENCE'
 ]

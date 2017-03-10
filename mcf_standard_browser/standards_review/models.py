@@ -222,6 +222,8 @@ class Dataset(models.Model):
     instrument_info = models.ManyToManyField(to=InstrumentInfo)
     ionization_method = models.TextField(default="")
     ion_analyzer = models.TextField(default="")
+    date_added = models.DateTimeField(auto_now_add=True, blank=True)
+    date_modified = models.DateTimeField(auto_now=True, blank=True)
 
     # (for xic search)
     def __unicode__(self):
@@ -335,6 +337,10 @@ class FragmentationSpectrum(models.Model):
         request = Request(url, data=splash_payload, headers={'Content-Type': "application/json"})
         response = urlopen(request).read().decode()
         return response
+
+    @property
+    def massbank_accession(self): # return a six digit number
+        return "{:06.0f}".format(self.id % 999999) #horrible hack
 
 
 class MoleculeSpectraCount(models.Model):
