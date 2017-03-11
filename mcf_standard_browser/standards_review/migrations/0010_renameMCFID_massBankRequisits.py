@@ -13,10 +13,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='standard',
-            name='MCFID',
-        ),
         migrations.AddField(
             model_name='dataset',
             name='date_added',
@@ -27,21 +23,5 @@ class Migration(migrations.Migration):
             model_name='dataset',
             name='date_modified',
             field=models.DateTimeField(auto_now=True),
-        ),
-        migrations.AddField(
-            model_name='standard',
-            name='inventory_id',
-            field=models.IntegerField(db_column='MCFID', default=99999, unique=True),
-            preserve_default=False,
-        ),
-        migrations.AlterField(
-            model_name='dataset',
-            name='ion_analyzer',
-            field=models.TextField(default=''),
-        ),
-        migrations.AlterField(
-            model_name='dataset',
-            name='ionization_method',
-            field=models.TextField(default=''),
         ),
     ]
