@@ -9,11 +9,11 @@
     <div class="main-content">
         <div class="mol">
             <h2>Fragmentation Spectrum Detail</h2>
+            <p><a href="{% url 'standard-detail' specdata.spectrum.standard.inventory_id %}">{{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct.html_str }}</a></p>
             <h3>Scan number: {{ specdata.spectrum.spec_num }}</h3>
             <p>Precursor m/z: {{ specdata.spectrum.precursor_mz }}</p>
             <p>Retention time: {{ specdata.spectrum.rt }}</p>
             <p>Collision energy: {{ specdata.spectrum.collision_energy }}</p>
-            <p>Ion: <a href="{% url 'standard-detail' specdata.spectrum.standard.inventory_id %}">{{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct }}</a></p>
             <p>Raw data: <a href="{% url 'dataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} </a></p>
             <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
             <p id="splash">Splash: calculating...</p>
@@ -30,38 +30,17 @@
         </div>
     </div>
     <div class="main-content">
-        <div id='chart_id' class="specgraph"></div>
+        {{xic_plot|safe}}
+        {{fragment_plot|safe}}
     </div>
 {% endblock %}
 
 {% block script %}
-<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
 <script>
-    var chart_id = {{ highchart.chart_id|safe }}
-    var chart = {{ highchart.chart|safe }}
-    var title = {{ highchart.title|safe }}
-    var xAxis = {{ highchart.xAxis|safe }}
-    var yAxis = {{ highchart.yAxis|safe }}
-    var series = {{ highchart.series|safe }}
-</script>
-
-<!-- Highchart js. Variable map shown above -->
-<script>
-    $(function() {
-        $('#chart_id').highcharts({
-            chart: chart,
-            title: title,
-            xAxis: xAxis,
-            yAxis: yAxis,
-            series: series
-        });
-    });
-
     function setSplash(splash, status, jqxhr) {
         console.log(splash);
         $('#splash').text("Splash: " + splash);
     }
-
     $.ajax({
         type: "POST",
         url: "http://splash.fiehnlab.ucdavis.edu/splash/it",
@@ -69,5 +48,6 @@
         contentType: "application/json"
     }).done(setSplash).fail(function (jqxhr, status, error) {console.log("Error: " + error + ", Status: " + status)});
 </script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 {% endblock %}
 

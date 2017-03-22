@@ -22,6 +22,7 @@ from table.views import FeedDataView
 
 import tasks
 import tools
+import plots
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag, \
     LcInfo, MsInfo, InstrumentInfo
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
@@ -136,10 +137,16 @@ def molecule_detail(request, pk):
         frag_specs.extend(FragmentationSpectrum.objects.all().filter(standard=standard))
     chart_type = 'line'
     chart_height = 300
+
+    _frag_specs = []
+    for standard in standards:
+        _frag_specs.append(
+            [(spectrum, plots.fragment_plot(spectrum.centroid_mzs, spectrum.centroid_ints, spectrum.precursor_mz))
+             for spectrum in FragmentationSpectrum.objects.all().filter(standard=standard)] )
+
     data = {
         'molecule': molecule,
-        "standards": [[standard, FragmentationSpectrum.objects.all().filter(standard=standard)] for standard in
-                      standards],
+        "standards": zip(standards, _frag_specs),
         "frag_spec_highchart": [{
                                     "chart_id": 'frag_spec{}'.format(spec.id),
                                     "chart": {"type": chart_type, "height": chart_height, "zoomType": "x"},
@@ -152,7 +159,7 @@ def molecule_detail(request, pk):
                                                                                    spec.centroid_ints) for d, m in
                                                                                zip([-0.00, 0, 0.00], [0, 1, 0])]
                                          },
-                                    ],} for spec in frag_specs]
+                                    ],} for spec in frag_specs],
     }
     return render(request, 'mcf_standards_browse/mcf_molecule_detail.html', data)
 
@@ -272,60 +279,19 @@ class SpectraListView(FeedDataView):
 
 def fragmentSpectrum_detail(request, pk):
     spectrum = get_object_or_404(FragmentationSpectrum, pk=pk)
+    xic = Xic.objects.all().filter(standard=spectrum.standard, adduct=spectrum.adduct, dataset=spectrum.dataset)[0]
     splash_payload = json.dumps({
         "ions": [{"mass": mz, "intensity": int_} for mz, int_ in zip(spectrum.centroid_mzs, spectrum.centroid_ints)],
         "type": "MS"})
-    xdata = np.concatenate((spectrum.centroid_mzs,
-                            spectrum.centroid_mzs + 0.00001,
-                            spectrum.centroid_mzs - 0.00001,
-
-                            ))
-    n_mzs = len(xdata)
-    ydata = np.concatenate((spectrum.centroid_ints,
-                            np.zeros((n_mzs,)),
-                            np.zeros((n_mzs,)),
-
-                            ))
-    idx = np.argsort(xdata)
-    xdata = xdata[idx][1:-1]
-    ydata = ydata[idx][1:-1]
-
-    extra_serie1 = {"tooltip": {"y_start": "", "y_end": " "}}
-    chartdata = [{
-        'x': xdata, 'name': 'intensity', 'y': ydata, 'extra': extra_serie1, 'kwargs': {}
-    }, ]
-    # charttype = "discreteBarChart"
-    charttype = "lineWithFocusChart"
-    chartcontainer = 'discretebarchart_container'  # container name
-    chartID = 'chart_ID'
-    chart_type = 'line'
-    chart_height = 500
     data = {
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'chartcontainer': chartcontainer,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': True,
-        },
         'specdata': {
             'spectrum': spectrum,
             'centroids': [spectrum.centroid_mzs, spectrum.centroid_ints],
         },
-        "highchart": {
-            "chart_id": 'chart_id',
-            "chart": {"renderTo": 'chart_id', "type": chart_type, "height": chart_height, "zoomType": "x"},
-            "title": {"text": 'Fragment Spectrum'},
-            "xAxis": {"title": {"text": 'm/z'},},
-            "yAxis": {"title": {"text": 'Intensity'}},
-            "series": [
-                {"name": 'spectrum',
-                 "data": [[ii, jj] for ii, jj in zip(np.round(chartdata[0]['x'], 5), chartdata[0]['y'])]},
-            ],
-        },
         "splash_payload": splash_payload,
+        "fragment_plot": plots.fragment_plot(spectrum.centroid_mzs, spectrum.centroid_ints, pk),
+        "xic_plot": plots.xic_plot(xic.rt, xic.xic, [spectrum.rt,], [spectrum.ms1_intensity,],)
+
     }
     return render(request, 'mcf_standards_browse/mcf_fragmentSpectrum_detail.html', data)
 
@@ -392,9 +358,9 @@ def xic_detail(request, dataset_pk, mcfid, adduct_pk):
     mz = standard.molecule.get_mz(adduct)
     delta_mz = mz * dataset.mass_accuracy_ppm * 1e-6
     # xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
-    xics = Xic.objects.all().filter(standard=standard, adduct=adduct, dataset=dataset)
+    xic = Xic.objects.all().filter(standard=standard, adduct=adduct, dataset=dataset)[0]
     frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(
-        precursor_mz__gte=mz - delta_mz).filter(precursor_mz__lte=mz + delta_mz).order_by('-ms1_intensity')[:20]
+        precursor_mz__gte=mz - delta_mz).filter(precursor_mz__lte=mz + delta_mz).order_by('-ms1_intensity')[:10]
     form = FragSpecReview(request.POST or None, extra=list([fs.pk for fs in frag_specs]), user=request.user)
     if form.is_valid():
         for (fragSpecId, response) in form.get_response():
@@ -403,68 +369,26 @@ def xic_detail(request, dataset_pk, mcfid, adduct_pk):
             tools.update_fragSpec(fragSpecId, response, standard, adduct, request.user.username)
         return redirect('dataset-detail', dataset_pk)
     else:
-        chartdata = []
-        for xic in xics:
-            chartdata.append(
-                {'name': xic.mz, 'x': xic.rt, 'y': xic.xic, 'extra': {}, 'kwargs': {}},
-            )
-        charttype = "lineWithFocusChart"
-        chartcontainer = 'discretebarchart_container'  # container name
-        chartID = 'chart_ID'
-        chart_type = 'line'
-        chart_height = 300
         data = {
             'form': form,
-            'charttype': charttype,
-            'chartdata': chartdata,
-            'chartcontainer': chartcontainer,
             'extra': {
                 'x_is_date': False,
                 'x_axis_format': '',
                 'tag_script_js': True,
                 'jquery_on_ready': True,
             },
-            "highchart": {
-                "chart_id": 'chart_id',
-                "chart": {"renderTo": 'chart_id', "type": chart_type, "height": chart_height, "zoomType": "x"},
-                "title": {"text": ''},
-                "xAxis": {"title": {"text": 'time (s)'},},
-                "yAxis": {"title": {"text": 'Intensity'}},
-                "series": [
-                    {"name": 'xic',
-                     "data": [[ii, jj] for ii, jj in zip(np.round(chartdata[0]['x'], 5), chartdata[0]['y'])]},
-                    {"name": 'ms2',
-                     "data": [[frag_specs[ii].rt, 0] for ii in np.argsort([spec.rt for spec in frag_specs])],
-                     'lineColor': 'black',
-                     "marker": {"symbol": 'triangle',
-                                }
-                     }
-                ],
-            },
             "mz": mz,
             "dataset": dataset,
             "standard": standard,
             "adduct": adduct,
-            "xics": xics,
+            "xic": xic,
             "frag_specs": frag_specs,
-            "frag_spec_highchart": [{
-                                        "chart_id": 'frag_spec{}'.format(spec.id),
-                                        "chart": {"renderTo": 'chart_id', "type": chart_type, "height": 300,
-                                                  "zoomType": "x"},
-                                        "title": {"text": ''},
-                                        "xAxis": {"title": {"text": 'm/z'},
-                                                  "max": spec.precursor_mz + 2 * spec.dataset.quad_window_mz},
-                                        "yAxis": {"title": {"text": 'Intensity'}},
-                                        "series": [
-                                            {"name": 'fragment spectrum', "data": [[x + d, y * m] for x, y in
-                                                                                   zip(np.round(spec.centroid_mzs, 5),
-                                                                                       spec.centroid_ints) for d, m in
-                                                                                   zip([-0.00, 0, 0.00], [0, 1, 0])]
-                                             },
-                                        ],} for spec in frag_specs]
+            "xic_plot": plots.xic_plot(xic.rt, xic.xic, [spectrum.rt for spectrum in frag_specs], [spectrum.ms1_intensity for spectrum in frag_specs ]),
+            "frag_info": zip(frag_specs,  [
+                plots.fragment_plot(spectrum.centroid_mzs, spectrum.centroid_ints, spectrum.precursor_mz)
+                    for spectrum in frag_specs])
         }
         return render(request, 'mcf_standards_browse/mcf_xic_detail.html', context=data)
-
 
 @login_required()
 def dataset_upload(request):
