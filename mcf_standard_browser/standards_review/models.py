@@ -289,6 +289,7 @@ class FragmentationSpectrum(models.Model):
     date_added = models.DateField(default=timezone.now)
     date_edited = models.DateField(default=timezone.now)
     last_editor = models.ForeignKey(User, blank=True, null=True)
+    _splash = models.TextField(default='', null=True)
 
     def __unicode__(self):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)
@@ -330,6 +331,13 @@ class FragmentationSpectrum(models.Model):
 
     @property
     def splash(self):
+        if self._splash == "":
+            response = self.get_splash()
+            if response.startswith('splash'):
+                self._splash = response
+        return self._splash
+
+    def get_splash(self):
         splash_payload = json.dumps({
             "ions": [{"mass": mz, "intensity": int_} for mz, int_ in zip(self.centroid_mzs, self.centroid_ints)],
             "type": "MS"})
