@@ -6,17 +6,16 @@ from standards_review.tools import update_spectrum_from_file
 
 class Command(BaseCommand):
     help = 'Reinsert spectra into the database for all data files'
+    def add_arguments(self, parser):
+        # Named (optional) arguments
+        parser.add_argument(
+            '--check_files',
+            action='store_true',
+            dest='check_files',
+            default=False,
+            help='Just check which files are present',
+        )
     def handle(self, *args, **options):
-        def add_arguments(self, parser):
-            # Named (optional) arguments
-            parser.add_argument(
-                '--check_files',
-                action='store_true',
-                dest='check_files',
-                default=False,
-                help='Just check which files are present',
-            )
-
         datasets = Dataset.objects.all()
         for dataset in datasets:
             try:
