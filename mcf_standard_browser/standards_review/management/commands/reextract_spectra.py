@@ -18,7 +18,6 @@ class Command(BaseCommand):
 
         parser.add_argument(
             '--path_swap',
-            action='store_true',
             dest='path_swap_new',
             default=False,
             help='Remove existing path and replace with this directory',
@@ -32,7 +31,7 @@ class Command(BaseCommand):
                 if options['check_files']:
                     path = dataset.path
                     if options['path_swap_new']:
-                        path = self.path_swap(dataset.path, options["path_swap_old"], options["path_swap_new"])
+                        path = self.path_swap(dataset.path, options["path_swap_new"])
                     logging.debug((path, os.path.exists(path)))
                 else:
                     logging.debug(dataset.path)
