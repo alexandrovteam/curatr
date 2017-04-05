@@ -32,14 +32,15 @@ class Command(BaseCommand):
                 path = dataset.path
                 if options['path_swap_new']:
                     path = self.path_swap(dataset.path, options["path_swap_new"])
-
+                logging.debug(("Processing:",dataset.path, path))
                 if options['check_files']:
-                    logging.debug((path, os.path.exists(path)))
+                    logging.debug(("Does it exist:", os.path.exists(path)))
+
                 else:
-                    logging.debug((dataset.path, path))
                     update_spectrum_from_file(dataset, path)
+
             except Exception as e:
-                logging.error("Error updating spectrum")
+                logging.error(("Error updating spectrum", path))
                 logging.error(e, exc_info=True)
 
     def path_swap(self, path, path_swap_new):
