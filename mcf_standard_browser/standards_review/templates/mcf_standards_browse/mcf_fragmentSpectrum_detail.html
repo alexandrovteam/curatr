@@ -8,22 +8,21 @@
 
     <div class="main-content">
         <div class="mol">
-            <h2>Fragmentation Spectrum Detail</h2>
-            <p><a href="{% url 'standard-detail' specdata.spectrum.standard.inventory_id %}">{{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct.html_str }}</a></p>
+            <h2>Fragmentation Spectrum for <a href="{% url 'standard-detail' specdata.spectrum.standard.inventory_id %}">{{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct.html_str }}</a></h2>
             <h3>Scan number: {{ specdata.spectrum.spec_num }}</h3>
-            <p>Precursor m/z: {{ specdata.spectrum.precursor_mz }}</p>
-            <p>Retention time: {{ specdata.spectrum.rt }}</p>
+            <p>Precursor m/z: {{ specdata.spectrum.precursor_mz | floatformat:4}}</p>
+            <p>Retention time: {{ specdata.spectrum.rt |floatformat:1 }} min</p>
             <p>Collision energy: {{ specdata.spectrum.collision_energy }}</p>
             <p>Raw data: <a href="{% url 'dataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} </a></p>
-            <p>Precursor fraction of quad window: {{ specdata.spectrum.precursor_quad_fraction }}</p>
             <p id="splash">Splash: calculating...</p>
+            <p>LC Method: {% for info in specdata.spectrum.dataset.lc_info.all %}{{ info }}{% endfor %}</p>
+            <p>MS Method: {% for info in specdata.spectrum.dataset.ms_info.all %}{{ info }}{% endfor %}</p>
         </div>
         <br>
         <div class = "mol">
             <h3>Review Information </h3>
-            <p>MS1 intensity: {{ specdata.spectrum.ms1_intensity }}</p>
-            <p>Quadrupole Fraction: {{ specdata.spectrum.precursor_quad_fraction }}</p>
-            <p>Curate Status: {{ specdata.spectrum.reviewed }}</p>
+            <p>Precursor intensity: {{ specdata.spectrum.ms1_intensity |floatformat:0 }}</p>
+            <p>Precursor Fraction: {{ specdata.spectrum.precursor_quad_fraction }}</p>
             <p>Date added: {{ specdata.spectrum.date_added }}</p>
             <p>Date curated: {{ specdata.spectrum.date_edited }}</p>
             <p>Curator: {{ specdata.spectrum.last_editor }}</p>
