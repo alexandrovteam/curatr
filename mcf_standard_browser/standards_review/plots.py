@@ -19,7 +19,7 @@ def fragment_plot(xdata, ydata, label):
                 name=label
         ),]
 
-    layout = dict(title = 'Fragmentation Spectrum',
+    layout = dict(
               xaxis = dict(title = 'm/z'),
               yaxis = dict(title = 'Intensity'),
 
@@ -54,5 +54,46 @@ def xic_plot(xic_x, xic_y, pts_x, pts_y, timeunit='s'):
                   )
 
     fig = go.Figure(data=data, layout=layout)
+    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+    return plot_div
+
+def multixic(plotData, timeunit='s'):
+    """
+
+    Args:
+        plotData: [(xic_x, xic_y, pts_x, pts_y),]
+        timeunit: label string default = 's'
+
+    Returns: plotly graph object
+
+    """
+    traces = []
+    for xic_x, xic_y, pts_x, pts_y in plotData:
+        traces.append( go.Scatter(
+                x=xic_x,
+                y=xic_y,
+                mode='line',
+                name='xic'
+            )
+        )
+        traces.append(
+            go.Scatter(
+                x=pts_x,
+                y=pts_y,
+                marker=go.Marker(
+                    size=10,
+                    color='black',
+                    symbol='triangle-down'
+                ),
+                mode='markers',
+                name='ms/ms points'
+            )
+        )
+    layout = dict(title='XIC',
+                  xaxis=dict(title='time ({})'.format(timeunit)),
+                  yaxis=dict(title='Intensity'),
+                  )
+
+    fig = go.Figure(data=traces, layout=layout)
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
     return plot_div

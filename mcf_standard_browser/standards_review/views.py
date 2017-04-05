@@ -107,24 +107,23 @@ class Standard_list_ez(ListView):
 def standard_detail(request, mcfid):
     standard = get_object_or_404(Standard, inventory_id=mcfid)
     frag_specs = FragmentationSpectrum.objects.all().filter(standard=standard)
-    chart_type = 'line'
-    chart_height = 300
+    xics = Xic.objects.all().filter(standard=standard)
+
     data = {
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': True,
+        },
         "standard": standard,
+        "xics": xics,
         "frag_specs": frag_specs,
-        "frag_spec_highchart": [{
-                                    "chart_id": 'frag_spec{}'.format(spec.id),
-                                    "chart": {"type": chart_type, "height": chart_height, "zoomType": "x"},
-                                    "title": {"text": ''},
-                                    "xAxis": {"title": {"text": 'm/z'},},
-                                    "yAxis": {"title": {"text": 'Intensity'}},
-                                    "series": [
-                                        {"name": 'fragment spectrum', "data": [[x + d, y * m] for x, y in
-                                                                               zip(np.round(spec.centroid_mzs, 5),
-                                                                                   spec.centroid_ints) for d, m in
-                                                                               zip([-0.00, 0, 0.00], [0, 1, 0])]
-                                         },
-                                    ],} for spec in frag_specs]
+        "xic_plot": plots.multixic([(xic.rt, xic.xic, [spectrum.rt for spectrum in frag_specs],
+                                   [spectrum.ms1_intensity for spectrum in frag_specs]) for xic in xics]),
+        "frag_info": zip(frag_specs, [
+            plots.fragment_plot(spectrum.centroid_mzs, spectrum.centroid_ints, spectrum.precursor_mz)
+            for spectrum in frag_specs])
     }
     return render(request, 'mcf_standards_browse/mcf_standard_detail.html', data)
 
