@@ -26,16 +26,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         datasets = Dataset.objects.all()
+
         for dataset in datasets:
             try:
+                path = dataset.path
+                if options['path_swap_new']:
+                    path = self.path_swap(dataset.path, options["path_swap_new"])
+
                 if options['check_files']:
-                    path = dataset.path
-                    if options['path_swap_new']:
-                        path = self.path_swap(dataset.path, options["path_swap_new"])
                     logging.debug((path, os.path.exists(path)))
                 else:
-                    logging.debug(dataset.path)
-                    update_spectrum_from_file(dataset)
+                    logging.debug((dataset.path, path))
+                    update_spectrum_from_file(dataset, path)
             except Exception as e:
                 logging.error("Error updating spectrum")
                 logging.error(e, exc_info=True)
