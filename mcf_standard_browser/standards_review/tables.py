@@ -4,10 +4,10 @@ import django_tables2 as tables
 import numpy as np
 from django.core.urlresolvers import reverse_lazy
 from django.db.utils import OperationalError
-from django.utils import safestring
 from table import Table
 from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
+from django.utils import safestring
 
 from models import Standard, Adduct, FragmentationSpectrum, Dataset
 
@@ -107,8 +107,8 @@ try:
     for adduct in Adduct.objects.all().order_by("charge"):
         logging.debug(adduct)
         # dynamically add one column per adduct
-        col = tables.Column(accessor='adduct_mzs_by_pk.{}'.format(adduct.pk), empty_values=(), verbose_name=str(
-            adduct), orderable=False)
+        col = tables.Column(accessor='adduct_mzs_by_pk.{}'.format(adduct.pk), empty_values=(), verbose_name=
+            adduct.html_str(), orderable=False)
         MoleculeTable.base_columns['adduct{}'.format(adduct.id)] = col
 except OperationalError:
     pass
