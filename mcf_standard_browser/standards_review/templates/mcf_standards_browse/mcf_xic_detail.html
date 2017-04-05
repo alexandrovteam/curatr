@@ -12,7 +12,9 @@
             <h2> {{ standard }} {% autoescape off %}{{ adduct.html_str }} {% endautoescape %} </h2>
             <h2>Dataset: <a href="{% url 'dataset-detail' dataset.pk %}"> {{ dataset.name }}</a></h2>
             <h3>m/z: {{ mz|floatformat:"4" }}</h3>
-                <div id='chart_id' class="specgraph"></div>
+                <!--<div id='chart_id' class="specgraph"></div>-->
+                <div id="xi_plot" class="specgraph"> {{xic_plot|safe}}</div>
+
         </div>
         <div class="main-content">
             <h2>Fragmentation Spectra</h2>
@@ -27,7 +29,7 @@
                         <th>Fragmentation Spectrum </th>
                         <th>Status</th>
                     </tr>
-                    {% for spec in frag_specs %}
+                    {% for spec, spec_plot in frag_info %}
                         <tr>
                             <td>
                                 <div>
@@ -38,7 +40,9 @@
                                     <p > {{ spec.collision_energy }}</p>
                                 </div>
                             </td>
-                            <td> <div id="frag_spec{{ spec.id }}" class="xic_fraggraph"></div></td>
+                            <td>
+                                <div class="xic_fraggraph">{{spec_plot|safe}}</div>
+                            </td>
                             <td>
                                 {% if user.is_authenticated %}
                                     {{ form|form_id:spec.id }}
@@ -68,39 +72,6 @@
 {% endblock %}
 
 {% block script %}
-<script>
-    $(document).ready(function() {
-        $('#{{ highchart.chart_id|safe }}').highcharts({
-            chart: {{ highchart.chart|safe }},
-            title: {{ highchart.title|safe }},
-            xAxis: {{ highchart.xAxis|safe }},
-            yAxis: {{ highchart.yAxis|safe }},
-            series: {{ highchart.series|safe }},
-            legend: {enabled: false},
-        });
-    });
-</script>
-
-{% for spec in frag_spec_highchart %}
-    <script>
-        $(document).ready(function() {
-            $('#{{ spec.chart_id }}').highcharts({
-                chart: {{ spec.chart|safe }},
-                title: {{ spec.title|safe }},
-                xAxis: {{ spec.xAxis|safe }},
-                yAxis: {{ spec.yAxis|safe }},
-                series: {{ spec.series|safe }},
-                legend: {enabled: false},
-                tooltip: {
-                    snap: 50,
-                    crosshairs: [true,false],
-                    formatter: function () {
-                        return this.point.x;
-                    }
-                }
-            });
-        });
-    </script>
-{% endfor %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 {% endblock %}
