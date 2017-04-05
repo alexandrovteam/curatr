@@ -19,10 +19,10 @@ class Command(BaseCommand):
         datasets = Dataset.objects.all()
         for dataset in datasets:
             try:
-                logging.debug("Updating dataset {}".format(dataset))
                 if options['check_files']:
-                    logging.debug(dataset.path, os.path.exists(dataset.path))
+                    logging.debug((dataset.path, os.path.exists(dataset.path)))
                 else:
+                    logging.debug(dataset.path)
                     update_spectrum_from_file(dataset)
             except Exception as e:
                 logging.error("Error updating spectrum")
