@@ -61,10 +61,11 @@
                                 <a href="{% url 'library-home' %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Spectral Library <span class="caret"></span></a>
                                       <ul class="dropdown-menu">
                                         <li><a href="{% url 'molecule-list' %}">Browse Molecules</a></li>
-                                        <li><a href="{% url 'fragmentSpectrum-list' %}">Browse Fragmentation Spectra</a></li>
-                                        <li><a href="{% url 'stats' %}">Library statistics</a></li>
                                         <li class="divider"></li>
+                                        <li><a href="{% url 'fragmentSpectrum-list' %}">Browse Fragmentation Spectra</a></li>
                                         <li><a href="{% url 'fragmentSpectrum-export' %}">Export Spectra</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="{% url 'stats' %}">Library statistics</a></li>
                                       </ul>
                             </li>
                             <li>
