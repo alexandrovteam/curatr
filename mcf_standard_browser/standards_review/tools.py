@@ -59,10 +59,12 @@ def sum_of_2_perms(vals):
     return list(itertools.chain(iter(vals), map(''.join, itertools.product(vals, repeat=2))))
 
 
-def update_spectrum_from_file(dataset):
+def update_spectrum_from_file(dataset, mzml_filepath):
     import pymzml
     import numpy as np
-    mzml_filepath =dataset.path
+
+    if not mzml_filepath.endswith('mzML'):
+        raise ValueError('wrong file extension for {}'.format(mzml_filepath))
     msrun = pymzml.run.Reader(mzml_filepath)
     for current_spectrum in FragmentationSpectrum.objects.all().filter(dataset=dataset):
         new_spectrum = msrun[current_spectrum.spec_num]
