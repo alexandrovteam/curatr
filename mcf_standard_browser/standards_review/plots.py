@@ -8,6 +8,9 @@ def fragment_plot(xdata, ydata, label):
                 x=xdata,
                 y=ydata,
                 mode='markers',
+                marker=go.Marker(
+                    size=1,
+                ),
                 error_y = go.ErrorY(
                     symmetric=False,
                     arrayminus=np.zeros(ydata.shape),
