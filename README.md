@@ -58,7 +58,7 @@ python manage.py migrate
 ### Create an admin user ##
 ```
 python manage.py createsuperuser
-'''
+```
 
 ### Set up a message broker (example: RabbitMQ) ##
 1. [Install RabbitMQ] (https://www.rabbitmq.com/download.html)
