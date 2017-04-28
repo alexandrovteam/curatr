@@ -4,7 +4,6 @@ import os
 import time
 import zipfile
 from collections import Counter, defaultdict
-from tempfile import TemporaryFile
 
 import numpy as np
 from django.conf import settings
@@ -17,12 +16,14 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import CreateView
 from django.views.generic import TemplateView, ListView
 from django_tables2 import RequestConfig
-from django.core.urlresolvers import reverse
+from django.http import JsonResponse
+
 from table.views import FeedDataView
 
 import tasks
 import tools
 import plots
+import export
 from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag, \
     LcInfo, MsInfo, InstrumentInfo
 from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
@@ -30,7 +31,7 @@ from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragS
     StandardBatchForm, ExportLibrary, MoleculeTagForm, StandardAddForm
 
 
-# Create your views here.
+VALID_EXPORT_FORMATS = ['massbank', 'metabolights', 'tsv', 'mgf']
 
 def home_page(request):
     return render(request, 'mcf_standards_browse/home_page.html', )
@@ -447,122 +448,9 @@ class Echo(object):
 
 
 def fragmentSpectrum_export(request):
-    if request.method == 'POST':
-        form = ExportLibrary(request.POST)
-        if form.is_valid():
-            post_dict = dict(request.POST)
-            #spectra_to_export_id = int(post_dict['spectra_to_export'][0])
-            spectra = FragmentationSpectrum.objects.all().filter(reviewed=True).exclude(standard=None)
-            #if spectra_to_export_id == 0:
-            #    spectra = FragmentationSpectrum.objects.all().filter(reviewed=True).exclude(standard=None)
-            #elif spectra_to_export_id == 1:
-            #    spectra = FragmentationSpectrum.objects.all().filter(reviewed=True)
-            #elif spectra_to_export_id == 2:
-            #    spectra = FragmentationSpectrum.objects.all()
-            #else:
-            #    raise ValueError('export code not known')
-            class_to_export_id = int(post_dict['class_to_export'][0])
-            if class_to_export_id == 0: # all
-                spectra = spectra
-            if class_to_export_id == 1: # positive
-                spectra = spectra.exclude(adduct__charge__lte=0)
-            if class_to_export_id == 2: # negative
-                spectra = spectra.exclude(adduct__charge__gte=0)
-            data_format_id = int(post_dict['data_format'][0])
-            spec_pairs = [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints, (999/(np.max(spectrum.centroid_ints))*spectrum.centroid_ints).astype(int))] for spectrum in spectra]
-            c = {'spec_data': spec_pairs}
-            if data_format_id == 0:  # mgf
-                content_type = "text/txt"
-                response = HttpResponse(content_type=content_type)
-                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.mgf'
-                t = loader.get_template('mcf_standards_browse/mgf_template.mgf')
-                response.write(t.render(c))
-            elif data_format_id == 1:  # msp
-                content_type = "text/txt"
-                response = HttpResponse(content_type=content_type)
-                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.msp'
-                t = loader.get_template('mcf_standards_browse/mgf_template.msp')
-                response.write(t.render(c))
-            elif data_format_id == 2:  # csv
-                content_type = "text/tsv"
-                response = HttpResponse(content_type=content_type)
-                response['Content-Disposition'] = 'attachment; filename=mcf_spectra.tsv'
-                t = loader.get_template('mcf_standards_browse/spectra_export_template.csv')
-                response.write(t.render(c))
-                # writer = csv.writer(pseudo_buffer, dialect='excel')
-                # content_type = "text/csv"
-                # response = StreamingHttpResponse((writer.writerow([spectrum.dataset, spectrum.precursor_mz, spectrum.spec_num, spectrum.standard, spectrum.adduct, spectrum.centroid_mzs, spectrum.centroid_ints]) for spectrum in spectra),
-                #                     content_type=content_type)
-                # response['Content-Disposition'] = 'attachment; filename=mcf_spectra.csv'
-            elif data_format_id == 3:  # ebi json
-                # if you wanted to do this in memory
-                # in_memory = StringIO()
-                # zip = ZipFile(in_memory, "w")
-                zf_n = os.path.join(settings.MEDIA_ROOT, 'tmp_ebi_export.zip')
-                zf = zipfile.ZipFile(zf_n, mode="w")
-                filename_list = []
-                for cc in spec_pairs:
-                    if cc[0].standard:
-                        export_filename = "InventoryID{}".format(cc[0].standard.inventory_id)
-                    else:
-                        export_filename = 'unknown_standard'
-                    ii = 0
-                    _export_filename = export_filename
-                    while _export_filename in filename_list:
-                        _export_filename = "{}_{}".format(export_filename, ii)
-                        ii += 1
-                    export_filename = _export_filename
-                    filename_list.append(export_filename)
-                    logging.debug(export_filename)
-                    t = loader.get_template('mcf_standards_browse/export_template_ebi.json')
-                    r = t.render({'spec_data': [cc, ]})
-                    info = zipfile.ZipInfo(export_filename.format(ii),
-                                           date_time=time.localtime(time.time()),
-                                           )
-                    info.compress_type = zipfile.ZIP_DEFLATED
-                    info.comment = 'Remarks go here'
-                    info.create_system = 0
-                    zf.writestr(info, r)
-                zf.close()
-                logging.debug('open file: ')
-                zfr = zipfile.ZipFile(zf_n, 'r')
-                logging.debug(zfr.read(export_filename))
-                response = HttpResponse(content_type="application/zip")
-                response['Content-Disposition'] = 'attachment; filename="mcf_spectra.zip"'
-                response.write(open(zf_n, 'r').read())
-            elif data_format_id == 4:  # massbank
-                fn_counter = defaultdict(int)  # counts filename occurence for disambiguation
-                zf_n = TemporaryFile('w+b', suffix='.zip', dir=settings.MEDIA_ROOT)
-                with zipfile.ZipFile(zf_n, mode="w") as zf:
-                    for spectrum, peak_list in spec_pairs:
-                        if spectrum.standard:
-                            ambiguous_fn = "Inventory_ID{}".format(spectrum.standard.inventory_id)
-                        else:
-                            ambiguous_fn = 'unknown_standard'
-                        export_filename = "{}_{}.txt".format(ambiguous_fn, fn_counter[ambiguous_fn])
-                        fn_counter[ambiguous_fn] += 1
-                        t = loader.get_template('mcf_standards_browse/export_template_massbank.txt')
-                        timestamp = time.localtime(time.time())
-                        full_url = request.build_absolute_uri(reverse('fragmentSpectrum-detail', args=(spectrum.pk,)))
-                        r = t.render({'spectrum': spectrum, 'peak_list': peak_list, 'num_peak': len(peak_list),
-                                      'settings': settings,
-                                      'info':{
-                                            'url': full_url,
-                                            'ion_mode': 'POSITIVE' if spectrum.adduct.charge > 0 else 'NEGATIVE'}
-                                      })
 
-                        info = zipfile.ZipInfo(export_filename, date_time=timestamp)
-                        info.compress_type = zipfile.ZIP_DEFLATED
-                        info.comment = 'generated by curatr'
-                        info.create_system = 0
-                        zf.writestr(info, r.encode('utf-8'))
-                zf_n.seek(0)
-                response = FileResponse(zf_n, content_type="application/zip")
-                response['Content-Disposition'] = 'attachment; filename="mcf_spectra.zip"'
-            return response
-    else:
-        form = ExportLibrary()
-    return render(request, 'mcf_standards_browse/export_library.html', {'form': form})
+
+    return render(request, 'mcf_standards_browse/export_library.html', {'form': {}, 'formats': VALID_EXPORT_FORMATS})
 
 
 @login_required()
@@ -625,3 +513,29 @@ def library_stats(request):
 
 def _percent(numerator, total_spectra, ndigits=2):
     return round((100.0 * numerator) / total_spectra, ndigits=ndigits)
+
+
+def fragmentSpectrumExportFormats(request):
+    return JsonResponse({'export_formats': VALID_EXPORT_FORMATS})
+
+
+def fragmentSpectrumExport(request, fmt):
+    print('export', fmt)
+    if not fmt in VALID_EXPORT_FORMATS:
+        raise ValueError('unrecognised export format {}'.format(fmt))
+    polarity = request.GET.get('polarity', None)
+    spectra = FragmentationSpectrum.objects.all().filter(reviewed=True).exclude(standard=None)
+    if polarity:
+        if polarity == 'positive':
+            spectra = spectra.exclude(adduct__charge__lte=0)
+        elif polarity == 'negative':
+            spectra = spectra.exclude(adduct__charge__gte=0)
+        else:
+            raise ValueError("value of polarity not valid {}".format(polarity))
+
+    spec_pairs = [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints,
+                                 (999 / (np.max(spectrum.centroid_ints)) * spectrum.centroid_ints).astype(int))] for
+                  spectrum in spectra]
+    exporter = getattr(export, 'get_'+fmt)
+    response = exporter(request, spec_pairs)
+    return response

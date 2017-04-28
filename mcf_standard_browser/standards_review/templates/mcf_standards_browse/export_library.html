@@ -1,13 +1,32 @@
 {% extends 'mcf_standards_browse/base.html' %}
 
 {% block content %}
-    <div id="center">
-    <div id = welcome>
-            <h2>Export Library</h2>
-        <form method="POST" class="data_upload-form" enctype="multipart/form-data">{% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="save btn btn-default">Download</button>
-        </form>
-    </div>
+    <div class="center">
+
+        <div class="container">
+            <table class="table table-striped">
+            <thead>
+            <tr>
+                <th style="text-align: center">Export Type</th>
+                <th colspan="3" style="text-align: center">Polarity to Export</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th style="text-align: center">All</th>
+                <th style="text-align: center">Positive</th>
+                <th style="text-align: center">Negative</th>
+            </tr>
+            </thead>
+                {% for fmt in formats %}
+                <tr>
+                    <td>{{ fmt }}</td>
+                    <td> <a href="{% url 'fragmentSpectrumExport' fmt=fmt  %}"> <span class="glyphicon glyphicon-download-alt"></span>  </a></td>
+                    <td> <a href="{% url 'fragmentSpectrumExport' fmt=fmt  %}?polarity=positive"> <span class="glyphicon glyphicon-download-alt"></span>  </a></td>
+                    <td> <a href="{% url 'fragmentSpectrumExport' fmt=fmt  %}?polarity=negative"> <span class="glyphicon glyphicon-download-alt"></span>  </a></td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
     </div>
 {% endblock %}
