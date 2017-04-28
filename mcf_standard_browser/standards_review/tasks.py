@@ -141,8 +141,8 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
         mz[standard] = {}
         for adduct in adducts:
             mz[standard][adduct] = standard.molecule.get_mz(adduct)
-            logger.debug(standard)
-            logger.debug(mz[standard][adduct])
+            logger.debug({'standard': standard})
+            logger.debug({'mz': mz[standard][adduct]})
             delta_mz = mz[standard][adduct] * ppm * 1e-6
             mz_upper[standard][adduct] = mz[standard][adduct] + delta_mz
             mz_lower[standard][adduct] = mz[standard][adduct] - delta_mz
