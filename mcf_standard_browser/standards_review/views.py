@@ -31,7 +31,7 @@ from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragS
     StandardBatchForm, ExportLibrary, MoleculeTagForm, StandardAddForm
 
 
-VALID_EXPORT_FORMATS = ['massbank', 'metabolights', 'tsv', 'mgf']
+VALID_EXPORT_FORMATS = ['massbank', 'metabolights', 'tsv', 'mgf', 'msp']
 
 def home_page(request):
     return render(request, 'mcf_standards_browse/home_page.html', )
