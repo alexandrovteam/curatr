@@ -31,7 +31,6 @@ from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragS
     StandardBatchForm, ExportLibrary, MoleculeTagForm, StandardAddForm
 
 
-VALID_EXPORT_FORMATS = ['massbank', 'metabolights', 'tsv', 'mgf', 'msp']
 
 def home_page(request):
     return render(request, 'mcf_standards_browse/home_page.html', )
@@ -448,9 +447,7 @@ class Echo(object):
 
 
 def fragmentSpectrum_export(request):
-
-
-    return render(request, 'mcf_standards_browse/export_library.html', {'form': {}, 'formats': VALID_EXPORT_FORMATS})
+    return render(request, 'mcf_standards_browse/export_library.html', {'form': {}, 'formats': settings.VALID_EXPORT_FORMATS})
 
 
 @login_required()
@@ -516,12 +513,12 @@ def _percent(numerator, total_spectra, ndigits=2):
 
 
 def fragmentSpectrumExportFormats(request):
-    return JsonResponse({'export_formats': VALID_EXPORT_FORMATS})
+    return JsonResponse({'export_formats': settings.VALID_EXPORT_FORMATS})
 
 
 def fragmentSpectrumExport(request, fmt):
     print('export', fmt)
-    if not fmt in VALID_EXPORT_FORMATS:
+    if not fmt in settings.VALID_EXPORT_FORMATS:
         raise ValueError('unrecognised export format {}'.format(fmt))
     polarity = request.GET.get('polarity', None)
     spectra = FragmentationSpectrum.objects.all().filter(reviewed=True).exclude(standard=None)

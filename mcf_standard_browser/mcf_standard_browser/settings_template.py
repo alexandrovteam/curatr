@@ -162,10 +162,13 @@ CELERYD_CONCURRENCY = 1
 INSTITUTE_NAME= 'MY INSTITUTE'
 MASSBANK_INSTITUTE_CODE = 'DMY' # two or three letter code for massbank export
 EXPORT_LICENCE = "CC BY"
+VALID_EXPORT_FORMATS = ['massbank', 'metabolights', 'tsv', 'mgf', 'msp']
+
 
 SETTINGS_EXPORT = [
     'INSTITUTE_NAME',
     'MASSBANK_INSTITUTE_CODE',
     'MEDIA_URL',
-    'EXPORT_LICENCE'
+    'EXPORT_LICENCE',
+    'VALID_EXPORT_FORMATS'
 ]
