@@ -108,7 +108,10 @@ def standard_detail(request, mcfid):
     standard = get_object_or_404(Standard, inventory_id=mcfid)
     frag_specs = FragmentationSpectrum.objects.all().filter(standard=standard)
     xics = Xic.objects.all().filter(standard=standard)
-
+    xic_plots =""
+    if frag_specs:
+        xic_plots = plots.multixic([(xic.rt, xic.xic, [spectrum.rt for spectrum in frag_specs],
+                                   [spectrum.ms1_intensity for spectrum in frag_specs]) for xic in xics])
     data = {
         'extra': {
             'x_is_date': False,
@@ -119,8 +122,7 @@ def standard_detail(request, mcfid):
         "standard": standard,
         "xics": xics,
         "frag_specs": frag_specs,
-        "xic_plot": plots.multixic([(xic.rt, xic.xic, [spectrum.rt for spectrum in frag_specs],
-                                   [spectrum.ms1_intensity for spectrum in frag_specs]) for xic in xics]),
+        "xic_plot": xic_plots,
         "frag_info": zip(frag_specs, [
             plots.fragment_plot(spectrum.centroid_mzs, spectrum.centroid_ints, spectrum.precursor_mz)
             for spectrum in frag_specs])
