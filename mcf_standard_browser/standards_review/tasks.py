@@ -283,4 +283,3 @@ def remove_old_spectra():
         spectra = FragmentationSpectrum.objects.filter(reviewed=False).filter(date_added__lt=time_threshold)
         logging.debug(('number spectra to delete:', spectra.count()))
         spectra.delete()
-

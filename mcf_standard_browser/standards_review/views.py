@@ -497,6 +497,10 @@ def library_stats(request):
             'data': tag_counts,
             'labels': [str(t) for t in MoleculeTag.objects.all()],
         },
+        "adduct_bar_chart": {
+            'data': [FragmentationSpectrum.objects.filter(adduct=a).count() for a in Adduct.objects.all()],
+            'labels': [str(a.nice_str()) for a in Adduct.objects.all()]
+        },
         "total_spectra": total_spectra,
         "total_molecules": total_molecules,
         "total_annotated": total_annotated,
