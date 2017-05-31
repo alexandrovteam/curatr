@@ -284,3 +284,25 @@ def remove_old_spectra():
         logging.debug(('number spectra to delete:', spectra.count()))
         spectra.delete()
 
+
+@periodic_task(run_every=crontab(minute=0, hour=1, day_of_week=1))  # every week at 1am
+def export_dump():
+    import urllib.request
+    from django.urls import reverse
+
+    from django.conf import settings
+    for fmt in settings.VALID_EXPORT_FORMATS:
+        for polarity in ['all', 'positive', 'negative']:
+            spectra = FragmentationSpectrum.objects.all().filter(reviewed=True).exclude(standard=None)
+            if polarity:
+                if polarity == 'positive':
+                    spectra = spectra.exclude(adduct__charge__lte=0)
+                elif polarity == 'negative':
+                    spectra = spectra.exclude(adduct__charge__gte=0)
+            url = reverse()
+            spec_pairs = [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints,
+                                         (999 / (np.max(spectrum.centroid_ints)) * spectrum.centroid_ints).astype(int))] for
+                          spectrum in spectra]
+            exporter = getattr(export, 'get_' + fmt)
+            response = exporter("", spec_pairs)
+            response.read()
