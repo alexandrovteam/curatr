@@ -272,6 +272,10 @@ def scrape_pubchem_for_inchi():
 
 @periodic_task(run_every=crontab(minute=0, hour=1, day_of_week=1))  # every week at 1am
 def remove_old_spectra():
+    """
+    Deletes unreviewed spectra from the database if they have been there for longer than settings.SPECTRA_LIFETIME (weeks)
+
+    """
     logging.debug('running tidy old')
     if settings.SPECTRA_LIFETIME:
         time_threshold = (datetime.datetime.now() - datetime.timedelta(weeks=settings.SPECTRA_LIFETIME)).date()
@@ -279,8 +283,4 @@ def remove_old_spectra():
         spectra = FragmentationSpectrum.objects.filter(reviewed=False).filter(date_added__lt=time_threshold)
         logging.debug(('number spectra to delete:', spectra.count()))
         spectra.delete()
-
-
-
-
 
