@@ -10,8 +10,10 @@ from celery.task import periodic_task
 
 from models import Adduct, FragmentationSpectrum, Xic, LcInfo, MsInfo, InstrumentInfo
 from models import Molecule, Standard
+from django.conf import settings
 from tools import DatabaseLogHandler
 
+import datetime
 
 @shared_task
 def add_batch_standard(metadata, csv_file):
@@ -266,3 +268,19 @@ def scrape_pubchem_for_inchi():
                 m.save()
             except (BadRequestError, NotFoundError):
                 logging.error('Invalid PubChem CID: {}'.format(m.pubchem_id))
+
+
+@periodic_task(run_every=crontab(minute=0, hour=1, day_of_week=1))  # every week at 1am
+def remove_old_spectra():
+    logging.debug('running tidy old')
+    if settings.SPECTRA_LIFETIME:
+        time_threshold = (datetime.datetime.now() - datetime.timedelta(weeks=settings.SPECTRA_LIFETIME)).date()
+        logging.debug(('deleting spectra before', time_threshold))
+        spectra = FragmentationSpectrum.objects.filter(reviewed=False).filter(date_added__lt=time_threshold)
+        logging.debug(('number spectra to delete:', spectra.count()))
+        spectra.delete()
+
+
+
+
+
