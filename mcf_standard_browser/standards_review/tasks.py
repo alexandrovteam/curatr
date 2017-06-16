@@ -261,7 +261,7 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
 def scrape_pubchem_for_inchi():
     from pubchempy import BadRequestError, Compound, NotFoundError
     for m in Molecule.objects.filter(pubchem_id__isnull=False).order_by('pubchem_id'):
-        if m.pubchem_id:
+        if m.inchi_code == "":
             try:
                 c = Compound.from_cid(m.pubchem_id)
                 m.inchi_code = c.inchi
