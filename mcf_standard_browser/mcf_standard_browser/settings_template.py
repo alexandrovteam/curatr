@@ -163,8 +163,7 @@ INSTITUTE_NAME= 'MY INSTITUTE'
 MASSBANK_INSTITUTE_CODE = 'DMY' # two or three letter code for massbank export
 EXPORT_LICENCE = "CC BY"
 VALID_EXPORT_FORMATS = ['massbank', 'metabolights', 'tsv', 'mgf', 'msp']
-SPECTRA_LIFETIME = False # number of months to keep old spectra in the database, False = Forever
-
+SITE_URL = "http://my_domain.edu"
 
 SETTINGS_EXPORT = [
     'INSTITUTE_NAME',
@@ -172,5 +171,6 @@ SETTINGS_EXPORT = [
     'MEDIA_URL',
     'EXPORT_LICENCE',
     'VALID_EXPORT_FORMATS',
-    'SPECTRA_LIFETIME'
+    'SPECTRA_LIFETIME',
+    'SITE_URL'
 ]
