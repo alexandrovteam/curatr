@@ -9,7 +9,7 @@ It is written in python using the django web framework and is being developed by
 * Django 1.9
 * git 2.6
 * RabbitMQ 3.6
-* OpenBabel ```conda install -c clyde_fare openbabel=2.3.2'''
+* OpenBabel ```conda install -c clyde_fare openbabel=2.3.2```
 
 ## Installation ##
 We recommend installing curatr and its python dependencies inside a virtual environment as follows:
@@ -58,7 +58,7 @@ python manage.py migrate
 ### Create an admin user ##
 ```
 python manage.py createsuperuser
-'''
+```
 
 ### Set up a message broker (example: RabbitMQ) ##
 1. [Install RabbitMQ] (https://www.rabbitmq.com/download.html)

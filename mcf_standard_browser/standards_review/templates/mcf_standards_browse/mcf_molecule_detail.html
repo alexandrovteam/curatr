@@ -32,11 +32,13 @@
         </div>
         <div class="main-content">
             {% for standard, spectra in standards %}
-            <p>Standard ID: <a href="{% url 'standard-detail' mcfid=standard.inventory_id %}"> {{ standard }} </a></p>
-                {% for spectrum in spectra %}
-                    {{ spectrum.adduct.html_str|safe }}
-                    <div id="frag_spec{{ spectrum.id }}" class="xic_fraggraph"></div>
+            <h3>Standard: <a href="{% url 'standard-detail' mcfid=standard.inventory_id %}"> {{ standard }} </a></h3>
+                {% for spectrum, frag_plot in spectra %}
+                    {{ spectrum.adduct.html_str }}
+                    <!--<div id="frag_spec{{ spectrum.id }}" class="xic_fraggraph"></div>-->
+                    <div class="xic_fraggraph">{{frag_plot|safe}}
                     <a href="{% url 'fragmentSpectrum-detail' pk=spectrum.pk %}">View Spectrum Detail</a>
+                        </div>
             <br>
                 {% endfor %}
             {% endfor %}
@@ -51,25 +53,6 @@
 
 
 {% block script %}
-{% for spec in frag_spec_highchart %}
-    <script>
-        $(document).ready(function() {
-            $('#{{ spec.chart_id }}').highcharts({
-                chart: {{ spec.chart|safe }},
-                title: {{ spec.title|safe }},
-                xAxis: {{ spec.xAxis|safe }},
-                yAxis: {{ spec.yAxis|safe }},
-                series: {{ spec.series|safe }},
-                legend: {enabled: false},
-                tooltip: {
-                    snap: 50,
-                    crosshairs: [true,false],
-                    formatter: function () {
-                        return this.point.x;
-                    }
-                }
-            });
-        });
-    </script>
-{% endfor %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 {% endblock %}

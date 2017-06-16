@@ -81,13 +81,13 @@ body {
 }
 .specgraph {
     margin-left: 10px;
-    min-width: 100px;
+    min-width: 500px;
     max-width: 700px;
     width: 100%;
 }
 .xic_fraggraph {
     min-width: 500px;
-    max-width: 500px;
+    max-width: 1000px;
     width: 100%;
 }
 .mol {
