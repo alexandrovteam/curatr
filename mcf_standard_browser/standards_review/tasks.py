@@ -12,8 +12,9 @@ from models import Adduct, FragmentationSpectrum, Xic, LcInfo, MsInfo, Instrumen
 from models import Molecule, Standard
 from django.conf import settings
 from tools import DatabaseLogHandler
-
+import os
 import datetime
+import numpy as np
 
 @shared_task
 def add_batch_standard(metadata, csv_file):
@@ -287,3 +288,29 @@ def remove_old_spectra():
         spectra = FragmentationSpectrum.objects.filter(reviewed=False).filter(date_added__lt=time_threshold)
         logging.debug(('number spectra to delete:', spectra.count()))
         spectra.delete()
+
+
+@periodic_task(run_every=crontab(minute=0, hour=0))  # every day at midnight
+def periodic_export():
+    from . import export
+    for polarity in [None, 'positive', 'negative']:
+        spectra = FragmentationSpectrum.objects.all().filter(reviewed=True).exclude(standard=None)
+        if polarity:
+            if polarity == 'positive':
+                spectra = spectra.exclude(adduct__charge__lte=0)
+            elif polarity == 'negative':
+                spectra = spectra.exclude(adduct__charge__gte=0)
+            else:
+                raise ValueError("value of polarity not valid {}".format(polarity))
+
+        spec_pairs = [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints,
+                                 (999 / (np.max(spectrum.centroid_ints)) * spectrum.centroid_ints).astype(int))] for
+                  spectrum in spectra]
+        for fmt in [at for at in dir(export) if at.startswith('write')]:
+            fmt_name = fmt.replace("write_", "")
+            d = datetime.datetime.now()
+            fn = os.path.join(settings.MEDIA_ROOT, d.strftime("%y%d%m_{}.zip".format(fmt_name)))
+            if polarity:
+                fn = fn.replace(fmt_name, fmt_name + polarity)
+            getattr(export, fmt)(fn, spec_pairs)
+
