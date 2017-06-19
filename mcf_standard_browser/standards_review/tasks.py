@@ -223,12 +223,16 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
                         ce_type = ''
                         ce_energy = ''
                         ce_gas = ''
-                        for element in spectrum.xmlTree:
-                            if element.get('accession') == "MS:1000133":
-                                ce_type = element.items()
-                            elif element.get('accession') == "MS:1000045":
-                                ce_energy = dict(element.items())
-                        ce_str = "{} {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
+                        logging.warning(spectrum.keys())
+                        if "MS:1000512" in spectrum: # Thermo filter string
+                            ce_str = spectrum["MS:1000512"].split('@')[1].split('[')[0]
+                        else:
+                            for element in spectrum.xmlTree:
+                                if element.get('accession') == "MS:1000133":
+                                    ce_type = element.items()
+                                elif element.get('accession') == "MS:1000045":
+                                    ce_energy = dict(element.items())
+                            ce_str = "{} {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
                         if ppm_ints_sum == 0:
                             pre_fraction = 0
                         else:
