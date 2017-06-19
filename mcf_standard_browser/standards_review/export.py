@@ -45,10 +45,10 @@ def get_massbank(request, spec_pairs):
     fn = os.path.join(settings.MEDIA_ROOT, d.strftime("%y%d%m_massbank.zip"))
     if polarity:
         fn = fn.replace("_massbank", "_massbank_"+polarity)
+    logging.debug(('get massbank', fn, polarity))
     if not os.path.exists(fn):
         write_massbank(fn, spec_pairs)
-    logging.debug(('get massbank', fn, polarity))
-    response = FileResponse(open(fn), content_type="application/zip")
+    response = FileResponse(open(fn, 'rb'), content_type="application/zip")
     response['Content-Disposition'] = 'attachment; filename="spectra.zip"'
     return response
 

@@ -8,6 +8,7 @@ COPYRIGHT: (C) {% now 'Y'%} {{ settings.INSTITUTE_NAME }}
 COMMENT: export powered by curatr (https://github.com/alexandrovteam/curatr)
 COMMENT: {{ info.url }}
 COMMENT: source filename: {{ spectrum.dataset.name }}
+COMMENT: datasetId: {{ spectrum.dataset.pk }}
 CH$NAME: {{ spectrum.standard.molecule.name }}
 CH$COMPOUND_CLASS: N/A. Analytical Standard ({{ spectrum.standard.vendor }})
 CH$FORMULA: {{ spectrum.standard.molecule.sum_formula }}
