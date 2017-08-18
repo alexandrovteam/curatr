@@ -73,9 +73,10 @@ python manage.py createsuperuser
 1. [Install RabbitMQ] (https://www.rabbitmq.com/download.html)
 
     ```commandline
-     cd $HOME/Downloads
-     wget https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_11/rabbitmq-server_3.6.11-1_all.deb
-     sudo apt install ./rabbitmq-server_3.6.11-1_all.deb
+    echo "deb http://www.rabbitmq.com/debian/ testing main" >> /etc/apt/sources.list
+    curl http://www.rabbitmq.com/rabbitmq-signing-key-public.asc | sudo apt-key add -
+    sudo apt-get update
+    sudo apt-get install rabbitmq-server
     ```
 2. (Optional) Configure a user
     ```
