@@ -21,17 +21,18 @@ pip install pip-tools
 conda install -y -c clyde_fare openbabel=2.3.2
 pip-sync
 
-apt-get install -y rabbitmq-server
+apt-get install -y --force-yes rabbitmq-server
 
-cp mcf_standard_browser/mcf_standard_browser/settings_template.py cp mcf_standard_browser/mcf_standard_browser/settings.py
+cp /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings_template.py /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings.py
 
 chown -R vagrant:vagrant $HOMEPATH
 sudo -i -u vagrant
 
+cd /$HOMEPATH/curatr/mcf_standard_browser
 python manage.py migrate
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'pass')" | python manage.py shell
 python manage.py migrate djcelery
 service rabbitmq-server start
 
-screen -dmS rabbitmq python manage.py celeryd
-screen -dmS curatr python manage.py python manage.py runserver
+screen -dmS celery -L bash -c "source activate venv; python manage.py celeryd"
+screen -dmS curatr -L bash -c "source activate venv; python manage.py runserver [::]:8000"
