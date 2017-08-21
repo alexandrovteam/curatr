@@ -9,6 +9,7 @@ django-tables2
 numpy
 openbabel
 pandas
+plotly
 pubchempy
 pymspec
 pymzml
