@@ -12,7 +12,7 @@ pandas
 requests
 plotly
 pubchempy
-pymspec==0.7.8
--e git+https://github.com/celery/django-celery@v3.2.0#egg=django-celery
+pymspec==0.1.2
+pymzml==0.7.8
 python-dateutil
 sqlparse
