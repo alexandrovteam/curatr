@@ -9,9 +9,10 @@ django-tables2
 numpy
 openbabel
 pandas
+requests
 plotly
 pubchempy
-pymspec
-pymzml
+pymspec=0.7.8
+-e git+https://github.com/celery/django-celery@v3.2.0#egg=django-celery
 python-dateutil
 sqlparse
