@@ -104,7 +104,7 @@ Curatr should now be visible on  [localhost:8000](http://localhost:8000)
 
 ### Getting Going ###
 
-We have provided an example molecular library and data in the [media](https://github.com/alexandrovteam/curatr/mcf_standard_browser/media) directory 
+We have provided an example molecular library and data in the [media](https://github.com/alexandrovteam/curatr/tree/master/mcf_standard_browser/media) directory 
 1. Add standards to library
     * Single
         1. Add molecule:
