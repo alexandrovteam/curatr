@@ -55,21 +55,17 @@ class Adduct(models.Model):
         if all([self.delta_formula.startswith("+"), self.delta_formula.startswith("-")]):
             self.delta_formula = "+" + self.delta_formula
         formula_split = re.split(u'([+-])', self.delta_formula)
-        logging.debug(formula_split)
         el_dict = {}
         for sign, el in zip(formula_split[1::2], formula_split[2::2]):
             this_el_dict = dict([(segment.element().name(), int("{}1".format(sign)) * segment.amount()) for segment in
                                  pyisocalc.parseSumFormula(el).get_segments()])
             for this_el in this_el_dict:
-                logging.debug(el_dict)
                 addElement(el_dict, this_el, this_el_dict[this_el])
         sign_dict = {1: "+", -1: "-"}
         for this_el in el_dict:
             el_dict[this_el] = sum(el_dict[this_el])
-        logging.debug(el_dict)
         el_string = "".join(["{}{}{}".format(sign_dict[np.sign(el_dict[el])], el, abs(el_dict[el])) for el in el_dict if
                              el_dict[el] != 0])
-        logging.debug(el_string)
         return el_string
 
     def save(self, *args, **kwargs):
@@ -317,7 +313,6 @@ class FragmentationSpectrum(models.Model):
         return self.centroid_mzs, self.centroid_ints
 
     def save(self, *args, **kwargs):
-        logging.debug(self.pk)
         if not self.pk:
             self.date_added = datetime.datetime.now()
         self.date_edited = datetime.datetime.now()
