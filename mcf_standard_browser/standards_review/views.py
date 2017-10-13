@@ -323,12 +323,11 @@ def dataset_detail_show(request, pk):
             table_list.append(
                 [standard,
                  adduct,
-                 int(np.sum(Xic.objects.get(standard=standard, adduct=adduct, dataset=dataset).xic)),
+                 int(np.sum([np.sum(x.xic) for x in Xic.objects.all().filter(standard=standard, adduct=adduct, dataset=dataset)])),
                  FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(
                      precursor_mz__gte=mz - delta_mz).filter(precursor_mz__lte=mz + delta_mz).count(),
                  ]
             )
-
         #    data = {'dataset':dataset,
         #            'adducts':adducts,
         #            'standards':standards,
@@ -406,7 +405,6 @@ def dataset_upload(request):
                     "quad_window_mz": post_dict['quad_window_mz'][0],
                     "lc_info": post_dict['lc_info'][0],
                     "ms_info": post_dict['ms_info'][0],
-                    "instrument_info": post_dict['instrument_info'][0],
                     "ionization_method": post_dict['ionization_method'][0],
                     "ion_analyzer": post_dict['ion_analyzer'][0]}
             uploaded_file = request.FILES['mzml_file']
@@ -430,7 +428,6 @@ def dataset_upload(request):
     autocomplete = {
         'lc_info': [str(info.content) for info in LcInfo.objects.all()],
         'ms_info': [str(info.content) for info in MsInfo.objects.all()],
-        'instrument_info': [str(info.content) for info in InstrumentInfo.objects.all()],
         'ionization_method': json.dumps(
             list(set(Dataset.objects.values_list('ionization_method', flat=True).distinct()).union(
                 ['APCI', 'APPI', 'EI', 'ESI', 'FAB', 'MALDI']))),
