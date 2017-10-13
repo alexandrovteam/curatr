@@ -1,6 +1,6 @@
 import logging
 import sys
-
+import traceback
 import dateutil
 import pandas as pd
 import pymzml
@@ -9,7 +9,7 @@ from celery.schedules import crontab
 from celery.task import periodic_task
 
 from models import Adduct, FragmentationSpectrum, Xic, LcInfo, MsInfo, InstrumentInfo
-from models import Molecule, Standard
+from models import Molecule, Standard, ProcessingError
 from django.conf import settings
 from tools import DatabaseLogHandler
 import os
@@ -125,136 +125,150 @@ def add_batch_standard(metadata, csv_file):
 def handle_uploaded_files(metadata, mzml_filepath, d):
     logger = logging.getLogger(__file__ + str(d.id))
     logger.addHandler(DatabaseLogHandler(d, level=logging.ERROR))
-
-    msrun = pymzml.run.Reader(mzml_filepath)
-    ppm = float(metadata['mass_accuracy_ppm'])
-    mz_tol_quad = float(metadata['quad_window_mz'])
-    ionization_method = metadata['ionization_method']
-    ion_analyzer = metadata['ion_analyzer']
-    scan_time = []
-    standards = Standard.objects.all().filter(pk__in=metadata['standards'])
-    adducts = Adduct.objects.all().filter(pk__in=metadata['adducts'])
-    mz_upper = {}
-    mz_lower = {}
-    mz = {}
-    logger.debug(standards.count())
-    for standard in standards:
-        mz_upper[standard] = {}
-        mz_lower[standard] = {}
-        mz[standard] = {}
-        for adduct in adducts:
-            mz[standard][adduct] = standard.molecule.get_mz(adduct)
-            logger.debug({'standard': standard})
-            logger.debug({'mz': mz[standard][adduct]})
-            delta_mz = mz[standard][adduct] * ppm * 1e-6
-            mz_upper[standard][adduct] = mz[standard][adduct] + delta_mz
-            mz_lower[standard][adduct] = mz[standard][adduct] - delta_mz
-    logger.debug('adding dataset')
     try:
-        lc_info = metadata['lc_info']
-        ms_info = metadata['ms_info']
-        instrument_info = metadata['instrument_info']
-    except LookupError:
-        logger.debug('no instrument information supplied; using empty string instead')
-        lc_info = ms_info = instrument_info = ''
-
-    lc_info_stripped = set()
-    ms_info_stripped = set()
-    instr_info_stripped = set()
-    tag_sets = (lc_info_stripped, ms_info_stripped, instr_info_stripped)
-    for tag_str, tag_set in zip([lc_info, ms_info, instrument_info], tag_sets):
-        for tag in tag_str.split(', '):
-            if tag:
-                tag_stripped = tag.replace(',', '').strip()
-                tag_set.add(tag_stripped)
-    for tag_set, TagClass, attrname in zip(tag_sets, [LcInfo, MsInfo, InstrumentInfo],
-                                           ['lc_info', 'ms_info', 'instrument_info']):
-        for tag in tag_set:
-            tag_obj = TagClass.objects.get_or_create(content=tag)[0]
-            if tag_obj not in getattr(d, attrname).all():
-                getattr(d, attrname).add(tag_obj)
-
-    d.ionization_method = ionization_method
-    d.ion_analyzer = ion_analyzer
-    d.mass_accuracy_ppm = ppm
-    d.save()
-    for standard in standards:
-        d.standards_present.add(standard)
-    for adduct in adducts:
-        d.adducts_present.add(adduct)
-    d.save()
-    logger.debug('adding msms')
-    xics = {}
-    spec_n = 0
-    for spectrum in msrun:
-        spec_n += 1
-        if spectrum['ms level'] == 1:
-            scan_time.append(spectrum['scan start time'])
-        # Iterate adducts/standards and get values as required
+        msrun = pymzml.run.Reader(mzml_filepath)
+        ppm = float(metadata['mass_accuracy_ppm'])
+        mz_tol_quad = float(metadata['quad_window_mz'])
+        ionization_method = metadata['ionization_method']
+        ion_analyzer = metadata['ion_analyzer']
+        scan_time = []
+        standards = Standard.objects.all().filter(pk__in=metadata['standards'])
+        adducts = Adduct.objects.all().filter(pk__in=metadata['adducts'])
+        mz_upper = {}
+        mz_lower = {}
+        mz = {}
+        logger.debug(standards.count())
         for standard in standards:
-            if standard not in xics:
-                xics[standard] = {}
+            mz_upper[standard] = {}
+            mz_lower[standard] = {}
+            mz[standard] = {}
             for adduct in adducts:
-                if adduct not in xics[standard]:
-                    xics[standard][adduct] = []
-                if spectrum['ms level'] == 1:
-                    x = 0
-                    for m, i in spectrum.centroidedPeaks:
-                        if all([m >= mz_lower[standard][adduct], m <= mz_upper[standard][adduct]]):
-                            x += i
-                    xics[standard][adduct].append(x)
-                if spectrum['ms level'] == 2:
-                    add_msms = False
-                    pre_mz = float(spectrum['precursors'][0]['mz'])
-                    mz_tol_this_adduct = mz[standard][adduct] * ppm * 1e-6
-                    if any((abs(pre_mz - mz[standard][adduct]) <= mz_tol_this_adduct,
-                            abs(pre_mz - mz[standard][adduct]) <= mz_tol_quad)):  # frag spectrum probably the target
-                        add_msms = True
-                    if add_msms:
-                        ms1_intensity = xics[standard][adduct][-1]
-                        mzs = spectrum.mz
-                        ints = spectrum.i
-                        quad_ints = [ii for m, ii in zip(mzs, ints) if
-                                     all((m >= pre_mz - mz_tol_quad, m <= pre_mz + mz_tol_quad))]
-                        ppm_ints = [ii for m, ii in zip(mzs, ints) if
-                                    all((m >= pre_mz - mz_tol_this_adduct, m <= pre_mz + mz_tol_this_adduct))]
-                        quad_ints_sum = sum(quad_ints)
-                        ppm_ints_sum = sum(ppm_ints)
-                        ce_type = ''
-                        ce_energy = ''
-                        ce_gas = ''
-                        logging.warning(spectrum.keys())
-                        if "MS:1000512" in spectrum: # Thermo filter string
-                            ce_str = spectrum["MS:1000512"].split('@')[1].split('[')[0]
-                        else:
-                            for element in spectrum.xmlTree:
-                                if element.get('accession') == "MS:1000133":
-                                    ce_type = element.items()
-                                elif element.get('accession') == "MS:1000045":
-                                    ce_energy = dict(element.items())
-                            ce_str = "{} {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
-                        if ppm_ints_sum == 0:
-                            pre_fraction = 0
-                        else:
-                            pre_fraction = sum(ppm_ints) / sum(quad_ints)
-                        f = FragmentationSpectrum(precursor_mz=pre_mz,
-                                                  rt=spectrum['scan start time'], dataset=d, spec_num=spec_n,
-                                                  precursor_quad_fraction=pre_fraction, ms1_intensity=ms1_intensity,
-                                                  collision_energy=ce_str)
-                        f.set_centroid_mzs(spectrum.mz)
-                        f.set_centroid_ints(spectrum.i)
-                        f.collision = ce_str
-                        f.save()
-    logger.debug("adding xics")
-    for standard in standards:
+                mz[standard][adduct] = standard.molecule.get_mz(adduct)
+                logger.debug({'standard': standard})
+                logger.debug({'mz': mz[standard][adduct]})
+                delta_mz = mz[standard][adduct] * ppm * 1e-6
+                mz_upper[standard][adduct] = mz[standard][adduct] + delta_mz
+                mz_lower[standard][adduct] = mz[standard][adduct] - delta_mz
+        logger.debug('adding dataset')
+        try:
+            lc_info = metadata['lc_info']
+            ms_info = metadata['ms_info']
+            instrument_info = metadata['instrument_info']
+        except LookupError:
+            logger.debug('no instrument information supplied; using empty string instead')
+            lc_info = ms_info = instrument_info = ''
+
+        lc_info_stripped = set()
+        ms_info_stripped = set()
+        instr_info_stripped = set()
+        tag_sets = (lc_info_stripped, ms_info_stripped, instr_info_stripped)
+        for tag_str, tag_set in zip([lc_info, ms_info, instrument_info], tag_sets):
+            for tag in tag_str.split(', '):
+                if tag:
+                    tag_stripped = tag.replace(',', '').strip()
+                    tag_set.add(tag_stripped)
+        for tag_set, TagClass, attrname in zip(tag_sets, [LcInfo, MsInfo, InstrumentInfo],
+                                               ['lc_info', 'ms_info', 'instrument_info']):
+            for tag in tag_set:
+                tag_obj = TagClass.objects.get_or_create(content=tag)[0]
+                if tag_obj not in getattr(d, attrname).all():
+                    getattr(d, attrname).add(tag_obj)
+
+        d.ionization_method = ionization_method
+        d.ion_analyzer = ion_analyzer
+        d.mass_accuracy_ppm = ppm
+        d.save()
+        for standard in standards:
+            d.standards_present.add(standard)
         for adduct in adducts:
-            # if np.sum(xics[standard][adduct]) > 0:
-            x = Xic(mz=standard.molecule.get_mz(adduct), dataset=d)
-            x.set_xic(xics[standard][adduct])
-            x.set_rt(scan_time)
-            x.standard = standard
-            x.adduct = adduct
-            x.save()
+            d.adducts_present.add(adduct)
+        d.save()
+        logger.debug('adding msms')
+        xics = {}
+        spec_n = 0
+        for spectrum in msrun:
+            spec_n += 1
+            if spectrum['ms level'] == 1:
+                scan_time.append(spectrum['scan start time'])
+                last_ms1 = spectrum
+            # Iterate adducts/standards and get values as required
+            for standard in standards:
+                if standard not in xics:
+                    xics[standard] = {}
+                for adduct in adducts:
+                    if adduct not in xics[standard]:
+                        xics[standard][adduct] = []
+                    if spectrum['ms level'] == 1:
+                        x = 0
+                        for m, i in spectrum.centroidedPeaks:
+                            if all([m >= mz_lower[standard][adduct], m <= mz_upper[standard][adduct]]):
+                                x += i
+                        xics[standard][adduct].append(x)
+                    if spectrum['ms level'] == 2:
+                        add_msms = False
+                        pre_mz = float(spectrum['precursors'][0]['mz'])
+                        mz_tol_this_adduct = mz[standard][adduct] * ppm * 1e-6
+                        if any((abs(pre_mz - mz[standard][adduct]) <= mz_tol_this_adduct,
+                                abs(pre_mz - mz[standard][adduct]) <= mz_tol_quad)):  # frag spectrum probably the target
+                            add_msms = True
+                        if add_msms:
+                            if xics[standard][adduct]:
+                                ms1_intensity = xics[standard][adduct][-1]
+                                mzs = last_ms1.mz
+                                ints = last_ms1.i
+                                quad_ints = [ii for m, ii in zip(mzs, ints) if
+                                             all((m >= pre_mz - mz_tol_quad, m <= pre_mz + mz_tol_quad))]
+                                ppm_ints = [ii for m, ii in zip(mzs, ints) if
+                                            all((m >= pre_mz - mz_tol_this_adduct, m <= pre_mz + mz_tol_this_adduct))]
+                                quad_ints_sum = sum(quad_ints)
+                                ppm_ints_sum = sum(ppm_ints)
+                                if ppm_ints_sum == 0:
+                                    pre_fraction = 0
+                                else:
+                                    pre_fraction = ppm_ints_sum / quad_ints_sum
+                            else:
+                                ms1_intensity = -1. #TODO update pymzml version and take value from selected precursors
+                                pre_fraction = 0
+
+                            ce_type = ''
+                            ce_energy = ''
+                            ce_gas = ''
+                            logging.warning(spectrum.keys())
+                            if "MS:1000512" in spectrum: # Thermo filter string
+                                ce_str = spectrum["MS:1000512"].split('@')[1].split('[')[0]
+                            else:
+                                for element in spectrum.xmlTree:
+                                    if element.get('accession') == "MS:1000133":
+                                        ce_type = element.items()
+                                    elif element.get('accession') == "MS:1000045":
+                                        ce_energy = dict(element.items())
+                                ce_str = "{} {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
+                            f = FragmentationSpectrum(precursor_mz=pre_mz,
+                                                      rt=spectrum['scan start time'], dataset=d, spec_num=spec_n,
+                                                      precursor_quad_fraction=pre_fraction, ms1_intensity=ms1_intensity,
+                                                      collision_energy=ce_str)
+                            f.set_centroid_mzs(spectrum.mz)
+                            f.set_centroid_ints(spectrum.i)
+                            f.collision = ce_str
+                            f.save()
+        logger.debug("adding xics")
+        for standard in standards:
+            for adduct in adducts:
+                # if np.sum(xics[standard][adduct]) > 0:
+                x = Xic(mz=standard.molecule.get_mz(adduct), dataset=d)
+                x.set_xic(xics[standard][adduct])
+                x.set_rt(scan_time)
+                x.standard = standard
+                x.adduct = adduct
+                x.save()
+    except Exception as e:
+        exc_info = sys.exc_info()
+        message = "Dataset processing failed. Here's what we know, check the log for more details. {}".format(e)
+        p = ProcessingError(dataset=d, message=message)
+        p.save()
+        logger.error(e)
+        logger.error(traceback.print_exception(*exc_info))
+        del exc_info
     d.processing_finished = True
     d.save()
     logger.debug('done')
