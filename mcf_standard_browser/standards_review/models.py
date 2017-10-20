@@ -3,12 +3,10 @@ import base64
 import datetime
 import json
 import logging
-try:
-    # For Python 3.0 and later
-    from urllib.request import Request, urlopen
-except ImportError:
-    # Fall back to Python 2's urllib2
-    from urllib2 import Request, urlopen
+
+# For Python 3.0 and later
+from urllib.request import Request, urlopen
+
 
 from django.db.models import Max
 from django.utils import safestring

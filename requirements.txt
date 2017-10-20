@@ -8,10 +8,10 @@ django-settings-export
 django-tables2
 numpy
 pandas
-requests
 plotly
 pubchempy
 pymspec==0.1.2
 -e git+https://github.com/andy-d-palmer/pymzml@v2.0.0#egg=pymzml
 python-dateutil
+requests
 sqlparse
