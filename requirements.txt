@@ -1,8 +1,14 @@
+amqp==1.4.9
+anyjson==0.3.3
+billiard==3.3.0.23
 celery==3.1.25
 certifi==2017.7.27.1
 chardet==3.0.4
 click==6.7
-Django==1.11.6
+decorator==4.1.2
+Django==1.10.2
+django-braces==1.11.0
+-e git+https://github.com/celery/django-celery@v3.2.0#egg=django-celery
 django-datatable==0.3.1
 django-highcharts==0.1.7
 django-settings-export==1.2.1
@@ -10,6 +16,11 @@ django-static-jquery==2.1.4
 django-tables2==1.13.0
 first==2.0.1
 idna==2.6
+ipython-genutils==0.2.0
+jsonschema==2.6.0
+jupyter-core==4.3.0
+kombu==3.0.37
+nbformat==4.4.0
 numpy==1.13.3
 pandas==0.20.3
 pip==9.0.1
@@ -17,10 +28,13 @@ pip-tools==1.10.1
 plotly==2.1.0
 PubChemPy==1.0.4
 pyMSpec==0.1.2
+-e git+https://github.com/andy-d-palmer/pymzml@v2.0.0#egg=pymzml
 python-dateutil==2.6.1
+pytz==2017.2
 requests==2.18.4
 setuptools==36.4.0
 six==1.11.0
 sqlparse==0.2.4
+traitlets==4.3.2
 urllib3==1.22
 wheel==0.29.0
