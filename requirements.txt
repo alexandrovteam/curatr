@@ -15,3 +15,4 @@ pymspec==0.1.2
 python-dateutil
 requests
 sqlparse
+urllib3
