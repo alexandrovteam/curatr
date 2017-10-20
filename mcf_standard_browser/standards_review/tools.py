@@ -5,7 +5,7 @@ import logging
 
 from django.contrib.auth.models import User
 
-from .models import FragmentationSpectrum, Molecule, Standard, ProcessingError
+from standards_review.models import FragmentationSpectrum, Molecule, Standard, ProcessingError
 
 
 def update_fragSpec(frag_spec_id, response, standard, adduct, username):

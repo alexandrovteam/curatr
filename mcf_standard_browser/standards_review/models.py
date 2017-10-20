@@ -3,7 +3,12 @@ import base64
 import datetime
 import json
 import logging
-from urllib2 import Request, urlopen
+try:
+    # For Python 3.0 and later
+    from urllib.request import Request, urlopen
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import Request, urlopen
 
 from django.db.models import Max
 from django.utils import safestring
@@ -46,6 +51,10 @@ class Adduct(models.Model):
     def __unicode__(self):
         #!! don't edit this - I'm an idiot so it's used as a key in Molecule!!#
         return "[{}M{}]{}".format(self.nM, self.delta_formula, self.charge)
+
+    def __str__(self):
+        return self.html_str()
+
 
     def get_delta_atoms(self):
         def addElement(elDict, element, number):
@@ -95,12 +104,12 @@ class Molecule(models.Model):
     def set_adduct_mzs(self):
         adduct_dict = {}
         for adduct in Adduct.objects.all():
-            adduct_dict[str(adduct)] = self.get_mz(adduct)
+            adduct_dict[str(adduct.__unicode__())] = self.get_mz(adduct)
         self._adduct_mzs = json.dumps(adduct_dict)
 
     def get_adduct_mzs_by_pk(self):
         by_str = self.get_adduct_mzs()
-        return {add.pk: by_str[str(add)] for add in Adduct.objects.all()}
+        return {adduct.pk: by_str[str(adduct.__unicode__())] for adduct in Adduct.objects.all()}
 
     adduct_mzs = property(get_adduct_mzs, set_adduct_mzs)
     adduct_mzs_by_pk = property(get_adduct_mzs_by_pk)
@@ -116,6 +125,10 @@ class Molecule(models.Model):
 
     def __unicode__(self):
         return u"".join([i for i in self.name if ord(i) < 128])
+
+    def __str__(self):
+        return self.__unicode__()
+
 
     def html_str(self):
         return safestring.mark_safe("{}".format(self.name))
@@ -183,12 +196,18 @@ class Standard(models.Model):
     def __unicode__(self):
         return "{}: {}".format(self.inventory_id, self.molecule.name)
 
+    def __str__(self):
+        return self.__unicode__()
+
 
 class LcInfo(models.Model):
     content = models.TextField()
 
     def __unicode__(self):
         return self.content
+    def __str__(self):
+        return self.__unicode__()
+
 
 
 class MsInfo(models.Model):
@@ -197,12 +216,18 @@ class MsInfo(models.Model):
     def __unicode__(self):
         return self.content
 
+    def __str__(self):
+        return self.__unicode__()
+
 
 class InstrumentInfo(models.Model):
     content = models.TextField()
 
     def __unicode__(self):
         return self.content
+
+    def __str__(self):
+        return self.__unicode__()
 
 
 class Dataset(models.Model):
@@ -225,6 +250,8 @@ class Dataset(models.Model):
     def __unicode__(self):
         return self.name
 
+    def __str__(self):
+        return self.__unicode__()
 
 class Xic(models.Model):
     mz = models.FloatField(default=0.0)
@@ -249,11 +276,11 @@ class Xic(models.Model):
         self._rt = base64.b64encode(rt)
 
     def get_xic(self):
-        r = base64.decodestring(self._xic)
+        r = base64.b64decode(self._xic)
         return np.frombuffer(r, dtype=np.float64)
 
     def get_rt(self):
-        r = base64.decodestring(self._rt)
+        r = base64.b64decode(self._rt)
         return np.frombuffer(r, dtype=np.float64)
 
     xic = property(get_xic, set_xic)
@@ -289,12 +316,16 @@ class FragmentationSpectrum(models.Model):
     def __unicode__(self):
         return "{} {:3.2f}".format(self.spec_num, self.precursor_mz)
 
+    def __str__(self):
+        return self.__unicode__()
+
+
     def set_centroid_mzs(self, mzs):
         mzs = np.asarray(mzs, dtype=np.float64)
         self._centroid_mzs = base64.b64encode(mzs)
 
     def get_centroid_mzs(self):
-        r = base64.decodestring(self._centroid_mzs)
+        r = base64.b64decode(self._centroid_mzs)
         return np.frombuffer(r, dtype=np.float64)
 
     centroid_mzs = property(get_centroid_mzs, set_centroid_mzs)
@@ -304,7 +335,7 @@ class FragmentationSpectrum(models.Model):
         self._centroid_ints = base64.b64encode(values)
 
     def get_centroid_ints(self):
-        r = base64.decodestring(self._centroid_ints)
+        r = base64.b64decode(self._centroid_ints)
         return np.frombuffer(r, dtype=np.float64)
 
     centroid_ints = property(get_centroid_ints, set_centroid_ints)
@@ -356,3 +387,7 @@ class MoleculeTag(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def __str__(self):
+        return self.__unicode__()
+

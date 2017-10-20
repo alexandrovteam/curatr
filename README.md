@@ -9,6 +9,7 @@ It is written in python using the django web framework and is being developed by
 ## Requirements ##
 * Ubuntu 14.04 or 16.04
 * git 2.6
+* python 3.6
 
 ## Installation ##
 We recommend installing curatr and its python dependencies inside a conda virtual environment as follows:
@@ -31,11 +32,12 @@ git clone https://github.com/alexandrovteam/curatr
 
 ### Initialize and activate a 'curatr' environment with all python dependencies
     ```
-    conda create -y -n venv python=2.7
+    conda create -y -n venv python=3.6
     source activate venv
     pip install --upgrade pip
     pip install pip-tools
-    conda install -y -c clyde_fare openbabel=2.3.2
+    conda install cython
+    conda install -y -c openbabel openbabel
     pip-sync
     ```
     

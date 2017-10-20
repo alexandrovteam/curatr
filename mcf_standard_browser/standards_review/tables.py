@@ -9,7 +9,7 @@ from table.columns import Column, LinkColumn, Link
 from table.utils import Accessor
 from django.utils import safestring
 
-from models import Standard, Adduct, FragmentationSpectrum, Dataset
+from standards_review.models import Standard, Adduct, FragmentationSpectrum, Dataset
 
 
 class AdductMzColumn(Column):
@@ -100,7 +100,7 @@ class DatasetListTable(Table):
     class Meta:
         model = Dataset
         ajax = True
-        sort = [(0, 'asc')]
+        sort = [(0, 'desc')]
 
 
 try:

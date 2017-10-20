@@ -6,9 +6,9 @@ from django.test import Client
 from django.test import TestCase
 from os.path import join
 
-from models import Molecule, FragmentationSpectrum, Dataset
-from models import Standard
-from tasks import add_batch_standard
+from standards_review.models import Molecule, FragmentationSpectrum, Dataset
+from standards_review.models import Standard
+from standards_review.tasks import add_batch_standard
 
 test_credentials = dict(username='testuser', password='secret')
 

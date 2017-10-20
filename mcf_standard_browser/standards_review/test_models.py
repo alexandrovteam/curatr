@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 from django.test import TestCase
 
-from models import Molecule, Standard, Dataset, Adduct, Xic, FragmentationSpectrum
+from standards_review.models import Molecule, Standard, Dataset, Adduct, Xic, FragmentationSpectrum
 
 
 # Create your tests here.

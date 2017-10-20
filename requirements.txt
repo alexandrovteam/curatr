@@ -7,12 +7,11 @@ django-static-jquery
 django-settings-export
 django-tables2
 numpy
-openbabel
 pandas
 requests
 plotly
 pubchempy
 pymspec==0.1.2
-pymzml==0.7.8
+-e git+https://github.com/andy-d-palmer/pymzml@v2.0.0#egg=pymzml
 python-dateutil
 sqlparse

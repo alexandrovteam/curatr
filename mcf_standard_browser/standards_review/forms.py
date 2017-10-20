@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 
 __author__ = 'palmer'
 from django import forms
-from .models import Standard, Adduct, FragmentationSpectrum, Molecule, MoleculeTag, LcInfo, MsInfo
+from standards_review.models import Standard, Adduct, FragmentationSpectrum, Molecule, MoleculeTag, LcInfo, MsInfo
 import logging
 from django.utils.safestring import mark_safe
 

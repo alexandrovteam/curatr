@@ -8,10 +8,10 @@ from celery import shared_task
 from celery.schedules import crontab
 from celery.task import periodic_task
 
-from models import Adduct, FragmentationSpectrum, Xic, LcInfo, MsInfo, InstrumentInfo
-from models import Molecule, Standard, ProcessingError
+from standards_review.models import Adduct, FragmentationSpectrum, Xic, LcInfo, MsInfo, InstrumentInfo
+from standards_review.models import Molecule, Standard, ProcessingError
 from django.conf import settings
-from tools import DatabaseLogHandler
+from standards_review.tools import DatabaseLogHandler
 import os
 import datetime
 import numpy as np
@@ -53,7 +53,7 @@ def add_batch_standard(metadata, csv_file):
     :return:
     """
     error_list = []
-    df = pd.read_csv(csv_file, sep="\t", dtype=unicode)
+    df = pd.read_csv(csv_file, sep="\t")
     logging.info('I read the file')
     df.columns = [x.replace(" ", "_").lower() for x in df.columns]
     logging.info("I replaced columns")
@@ -123,8 +123,10 @@ def add_batch_standard(metadata, csv_file):
 
 @shared_task
 def handle_uploaded_files(metadata, mzml_filepath, d):
+    print(__file__ + str(d.id))
     logger = logging.getLogger(__file__ + str(d.id))
-    logger.addHandler(DatabaseLogHandler(d, level=logging.ERROR))
+    logger.addHandler(DatabaseLogHandler(d, level=logging.DEBUG))
+    logger.debug("adding dataset {}".format(mzml_filepath))
     try:
         msrun = pymzml.run.Reader(mzml_filepath)
         ppm = float(metadata['mass_accuracy_ppm'])
@@ -200,20 +202,22 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
                         xics[standard][adduct] = []
                     if spectrum['ms level'] == 1:
                         x = 0
-                        for m, i in spectrum.centroidedPeaks:
+                        for m, i in spectrum.peaks('centroided'):
                             if all([m >= mz_lower[standard][adduct], m <= mz_upper[standard][adduct]]):
                                 x += i
                         xics[standard][adduct].append(x)
                     if spectrum['ms level'] == 2:
                         add_msms = False
-                        pre_mz = float(spectrum['precursors'][0]['mz'])
+                        pre_mz, pre_int = spectrum.selected_precursors[0]
                         mz_tol_this_adduct = mz[standard][adduct] * ppm * 1e-6
                         if any((abs(pre_mz - mz[standard][adduct]) <= mz_tol_this_adduct,
                                 abs(pre_mz - mz[standard][adduct]) <= mz_tol_quad)):  # frag spectrum probably the target
                             add_msms = True
                         if add_msms:
                             if xics[standard][adduct]:
-                                ms1_intensity = xics[standard][adduct][-1]
+                                logging.debug(xics[standard][adduct][-1], pre_int)
+                                if not pre_int:
+                                    pre_int = xics[standard][adduct][-1]
                                 mzs = last_ms1.mz
                                 ints = last_ms1.i
                                 quad_ints = [ii for m, ii in zip(mzs, ints) if
@@ -227,25 +231,33 @@ def handle_uploaded_files(metadata, mzml_filepath, d):
                                 else:
                                     pre_fraction = ppm_ints_sum / quad_ints_sum
                             else:
-                                ms1_intensity = -1. #TODO update pymzml version and take value from selected precursors
+                                pre_int = -1
                                 pre_fraction = 0
 
                             ce_type = ''
                             ce_energy = ''
                             ce_gas = ''
-                            logging.warning(spectrum.keys())
-                            if "MS:1000512" in spectrum: # Thermo filter string
-                                ce_str = spectrum["MS:1000512"].split('@')[1].split('[')[0]
+                            tfs = spectrum.element.find(
+                                    "./{ns}cvParam[@accession='MS:1000512']".format(
+                                        ns=spectrum.ns
+                                    )
+                                ) # "MS:1000512" = Thermo filter string
+                            if tfs:
+                                ce_str = tfs.get('value').split('@')[1].split('[')[0]
                             else:
-                                for element in spectrum.xmlTree:
-                                    if element.get('accession') == "MS:1000133":
-                                        ce_type = element.items()
-                                    elif element.get('accession') == "MS:1000045":
-                                        ce_energy = dict(element.items())
+                                pcList = spectrum.element.find(spectrum.ns+"precursorList")
+                                activation = pcList.getchildren()[0].find(spectrum.ns+"activation")
+                                ce_type = activation.getchildren()[0].attrib['name']
+                                ce_energy =  dict(activation.getchildren()[1].items())
+                                #for element in spectrum.xmlTree:
+                                #    if element.get('accession') == "MS:1000133":
+                                #        ce_type = element.items()
+                                #    elif element.get('accession') == "MS:1000045":
+                                #        ce_energy = dict(element.items())
                                 ce_str = "{} {} {}".format(ce_energy['name'], ce_energy['value'], ce_energy['unitName'])
                             f = FragmentationSpectrum(precursor_mz=pre_mz,
                                                       rt=spectrum['scan start time'], dataset=d, spec_num=spec_n,
-                                                      precursor_quad_fraction=pre_fraction, ms1_intensity=ms1_intensity,
+                                                      precursor_quad_fraction=pre_fraction, ms1_intensity=pre_int,
                                                       collision_energy=ce_str)
                             f.set_centroid_mzs(spectrum.mz)
                             f.set_centroid_ints(spectrum.i)

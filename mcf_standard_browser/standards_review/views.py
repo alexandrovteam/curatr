@@ -19,15 +19,14 @@ from django_tables2 import RequestConfig
 from django.http import JsonResponse
 
 from table.views import FeedDataView
-
-import tasks
-import tools
-import plots
-import export
-from models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag, \
+import standards_review.tasks as tasks
+import standards_review.tools as tools
+import standards_review.plots as plots
+import standards_review.export as export
+from standards_review.models import Standard, FragmentationSpectrum, Dataset, Adduct, Xic, Molecule, MoleculeSpectraCount, MoleculeTag, \
     LcInfo, MsInfo, InstrumentInfo
-from tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
-from .forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
+from standards_review.tables import StandardTable, MoleculeTable, SpectraTable, DatasetListTable
+from standards_review.forms import AdductForm, MoleculeForm, StandardForm, UploadFileForm, FragSpecReview, \
     StandardBatchForm, ExportLibrary, MoleculeTagForm, StandardAddForm
 
 
@@ -415,7 +414,7 @@ def dataset_upload(request):
             mzml_filepath = os.path.join(settings.MEDIA_ROOT, mzml_filename)
             logging.debug("mzML filepath: " + mzml_filepath)
             logging.debug("original mzML filename: " + uploaded_file.name)
-            with open(mzml_filepath, 'w') as destination:
+            with open(mzml_filepath, 'wb') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
             d.path = mzml_filepath

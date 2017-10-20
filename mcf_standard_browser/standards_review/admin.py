@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import Standard,Dataset, FragmentationSpectrum, Adduct, Xic, Molecule, LcInfo, MsInfo
+from .models import Standard,Dataset, FragmentationSpectrum, Adduct, Xic, Molecule, LcInfo, MsInfo
 # Register your models here.
 admin.site.register(Standard)
 admin.site.register(Adduct)

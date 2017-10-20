@@ -2,11 +2,12 @@
 echo $HOME
 git clone https://github.com/alexandrovteam/curatr
 cd curatr
-conda create -y -n venv python=2.7
+conda create -y -n venv python=3.6
 source activate venv
 pip install --upgrade pip
 pip install pip-tools
-conda install -y -c clyde_fare openbabel=2.3.2
+conda install -y cython
+conda install -y -c openbabel openbabel
 pip-sync
 
 cp /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings_template.py /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings.py

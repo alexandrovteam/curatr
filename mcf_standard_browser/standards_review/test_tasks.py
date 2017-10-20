@@ -4,8 +4,8 @@ from django.conf import settings
 from django.test import TestCase
 from os.path import join
 
-from models import Molecule, Standard, Dataset, Adduct, LcInfo, MsInfo, InstrumentInfo
-from tasks import add_batch_standard, handle_uploaded_files
+from standards_review.models import Molecule, Standard, Dataset, Adduct, LcInfo, MsInfo, InstrumentInfo
+from standards_review.tasks import add_batch_standard, handle_uploaded_files
 
 
 class DataImportTest(TestCase):  # TODO: add test cases for overwriting existing standards

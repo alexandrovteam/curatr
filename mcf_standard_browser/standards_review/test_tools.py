@@ -2,8 +2,8 @@ import logging
 
 from django.test import TestCase
 
-from models import Molecule, Standard, Dataset, ProcessingError
-from tools import clear_molecules_without_standard, DatabaseLogHandler
+from standards_review.models import Molecule, Standard, Dataset, ProcessingError
+from standards_review.tools import clear_molecules_without_standard, DatabaseLogHandler
 
 
 class MoleculeCleanTest(TestCase):
