@@ -6,9 +6,9 @@ conda create -y -n venv python=3.6
 source activate venv
 pip install --upgrade pip
 pip install pip-tools
-conda install -y cython
 conda install -y -c openbabel openbabel
-pip-sync
+pip install cython
+pip install -r requirements.txt
 
 cp /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings_template.py /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings.py
 cd ~/curatr/mcf_standard_browser
