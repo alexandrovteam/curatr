@@ -8,6 +8,7 @@ pip install --upgrade pip
 pip install pip-tools
 conda install -y -c openbabel openbabel
 pip install cython
+pip install requests
 pip install -r requirements.txt
 
 cp /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings_template.py /home/vagrant/curatr/mcf_standard_browser/mcf_standard_browser/settings.py
