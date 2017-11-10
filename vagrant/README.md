@@ -8,7 +8,7 @@ Dependancies:
 Steps to get curatr running inside a virtual machine using vagrant.
 1. Clone or [download](https://github.com/alexandrovteam/curatr/archive/master.zip) the curatr repository
 2. Find this directory `cd ./curatr/vagrant`
-3. Edit start.sh and change the password on line 17 (optionally also change the username)
+3. Edit setup.sh and change the password on line 17 (optionally also change the username)
 4. Run `vagrant up`
 
 Curatr should now be visible at [localhost:8080/](http://localhost:8080/).
