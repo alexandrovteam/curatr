@@ -43,7 +43,7 @@ def add_batch_standard(metadata, csv_file):
     # Optional
     inchi_code = models.TextField(default="")
     exact_mass = models.FloatField(default=0.0)
-    solubility = models.TextField(null=True, blank=True)
+    solubility   = models.TextField(null=True, blank=True)
     # External reference numbers
     hmdb_id = models.TextField(null=True, blank=True)
     chebi_id = models.TextField(null=True, blank=True)
@@ -57,8 +57,10 @@ def add_batch_standard(metadata, csv_file):
     logging.info('I read the file')
     df.columns = [x.replace(" ", "_").lower() for x in df.columns]
     logging.info("I replaced columns")
-    df = df.fillna("")
-    # df = df.applymap(to_unicode)
+    # Fill missing values
+    df['id'].fillna(-1, inplace=True)
+    df.fillna("", inplace=True)
+    df['id'] = df['id'].astype(str)
     logging.info("Shape: {}".format(df.shape))
     for row in df.iterrows():
         logging.info("row: {}".format(row))
@@ -71,7 +73,6 @@ def add_batch_standard(metadata, csv_file):
             #    if entry[tag] != "":
             #        entry[tag] = entry[tag].encode("utf8") # make strings safe
 
-            entry['id'] = ''.join([char for char in entry['id'] if char in ("0123456789")])
 
             if entry['pubchem_id'] != "":
                 molecule = Molecule.objects.all().filter(pubchem_id=entry['pubchem_id'])
@@ -100,6 +101,7 @@ def add_batch_standard(metadata, csv_file):
             s = Standard.objects.all().filter(inventory_id=entry['id'])
             if s.exists():  # standard already added, overwrite
                 s = s[0]
+                s.molecule=molecule
             else:
                 s = Standard(molecule=molecule)
                 s.save()
