@@ -2,6 +2,7 @@
 echo $HOME
 git clone https://github.com/alexandrovteam/curatr
 cd curatr
+git pull
 conda create -y -n venv python=3.6
 source activate venv
 pip install --upgrade pip
