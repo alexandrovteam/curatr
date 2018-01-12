@@ -18,4 +18,5 @@ echo "from django.contrib.auth.models import User; User.objects.create_superuser
 python manage.py migrate djcelery
 
 screen -dmS celery -L bash -c "source activate venv; python manage.py celeryd"
+screen -dmS beat -L bash -c "source activate venv; python manage.py celerybeat"
 screen -dmS curatr -L bash -c "source activate venv; python manage.py runserver [::]:8000"
