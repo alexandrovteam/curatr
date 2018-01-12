@@ -58,9 +58,8 @@ def add_batch_standard(metadata, csv_file):
     df.columns = [x.replace(" ", "_").lower() for x in df.columns]
     logging.info("I replaced columns")
     # Fill missing values
-    df['id'].fillna(-1, inplace=True)
-    df.fillna("", inplace=True)
     df['id'] = df['id'].astype(str)
+    df.fillna("", inplace=True)
     logging.info("Shape: {}".format(df.shape))
     for row in df.iterrows():
         logging.info("row: {}".format(row))
@@ -97,13 +96,15 @@ def add_batch_standard(metadata, csv_file):
                 logging.info(molecule)
                 molecule.save()
                 logging.info("Successfully saved " + molecule.name)
-
-            s = Standard.objects.all().filter(inventory_id=entry['id'])
-            if s.exists():  # standard already added, overwrite
-                s = s[0]
-                s.molecule=molecule
-            else:
+            if entry['id'] == 'nan':
                 s = Standard(molecule=molecule)
+            else:
+                s = Standard.objects.all().filter(inventory_id=entry['id'])
+                if s.exists():  # standard already added, overwrite
+                    s = s[0]
+                    s.molecule=molecule
+                else:
+                    s = Standard(molecule=molecule)
             s.vendor = entry["vendor"]
             s.vendor_cat = entry["vendor_id"]
             s.save()
