@@ -104,17 +104,8 @@ def add_batch_standard(metadata, csv_file):
                 s.molecule=molecule
             else:
                 s = Standard(molecule=molecule)
-                s.save()
             s.vendor = entry["vendor"]
             s.vendor_cat = entry["vendor_id"]
-            s.lot_num = entry["lot_num"]
-            if entry["purchase_date"] != '':
-                s.purchase_date = dateutil.parser.parse(entry["purchase_date"], fuzzy=True)
-            s.save()
-            if entry["id"] == []:
-                s.inventory_id = s.pk
-            else:
-                s.inventory_id = entry['id']
             s.save()
         except:
             error_list.append([entry['name'], sys.exc_info()[1]])
