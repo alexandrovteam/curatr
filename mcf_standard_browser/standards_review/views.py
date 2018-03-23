@@ -359,7 +359,7 @@ def xic_detail(request, dataset_pk, mcfid, adduct_pk):
     # xics=Xic.objects.all().filter(dataset=dataset).filter(mz__gte=mz-delta_mz).filter(mz__lte=mz+delta_mz)
     xic = Xic.objects.all().filter(standard=standard, adduct=adduct, dataset=dataset)[0]
     frag_specs = FragmentationSpectrum.objects.all().filter(dataset=dataset).filter(
-        precursor_mz__gte=mz - delta_mz).filter(precursor_mz__lte=mz + delta_mz).order_by('-ms1_intensity')[:10]
+        precursor_mz__gte=mz - delta_mz).filter(precursor_mz__lte=mz + delta_mz).distinct().order_by('-ms1_intensity')[:20]
     form = FragSpecReview(request.POST or None, extra=list([fs.pk for fs in frag_specs]), user=request.user)
     if form.is_valid():
         for (fragSpecId, response) in form.get_response():
@@ -476,27 +476,20 @@ def library_stats(request):
     total_taggings = sum(tag_counts)
     total_tagged = Molecule.objects.filter(tags__isnull=False).count()
 
+    # count spectra per adduct
+    adduct_count = [FragmentationSpectrum.objects.filter(adduct=a).count() for a in tools.all_adducts()]
+    adduct_count_label = [str(a.nice_str()) for a in tools.all_adducts()]
+
     # maps number of annotations to how many molecules exists with that amount of annotations, excluding 0
     annotation_count_histo = Counter(
         [int(d['spectra_count']) for d in MoleculeSpectraCount.objects.filter(spectra_count__gt=0).values()])
 
+    # Generate plots
+    plot_curated = plots.donut([total_accepted, total_rejected, total_spectra - total_reviewed], ['Accepted', 'Rejected', 'Unreviewed'])
+    plot_spec_count = plots.bar(list(annotation_count_histo.values()), list(annotation_count_histo.keys()), xlabel='number of molecules', ylabel='number of spectra', reverse=True)
+    plot_adduct_count = plots.bar(adduct_count, adduct_count_label, xlabel='adduct', ylabel='number of spectra', reverse=False)
+    plot_tag_count = plots.bar(tag_counts, [str(t) for t in MoleculeTag.objects.all()], xlabel='tag', ylabel='number of spectra', reverse=False)
     data = {
-        "chart1": {
-            'data': [total_accepted, total_rejected, total_spectra - total_reviewed],
-            'labels': ['accepted', 'rejected', 'unreviewed'],
-        },
-        "chart2": {
-            'data': annotation_count_histo.values(),
-            'labels': annotation_count_histo.keys()
-        },
-        "chart3": {
-            'data': tag_counts,
-            'labels': [str(t) for t in MoleculeTag.objects.all()],
-        },
-        "adduct_bar_chart": {
-            'data': [FragmentationSpectrum.objects.filter(adduct=a).count() for a in Adduct.objects.all()],
-            'labels': [str(a.nice_str()) for a in Adduct.objects.all()]
-        },
         "total_spectra": total_spectra,
         "total_molecules": total_molecules,
         "total_annotated": total_annotated,
@@ -506,6 +499,10 @@ def library_stats(request):
         "percent_spectra_curated": _percent(total_reviewed, total_spectra),
         "percent_molecules_annotated": _percent(total_annotated, total_molecules),
         "percent_molecules_tagged": _percent(total_tagged, total_molecules),
+        "plot_curated": plot_curated,
+        "plot_spec_count": plot_spec_count,
+        "plot_tag_count": plot_tag_count,
+        "plot_adduct_count":plot_adduct_count,
     }
     return render(request, 'mcf_standards_browse/mcf_library_stats.html', data)
 
