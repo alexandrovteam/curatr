@@ -5,7 +5,11 @@ import logging
 
 from django.contrib.auth.models import User
 
-from standards_review.models import FragmentationSpectrum, Molecule, Standard, ProcessingError
+from standards_review.models import FragmentationSpectrum, Molecule, Standard, ProcessingError, Adduct
+
+def all_adducts():
+    adducts = Adduct.objects.order_by('charge').all()
+    return adducts
 
 
 def update_fragSpec(frag_spec_id, response, standard, adduct, username):
