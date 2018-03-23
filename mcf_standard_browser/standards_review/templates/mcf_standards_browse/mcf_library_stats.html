@@ -23,8 +23,9 @@
                 <h2>Fragmentation Spectra</h2>
             </div>
             <div class="row" style="margin-top: 20px;">
-                <div class="col-sm-4">
-                    <canvas id="chart1" width="100%" height="100%"></canvas>
+                <div class="col-sm-6">
+                    <!--<canvas id="chart1" width="100%" height="100%"></canvas>-->
+                    {{plot_curated|safe}}
                 </div>
                 <div class="col-sm-2"></div>
                 <div class="col-sm-2">
@@ -55,7 +56,7 @@
             </div>
             <div class="row">
                 <div class="col-sm-4">
-                    <canvas id="chart_adducts" width="100%" height="100%"></canvas>
+                    <!--<canvas id="chart_adducts" width="100%" height="100%"></canvas>-->
                 </div>
             </div>
             <div style="margin-top: 100px;"></div>
@@ -65,7 +66,8 @@
 
             <div class="row" style="margin-top: 20px;">
                 <div class="col-sm-4">
-                    <canvas id="chart2" width="100%" height="100%"></canvas>
+                    <!--<canvas id="chart2" width="100%" height="100%"></canvas>-->
+                    {{plot_spec_count|safe}}
                 </div>
                 <div class="col-sm-2"></div>
                 <div class="col-sm-2">
@@ -94,15 +96,18 @@
                 </div>
                 <div class="col-sm-2"></div>
             </div>
-
-            <div style="margin-top: 100px;"></div>
+            <div class="row">
+                <h2>Adducts</h2>
+                <div class="col-sm-4">
+                    {{plot_adduct_count|safe}}
+                </div>
+            </div>
             <div class="row">
                 <h2>Tags</h2>
             </div>
-
             <div class="row" style="margin-top: 20px;">
                 <div class="col-sm-4">
-                    <canvas id="chart3" width="100%" height="100%"></canvas>
+                    {{plot_tag_count|safe}}
                 </div>
                 <div class="col-sm-2"></div>
                 <div class="col-sm-2">
@@ -137,91 +142,8 @@
 
 {% block script %}
     {% autoescape off %}
-        <script src="{% static 'js/chart.js' %}"></script>
         <script>
             $('document').ready(function () {
-                const spectra_pie_chart = document.getElementById("chart1");
-                const molecules_bar_chart = document.getElementById("chart2");
-                const tags_bar_chart = document.getElementById("chart3");
-                const adduct_bar_chart = document.getElementById("chart_adducts")
-                const data1 = {
-                    labels: {{ chart1.labels }},
-                    datasets: [{
-                        data: {{ chart1.data }},
-                        backgroundColor: [
-                            "#FF6384",
-                            "#36A2EB",
-                            "#FFCE56"
-                        ],
-                        hoverBackgroundColor: [
-                            "#FF6384",
-                            "#36A2EB",
-                            "#FFCE56"
-                        ],
-                        borderWidth: [
-                            0, 0, 0
-                        ]
-                    }]
-                };
-                const data2 = {
-                    labels: {{ chart2.labels }},
-                    datasets: [{
-                        label: 'Number of spectra per molecule',
-                        data: {{ chart2.data }}
-                    }]
-                };
-                const data3 = {
-                    labels: {{ chart3.labels }},
-                    datasets: [{
-                        label: 'Number of molecules per tag',
-                        data: {{ chart3.data }}
-                    }]
-                };
-                data4 = {
-                    labels: {{ adduct_bar_chart.labels }},
-                    datasets: [{
-                        label: 'Number of spectra per adduct',
-                        data: {{ adduct_bar_chart.data }}
-                    }]
-                };
-                const global_options = {
-                    animation: {
-                        animateScale: true
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                };
-                const bar_extra_options = {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    }
-                };
-                const bar_options = $.extend(bar_extra_options, global_options);
-                new Chart(spectra_pie_chart, {
-                    type: 'doughnut',
-                    data: data1,
-                    options: global_options
-                });
-                new Chart(molecules_bar_chart, {
-                    type: 'bar',
-                    data: data2,
-                    options: bar_options
-                });
-                new Chart(tags_bar_chart, {
-                    type: 'bar',
-                    data: data3,
-                    options: bar_options
-                });
-                new Chart(adduct_bar_chart, {
-                    type: 'bar',
-                    data: data4,
-                    options: bar_options
-                });
             })
         </script>
     {% endautoescape %}

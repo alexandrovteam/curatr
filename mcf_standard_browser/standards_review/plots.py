@@ -100,3 +100,55 @@ def multixic(plotData, timeunit='s'):
     fig = go.Figure(data=traces, layout=layout)
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
     return plot_div
+
+def donut(data, labels, name="", title="", label=""):
+    traces = [
+            {
+                "values": data,
+                "labels": labels,
+                "name": name,
+                "hoverinfo": "label+percent+name",
+                "hole": .4,
+                "type": "pie"
+            },
+        ]
+    layout = {
+            "title": title,
+            "annotations": [
+                {
+                    "font": {
+                        "size": 20
+                    },
+                    "showarrow": False,
+                    "text": label,
+                    "x": 0.5,
+                    "y": 0.5
+                },
+                ],
+        "autosize": True
+    }
+    fig = go.Figure(data=traces, layout=layout)
+    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+    return plot_div
+
+def bar(data, labels, name="", title="", xlabel="", ylabel="", reverse=False):
+    if reverse:
+        labels = list(reversed(labels))
+        data = list(reversed(data))
+    print(">>>>>>", xlabel, ylabel, data, labels)
+    traces = [
+            {
+                "x": labels,
+                "y": data,
+                "name": name,
+                "hoverinfo": "label+percent+name",
+                "type": "bar"
+            },
+        ]
+    layout = dict(title=title,
+                  xaxis=dict(title=xlabel),
+                  yaxis=dict(title=ylabel),
+                  )
+    fig = go.Figure(data=traces, layout=layout)
+    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+    return plot_div
