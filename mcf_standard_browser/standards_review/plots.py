@@ -32,7 +32,7 @@ def fragment_plot(xdata, ydata, label):
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
     return plot_div
 
-def xic_plot(xic_x, xic_y, pts_x, pts_y, timeunit='s'):
+def xic_plot(xic_x, xic_y, pts_x, pts_y, timeunit='min'):
     xicTrace = go.Scatter(
             x=xic_x,
             y=xic_y,
@@ -60,12 +60,12 @@ def xic_plot(xic_x, xic_y, pts_x, pts_y, timeunit='s'):
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
     return plot_div
 
-def multixic(plotData, timeunit='s'):
+def multixic(plotData, timeunit='min'):
     """
 
     Args:
         plotData: [(xic_x, xic_y, pts_x, pts_y),]
-        timeunit: label string default = 's'
+        timeunit: label string default = 'min'
 
     Returns: plotly graph object
 
