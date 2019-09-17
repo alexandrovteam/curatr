@@ -508,7 +508,10 @@ def library_stats(request):
 
 
 def _percent(numerator, total_spectra, ndigits=2):
-    return round((100.0 * numerator) / total_spectra, ndigits=ndigits)
+    try:
+        return round((100.0 * numerator) / total_spectra, ndigits=ndigits)
+    except ZeroDivisionError:
+        return 0.0
 
 
 def fragmentSpectrumExportFormats(request):
