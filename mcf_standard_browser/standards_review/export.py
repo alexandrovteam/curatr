@@ -11,7 +11,7 @@ import logging
 import datetime
 
 def write_massbank(fn, spec_pairs):
-    logging.debug("writing massbank file", fn)
+    logging.debug("writing massbank file %s", fn)
     fn_counter = defaultdict(int)  # counts filename occurence for disambiguation
     zf_n = open(fn, 'wb')
     with zipfile.ZipFile(zf_n, mode="w") as zf:
