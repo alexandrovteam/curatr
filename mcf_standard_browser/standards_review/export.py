@@ -106,7 +106,8 @@ def get_metabolights(request, spec_pairs):
     zf.close()
     logging.debug('open file: ')
     zfr = zipfile.ZipFile(zf_n, 'r')
-    logging.debug(zfr.read(export_filename))
+    if spec_pairs:
+        logging.debug(zfr.read(export_filename))
     response = HttpResponse(content_type="application/zip")
     response['Content-Disposition'] = 'attachment; filename="spectra.zip"'
     response.write(open(zf_n, 'r').read())
