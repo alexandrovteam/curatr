@@ -45,7 +45,7 @@ git clone https://github.com/alexandrovteam/curatr
 ### Django Settings ###
 Make and edit a local copy of the django settings file
 ```
-cd mcf_standard_browse/mcf_standard_browser/
+cd mcf_standard_browser/mcf_standard_browser/mcf_standard_browser/
 cp settings_template.py settings.py
 ```
 Open `settings.py` and edit the following fields
@@ -57,7 +57,7 @@ Open `settings.py` and edit the following fields
       from the python terminal:
       ```python
       import random
-      print ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+      print(''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)]))
       ```
  * CELERYD_CONCURRENCY: set this number to the desired amount of workers (degree of parallelism) or remove the line to use all CPUs  
 
