@@ -100,7 +100,7 @@ def get_metabolights(request, spec_pairs):
                                date_time=time.localtime(time.time()),
                                )
         info.compress_type = zipfile.ZIP_DEFLATED
-        info.comment = 'Remarks go here'
+        info.comment = b'Remarks go here'
         info.create_system = 0
         zf.writestr(info, r)
     zf.close()
