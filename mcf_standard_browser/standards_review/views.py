@@ -532,8 +532,8 @@ def fragmentSpectrumExport(request, fmt):
         else:
             raise ValueError("value of polarity not valid {}".format(polarity))
 
-    spec_pairs = [[spectrum, zip(spectrum.centroid_mzs, spectrum.centroid_ints,
-                                 (999 / (np.max(spectrum.centroid_ints)) * spectrum.centroid_ints).astype(int))] for
+    spec_pairs = [[spectrum, list(zip(spectrum.centroid_mzs, spectrum.centroid_ints,
+                                 (999 / (np.max(spectrum.centroid_ints)) * spectrum.centroid_ints).astype(int)))] for
                   spectrum in spectra]
     exporter = getattr(export, 'get_'+fmt)
     response = exporter(request, spec_pairs)
