@@ -486,7 +486,7 @@ def library_stats(request):
 
     # Generate plots
     plot_curated = plots.donut([total_accepted, total_rejected, total_spectra - total_reviewed], ['Accepted', 'Rejected', 'Unreviewed'])
-    plot_spec_count = plots.bar(list(annotation_count_histo.values()), list(annotation_count_histo.keys()), xlabel='number of molecules', ylabel='number of spectra', reverse=True)
+    plot_spec_count = plots.bar(list(annotation_count_histo.keys()), list(annotation_count_histo.values()), xlabel='number of spectra', ylabel='number of molecules', reverse=True)
     plot_adduct_count = plots.bar(adduct_count, adduct_count_label, xlabel='adduct', ylabel='number of spectra', reverse=False)
     plot_tag_count = plots.bar(tag_counts, [str(t) for t in MoleculeTag.objects.all()], xlabel='tag', ylabel='number of spectra', reverse=False)
     data = {
