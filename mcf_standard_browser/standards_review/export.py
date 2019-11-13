@@ -96,7 +96,7 @@ def get_metabolights(request, spec_pairs):
         logging.debug(export_filename)
         t = loader.get_template('mcf_standards_browse/export_template_ebi.json')
         r = t.render({'spec_data': [cc, ]})
-        info = zipfile.ZipInfo(export_filename.format(ii),
+        info = zipfile.ZipInfo(export_filename,
                                date_time=time.localtime(time.time()),
                                )
         info.compress_type = zipfile.ZIP_DEFLATED
@@ -105,12 +105,12 @@ def get_metabolights(request, spec_pairs):
         zf.writestr(info, r)
     zf.close()
     logging.debug('open file: ')
-    zfr = zipfile.ZipFile(zf_n, 'r')
     if spec_pairs:
+        zfr = zipfile.ZipFile(zf_n, 'r')
         logging.debug(zfr.read(export_filename))
     response = HttpResponse(content_type="application/zip")
     response['Content-Disposition'] = 'attachment; filename="spectra.zip"'
-    response.write(open(zf_n, 'r').read())
+    response.write(open(zf_n, 'rb').read())
     return response
 
 
