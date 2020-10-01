@@ -27,7 +27,8 @@ class AdductColumn(Column):
 
 
 class MzColumn(Column):
-    def render(self, value):
+    def render(self, obj):
+        value = Accessor(self.field).resolve(obj)
         return '{:0.5f}'.format(value)
 
 
