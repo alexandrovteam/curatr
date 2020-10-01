@@ -11,7 +11,7 @@
             <h2>Fragmentation Spectrum for <a href="{% url 'standard-detail' specdata.spectrum.standard.inventory_id %}">{{ specdata.spectrum.standard }}, {{ specdata.spectrum.adduct.html_str }}</a></h2>
             <h3>Scan number: {{ specdata.spectrum.spec_num }}</h3>
             <p>Precursor m/z: {{ specdata.spectrum.precursor_mz | floatformat:5}}</p>
-            <p>Retention time: {{ specdata.spectrum.rt |floatformat:1 }} min</p>
+            <p>Retention time: {{ specdata.spectrum.rt |floatformat:2 }} min</p>
             <p>Collision energy: {{ specdata.spectrum.collision_energy }}</p>
             <p>Raw data: <a href="{% url 'dataset-detail' specdata.spectrum.dataset.id %}">{{ specdata.spectrum.dataset}} </a></p>
             <p id="splash">Splash: calculating...</p>
