@@ -26,7 +26,12 @@ class AdductColumn(Column):
         return spectrum.adduct.html_str()
 
 
-class MzColumn(tables.Column):
+class MzColumn(Column):
+    def render(self, value):
+        return '{:0.5f}'.format(value)
+
+
+class Tables2MzColumn(tables.Column):
     def render(self, value):
         return '{:0.5f}'.format(value)
 
@@ -50,7 +55,7 @@ class ProcessingErrorColumn(Column):
 class MoleculeTable(tables.Table):
     name = tables.LinkColumn(viewname='molecule-detail', args=(tables.A('id'),), verbose_name='Name')
     formula = tables.Column(accessor='sum_formula', verbose_name='Sum Formula')
-    exact_mass = MzColumn(verbose_name='Exact Mass')
+    exact_mass = Tables2MzColumn(verbose_name='Exact Mass')
     pubchem_id = tables.Column(verbose_name='Pubchem ID')
     spectra_count = tables.Column(accessor='spectra_count',
                                   order_by='-moleculespectracount.spectra_count')
@@ -71,7 +76,7 @@ class StandardTable(tables.Table):
                            viewname='standard-detail')
     molecule_name = tables.Column(accessor='molecule.name', verbose_name='Name')
     molecular_formula = tables.Column(accessor='molecule.sum_formula', verbose_name='Formula')
-    mass = MzColumn(accessor='molecule.exact_mass', verbose_name='Exact Mass')
+    mass = Tables2MzColumn(accessor='molecule.exact_mass', verbose_name='Exact Mass')
     vendor = tables.Column(accessor='vendor', verbose_name='Vendor')
     vendor_id = tables.Column(accessor='vendor_cat', verbose_name='Vendor ID')
     pubchem_id = tables.Column(accessor='molecule.pubchem_id', verbose_name='Pubchem ID')
