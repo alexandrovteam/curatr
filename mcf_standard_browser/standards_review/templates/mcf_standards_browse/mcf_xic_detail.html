@@ -11,7 +11,7 @@
         <div class="main-content">
             <h2> {{ standard }} {% autoescape off %}{{ adduct.html_str }} {% endautoescape %} </h2>
             <h2>Dataset: <a href="{% url 'dataset-detail' dataset.pk %}"> {{ dataset.name }}</a></h2>
-            <h3>m/z: {{ mz|floatformat:"4" }}</h3>
+            <h3>m/z: {{ mz|floatformat:"5" }}</h3>
                 <!--<div id='chart_id' class="specgraph"></div>-->
                 <div id="xi_plot" class="specgraph"> {{xic_plot|safe}}</div>
 
@@ -34,7 +34,7 @@
                             <td>
                                 <div>
                                     <p > Scan Number {{ spec.spec_num }}</p>
-                                    <p > Precursor m/z: {{ spec.precursor_mz|floatformat:"4"  }} </p>
+                                    <p > Precursor m/z: {{ spec.precursor_mz|floatformat:"5"  }} </p>
                                     <p > Retention time: {{ spec.rt |floatformat:"2" }}</p>
                                     <p > Precursor Fraction: {{ spec.precursor_quad_fraction|floatformat:"2" }} </p>
                                     <p > {{ spec.collision_energy }}</p>

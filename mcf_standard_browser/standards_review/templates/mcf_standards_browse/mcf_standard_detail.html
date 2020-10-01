@@ -50,7 +50,7 @@
                         <table id="detail_table {{ spectrum.id }}" class="table">
                         <tbody>
                             <tr> <td> Scan Number </td> <td>{{ spectrum.spec_num }}</td></tr>
-                            <tr> <td>Precursor m/z</td> <td>{{ spectrum.precursor_mz|floatformat:"4"  }} </td></tr>
+                            <tr> <td>Precursor m/z</td> <td>{{ spectrum.precursor_mz|floatformat:"5"  }} </td></tr>
                             <tr> <td>Retention time</td> <td> {{ spectrum.rt |floatformat:"2" }}</td></tr>
                             <tr> <td>Precursor Fraction</td> <td> {{ spectrum.precursor_quad_fraction|floatformat:"2" }}</td> </tr>
                             <tr> <td>{{ spectrum.collision_energy }}</td> <td></td></tr>
