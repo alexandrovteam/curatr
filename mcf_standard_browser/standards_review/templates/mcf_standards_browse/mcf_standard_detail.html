@@ -14,7 +14,7 @@
                         <tr> <td>Name</td> <td>{{standard.molecule.name}} </td></tr>
                         <tr> <td>Formula</td> <td> {{standard.molecule.sum_formula}}</td></tr>
                         <tr> <td>Inventory ID</td> <td> {{standard.inventory_id}} </td></tr>
-                        <tr> <td>Exact mass</td> <td> {{standard.molecule.exact_mass}} </td></tr>
+                        <tr> <td>Exact mass</td> <td> {{standard.molecule.exact_mass|floatformat:"5"}} </td></tr>
                         <tr> <td>Solubility</td> <td> {{standard.molecule.solubility}}</td></tr>
                         <tr> <td>Inchi</td> <td> {{standard.molecule.inchi_code}} </td></tr>
                     </tbody>

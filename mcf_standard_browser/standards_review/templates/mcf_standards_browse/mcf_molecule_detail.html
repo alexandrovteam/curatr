@@ -13,7 +13,7 @@
             <h2>Chemical Information</h2>
             <p>Formula: {{molecule.sum_formula}}</p>
             <p>Inchi: {{molecule.inchi_code}} </p>
-            <p>Exact mass: {{molecule.exact_mass}} </p>
+            <p>Exact mass: {{molecule.exact_mass|floatformat:"5"}} </p>
             <p>Solubility: {{molecule.solubility}} </p>
         </div>
         <div class="main-content">
