@@ -107,7 +107,7 @@ class Molecule(models.Model):
 
     def get_adduct_mzs_by_pk(self):
         by_str = self.get_adduct_mzs()
-        return {adduct.pk: by_str[str(adduct.__unicode__())] for adduct in Adduct.objects.all()}
+        return {adduct.pk: by_str.get(str(adduct.__unicode__()), np.nan) for adduct in Adduct.objects.all()}
 
     adduct_mzs = property(get_adduct_mzs, set_adduct_mzs)
     adduct_mzs_by_pk = property(get_adduct_mzs_by_pk)

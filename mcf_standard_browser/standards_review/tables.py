@@ -34,7 +34,7 @@ class MzColumn(Column):
 
 class Tables2MzColumn(tables.Column):
     def render(self, value):
-        return '{:0.5f}'.format(value)
+        return '{:0.5f}'.format(value) if value else str(value)
 
 
 class DatasetStatusColumn(LinkColumn):
