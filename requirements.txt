@@ -37,5 +37,5 @@ setuptools==36.4.0
 six==1.11.0
 sqlparse==0.2.4
 traitlets==4.3.2
-urllib3==1.24.2
+urllib3==1.26.5
 wheel==0.29.0
