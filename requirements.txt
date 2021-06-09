@@ -24,7 +24,7 @@ kombu==3.0.37
 nbformat==4.4.0
 numpy==1.13.3
 pandas==0.20.3
-pip==9.0.1
+pip==19.2
 pip-tools==1.10.1
 plotly==2.1.0
 PubChemPy==1.0.4
