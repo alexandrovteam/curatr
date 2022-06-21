@@ -22,7 +22,7 @@ jsonschema==2.6.0
 jupyter-core==4.3.0
 kombu==3.0.37
 nbformat==4.4.0
-numpy==1.13.3
+numpy==1.22.0
 pandas==0.20.3
 pip==9.0.1
 pip-tools==1.10.1
