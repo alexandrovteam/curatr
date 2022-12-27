@@ -33,7 +33,7 @@ pyMSpec==0.1.2
 python-dateutil==2.6.1
 pytz==2017.2
 requests==2.20.0
-setuptools==36.4.0
+setuptools==65.5.1
 six==1.11.0
 sqlparse==0.2.4
 traitlets==4.3.2
